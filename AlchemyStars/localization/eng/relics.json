@@ -1,0 +1,11 @@
+{
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LUMEN_RELIC.title": "Innate Shackles",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LUMEN_RELIC.description": "At the start of combat, gain [blue]1[/blue] [blue]Forest[/blue], [gold]Thunder[/gold], [blue]Water[/blue], and [red]Fire[/red] Light Energy each.\nLight Energy and Conversion slots are capped at [blue]4[/blue]. When a slot is full, the oldest Light Energy or Attribute Cell is removed to make room.",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LUMEN_RELIC.flavor": "Shackles worn since birth in the hollow valley—the first fourfold bond of light.",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LUMEN_RELIC_UPGRADED.title": "Chord of Freedom",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LUMEN_RELIC_UPGRADED.description": "At the start of combat, gain [blue]1[/blue] [blue]Forest[/blue], [gold]Thunder[/gold], [blue]Water[/blue], and [red]Fire[/red] Light Energy each.\nLight Energy and Conversion slots are capped at [blue]8[/blue]. When a slot is full, the oldest Light Energy or Attribute Cell is removed to make room.",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LUMEN_RELIC_UPGRADED.flavor": "The shackles become a chord, and four colors of light answer one another across a wider bar.",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_RELIC.title": "Sample Relic",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_RELIC.description": "At the start of each turn, draw {Cards:diff()} cards.",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_RELIC.flavor": "A sample relic from the mod scaffold."
+}

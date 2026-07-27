@@ -1,0 +1,21 @@
+{
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.aromaPrinciple": "[sine][blue]The hollow valley echoes—our journey has only just begun.[/blue][/sine]",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.banter.alive.endTurnPing": "Alright, let's keep the momentum going!",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.banter.dead.endTurnPing": "I'll step back for now—not done yet.",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.cardsModifierDescription": "Void Descendant cards can now appear in rewards and shops.",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.cardsModifierTitle": "Void Descendant Cards",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.defeatMessage": "It's okay—rest up. We'll get it next time.",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.description": "A void-born descendant from the Hollow Valley, living earnestly and cheerfully as they embark on an unknown journey alongside their companions.",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.eventDeathPrevention": "The Void Descendant refuses to stop here.",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.flavor": "The hollow valley echoes, urging them onward.",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.goldMonologue": "With gold in hand, the road ahead feels a little more secure.",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.possessiveAdjective": "their",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.pronounObject": "them",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.pronounPossessive": "theirs",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.pronounSubject": "they",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.selectMessage": "Let's set out—together with our companions, and see what's beyond.",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.title": "Void Descendant",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.titleObject": "Void Descendant",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.unlockText": "Complete a run as [pink]{Prerequisite}[/pink] to unlock this character.",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.victoryMessage": "The road ahead is still unknown—but today, we made it through."
+}

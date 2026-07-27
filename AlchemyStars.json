@@ -1,0 +1,18 @@
+{
+  "id": "AlchemyStars",
+  "name": "AlchemyStars",
+  "pck_name": "AlchemyStars",
+  "author": "Author",
+  "description": "新增可玩角色「空裔」——来自空谷的空之末裔，与伙伴一起踏上未知的旅途。",
+  "version": "0.0.0",
+  "has_pck": true,
+  "has_dll": true,
+  "affects_gameplay": true,
+  "min_game_version": "0.106.0",
+  "dependencies": [
+    {
+      "id": "STS2-RitsuLib",
+      "version": "0.3.0"
+    }
+  ]
+}

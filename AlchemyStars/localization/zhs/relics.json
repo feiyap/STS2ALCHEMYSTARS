@@ -1,0 +1,11 @@
+{
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LUMEN_RELIC.title": "先天枷锁",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LUMEN_RELIC.description": "战斗开始时，获得 [blue]森[/blue]、[gold]雷[/gold]、[blue]水[/blue]、[red]火[/red] 各 [blue]1[/blue] 个光能点。\n光能栏位与转色栏位上限各为 [blue]4[/blue]。超过栏位上限时，会移除最前方的光能点或属性格，以增加新的。",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LUMEN_RELIC.flavor": "自空谷降生便缠在身上的枷锁，也是光能最初的四重束缚。",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LUMEN_RELIC_UPGRADED.title": "自由和弦",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LUMEN_RELIC_UPGRADED.description": "战斗开始时，获得 [blue]森[/blue]、[gold]雷[/gold]、[blue]水[/blue]、[red]火[/red] 各 [blue]1[/blue] 个光能点。\n光能栏位与转色栏位上限各为 [blue]8[/blue]。超过栏位上限时，会移除最前方的光能点或属性格，以增加新的。",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LUMEN_RELIC_UPGRADED.flavor": "枷锁化作和弦，四色光能在更宽广的栏位里彼此应和。",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_RELIC.title": "示例遗物",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_RELIC.description": "每回合开始时，抽 {Cards:diff()} 张牌。",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_RELIC.flavor": "模组脚手架自带的示例遗物。"
+}

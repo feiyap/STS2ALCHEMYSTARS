@@ -1,0 +1,48 @@
+[gd_scene load_steps=3 format=3 uid="uid://bxag5pq75xjo4"]
+
+[ext_resource type="Texture2D" uid="uid://cuox1quoevh38" path="res://AlchemyStars/scenes/characters/AlchemyStars_character.png" id="1_q6ifa"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_uouv1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_q6ifa")
+}, {
+"duration": 1.0,
+"texture": ExtResource("1_q6ifa")
+}],
+"loop": true,
+"name": &"idle_loop",
+"speed": 60.0
+}]
+
+[node name="AlchemyStarsCharacter" type="Node2D"]
+
+[node name="Visuals" type="AnimatedSprite2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(-1.9999999, -196)
+scale = Vector2(1.25, 1.25)
+sprite_frames = SubResource("SpriteFrames_uouv1")
+animation = &"idle_loop"
+autoplay = "idle_loop"
+
+[node name="Bounds" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+offset_left = -123.0
+offset_top = -401.0
+offset_right = 118.0
+offset_bottom = 7.0
+
+[node name="IntentPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(10, -290)
+
+[node name="CenterPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(24, -299)
+
+[node name="TalkPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(35, -330)
