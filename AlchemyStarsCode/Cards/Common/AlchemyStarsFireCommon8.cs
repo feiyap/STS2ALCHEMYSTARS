@@ -51,7 +51,7 @@ public sealed class AlchemyStarsFireCommon8 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(CardKeyword.Exhaust),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
+        
         HoverTipFactory.FromCard<Dazed>(),
         HoverTipFactory.FromPower<AlchemyStarsIgnitionPower>()
     ];

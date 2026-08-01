@@ -34,7 +34,7 @@ public sealed class AlchemyStarsRare2 : ModCardTemplate
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
+        
         HoverTipFactory.FromPower<AlchemyStarsSoaringPower>()
     ];
 

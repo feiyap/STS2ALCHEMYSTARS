@@ -41,8 +41,7 @@ public sealed class AlchemyStarsWaterCommon9 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy))
-    ];
+        ];
 
     public AlchemyStarsWaterCommon9()
         : base(BaseEnergyCost, CardKind, CardRarityValue, CardTarget, ShowInCardLibrary)

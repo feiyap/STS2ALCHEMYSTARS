@@ -52,7 +52,7 @@ public sealed class AlchemyStarsWaterRare5 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DragonFangMark)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
+        
         HoverTipFactory.FromPower<AlchemyStarsDragonFangMarkPower>()
     ];
 

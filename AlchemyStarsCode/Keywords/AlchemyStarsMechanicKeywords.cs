@@ -18,6 +18,22 @@ namespace AlchemyStars.Keywords;
 
 [RegisterOwnedCardKeyword("attribute_cell")]
 
+[RegisterOwnedCardKeyword("forest_light_energy", IncludeInCardHoverTip = false)]
+
+[RegisterOwnedCardKeyword("thunder_light_energy", IncludeInCardHoverTip = false)]
+
+[RegisterOwnedCardKeyword("water_light_energy", IncludeInCardHoverTip = false)]
+
+[RegisterOwnedCardKeyword("fire_light_energy", IncludeInCardHoverTip = false)]
+
+[RegisterOwnedCardKeyword("forest_attribute_cell", IncludeInCardHoverTip = false)]
+
+[RegisterOwnedCardKeyword("thunder_attribute_cell", IncludeInCardHoverTip = false)]
+
+[RegisterOwnedCardKeyword("water_attribute_cell", IncludeInCardHoverTip = false)]
+
+[RegisterOwnedCardKeyword("fire_attribute_cell", IncludeInCardHoverTip = false)]
+
 [RegisterOwnedCardKeyword("prismatic")]
 
 [RegisterOwnedCardKeyword("rainbow_light")]
@@ -192,7 +208,9 @@ namespace AlchemyStars.Keywords;
 
 [RegisterOwnedCardKeyword("strange_animal")]
 
-[RegisterOwnedCardKeyword("slow")]
+[RegisterOwnedCardKeyword(
+    "light_sword_armor",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
 
 [RegisterOwnedCardKeyword("awakening_form")]
 

@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// À×¹âÉÁ»÷¡¤°¬Àò·¨£º»ñµÃÀ×¹âÄÜ¡¢¸ñµ²£¬²¢ÖØÖÃ·ÇÀ×ÊôÐÔ¸ñ¡£
+/// ï¿½×¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ò·¨£ï¿½ï¿½ï¿½ï¿½ï¿½×¹ï¿½ï¿½Ü¡ï¿½ï¿½ñµ²£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¸ï¿½
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderCommon6 : ModCardTemplate
@@ -25,13 +25,13 @@ public sealed class AlchemyStarsThunderCommon6 : ModCardTemplate
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
 
-    /// <summary>ÖÐ¸ÅÂÊ£ºÉú³ÉÆÕÍ¨À×ÊôÐÔ¸ñ¡£</summary>
+    /// <summary>ï¿½Ð¸ï¿½ï¿½Ê£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½Ô¸ï¿½</summary>
     private const int MediumChancePercent = 50;
 
-    /// <summary>Ð¡¸ÅÂÊ£ºÉú³ÉÀ×ÊôÐÔÀâ¾µ¸ñ¡£</summary>
+    /// <summary>Ð¡ï¿½ï¿½ï¿½Ê£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½â¾µï¿½ï¿½</summary>
     private const int SmallChancePercent = 25;
 
-    /// <summary>´ó¸ÅÂÊ£ºÉú³ÉÈÎÒâÐÂ¸ñ×ÓµÄ×Ü¸ÅÂÊ£¨ÖÐ + Ð¡£©¡£</summary>
+    /// <summary>ï¿½ï¿½ï¿½ï¿½Ê£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¸ï¿½ï¿½Óµï¿½ï¿½Ü¸ï¿½ï¿½Ê£ï¿½ï¿½ï¿½ + Ð¡ï¿½ï¿½ï¿½ï¿½</summary>
     private const int LargeChancePercent = MediumChancePercent + SmallChancePercent;
 
     public override bool GainsBlock => true;
@@ -53,8 +53,8 @@ public sealed class AlchemyStarsThunderCommon6 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.AttributeCell)),
+        
+        
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.PrismCell))
     ];
 

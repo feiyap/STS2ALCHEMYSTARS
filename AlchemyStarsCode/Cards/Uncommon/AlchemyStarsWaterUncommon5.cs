@@ -50,7 +50,7 @@ public sealed class AlchemyStarsWaterUncommon5 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.ShadowTownTeaParty)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
+        
         HoverTipFactory.FromPower<AlchemyStarsTeaPartyDiscountPower>(),
         HoverTipFactory.FromPower<AlchemyStarsFrankClawPower>()
     ];

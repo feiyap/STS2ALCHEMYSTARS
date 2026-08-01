@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using AlchemyStars.Keywords;
 using MegaCrit.Sts2.Core.Combat;
@@ -25,7 +25,7 @@ public sealed class AlchemyStarsOverheatPower : ModPowerTemplate
 
     public override PowerStackType StackType => PowerStackType.Single;
 
-    protected override IEnumerable<string> RegisteredKeywordIds => ["overheat"];
+    protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.Overheat];
 
     public void ScheduleRemovalAfterNextTurnEnd(Player player)
     {

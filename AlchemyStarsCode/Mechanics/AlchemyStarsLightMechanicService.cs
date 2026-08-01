@@ -55,7 +55,12 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
 
         var element = LightMechanicDamageContext.CurrentElement;
         var state = LightMechanic.GetActiveState(dealer.Player);
-        if (element == null && (state == null || !state.RainbowActive))
+        if (state == null)
+            return 1m;
+
+        // 无属性伤害仅在虹光时吃增伤；先重算状态，避免缓存标志错误。
+        state.UpdateRainbowState();
+        if (element == null && !state.RainbowActive)
             return 1m;
 
         return LightMechanic.GetOutgoingDamageMultiplier(dealer.Player, element);

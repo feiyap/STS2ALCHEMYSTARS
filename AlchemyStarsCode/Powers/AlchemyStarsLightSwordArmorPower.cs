@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using AlchemyStars.Keywords;
 using AlchemyStars.Mechanics;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Creatures;
@@ -28,6 +30,8 @@ public sealed class AlchemyStarsLightSwordArmorPower : ModPowerTemplate
     public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Counter;
+
+    protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.LightSwordArmor];
 
     protected override object InitInternalData() => new Data();
 

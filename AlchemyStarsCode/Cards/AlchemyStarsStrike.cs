@@ -9,10 +9,9 @@ using STS2RitsuLib.Scaffolding.Content;
 
 namespace AlchemyStars.Cards;
 
-// RegisterCard 会把这张牌交给 RitsuLib 自动注册。
-// RegisterCharacterStarterCard 会把它追加进 AlchemyStarsCharacter 的初始卡组。
-[RegisterCard(typeof(AlchemyStarsCardPool))]
-[RegisterCharacterStarterCard(typeof(AlchemyStarsCharacter), 4)]
+/// <summary>
+/// 脚手架遗留打击牌，已由 <see cref="AlchemyStarsShoot"/> 替代；保留文件仅供参考，不再注册。
+/// </summary>
 public sealed class AlchemyStarsStrike : ModCardTemplate
 {
     // 基础耗能。
@@ -53,7 +52,7 @@ public sealed class AlchemyStarsStrike : ModCardTemplate
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
-            .FromCard(this)
+            .FromCard(this, cardPlay)
             .Targeting(cardPlay.Target)
             .Execute(choiceContext);
     }

@@ -1,5 +1,6 @@
 using MegaCrit.Sts2.Core.Entities.Relics;
 using AlchemyStars.Characters;
+using AlchemyStars.Keywords;
 using AlchemyStars.Mechanics;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
@@ -7,7 +8,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Relics;
 
 /// <summary>
-/// 空裔光能遗物的共同逻辑�?
+/// 空裔光能遗物的共同逻辑。
 /// </summary>
 public abstract class AlchemyStarsLumenRelicBase : ModRelicTemplate
 {
@@ -15,9 +16,9 @@ public abstract class AlchemyStarsLumenRelicBase : ModRelicTemplate
 
     protected override IEnumerable<string> RegisteredKeywordIds =>
     [
-        "ALCHEMY_STARS_KEYWORD_LIGHT_ENERGY",
-        "ALCHEMY_STARS_KEYWORD_ATTRIBUTE_CELL",
-        "ALCHEMY_STARS_KEYWORD_RAINBOW_LIGHT",
+        AlchemyStarsKeywordIds.LightEnergy,
+        AlchemyStarsKeywordIds.AttributeCell,
+        AlchemyStarsKeywordIds.RainbowLight,
     ];
 
     public override async Task BeforeCombatStart()

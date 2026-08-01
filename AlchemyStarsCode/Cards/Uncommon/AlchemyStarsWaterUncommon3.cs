@@ -10,7 +10,6 @@ using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
 using AlchemyStars.Mechanics;
-using AlchemyStars.Powers;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Keywords;
 using STS2RitsuLib.Scaffolding.Content;
@@ -18,11 +17,12 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 毒脉异变·丽贝卡：花海毒池；需水光能打出，消耗全部水光能并造成群体水伤与等量中毒�?/// </summary>
+/// 毒脉异变·丽贝卡：花海毒池；需消耗 1 点水光能打出，造成群体水伤与等量中毒。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterUncommon3 : ModCardTemplate
 {
-    private const int BaseEnergyCost = 1;
+    private const int BaseEnergyCost = 2;
     private const CardType CardKind = CardType.Attack;
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.AllEnemies;
@@ -56,11 +56,8 @@ public sealed class AlchemyStarsWaterUncommon3 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.PoisonFlowerPool)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.AttributeCell)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DarkCell)),
-        HoverTipFactory.FromPower<PoisonPower>(),
-        HoverTipFactory.FromPower<AlchemyStarsPoisonFlowerPoolPower>()
+        HoverTipFactory.FromPower<PoisonPower>()
     ];
 
     public AlchemyStarsWaterUncommon3()
@@ -70,7 +67,7 @@ public sealed class AlchemyStarsWaterUncommon3 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        ConsumeAllWaterLightEnergyOnPlay(Owner);
+        ConsumeOneWaterLightEnergyAsDarkCell(Owner);
 
         var damage = DynamicVars.Damage.BaseValue;
         foreach (var enemy in CombatState!.HittableEnemies.ToList())
@@ -104,34 +101,21 @@ public sealed class AlchemyStarsWaterUncommon3 : ModCardTemplate
     }
 
     /// <summary>
-    /// 消耗全部水光能；若拥有花海毒池则生成的属性格为深色格�?    /// </summary>
-    private static void ConsumeAllWaterLightEnergyOnPlay(Player player)
+    /// 消耗 1 点水光能；花海毒池使生成的属性格为深色格。
+    /// </summary>
+    private static void ConsumeOneWaterLightEnergyAsDarkCell(Player player)
     {
         var state = LightMechanic.GetActiveState(player);
         if (state == null)
             return;
 
-        var hasPoisonPool = player.Creature.GetPowerAmount<AlchemyStarsPoisonFlowerPoolPower>() > 0;
-        var waterEnergy = state.LightEnergy.Items
-            .Where(item => LightElementExtensions.Matches(LightElement.Water, item))
-            .ToList();
-        if (waterEnergy.Count == 0)
+        if (!state.LightEnergy.TryConsumeManyFromFront([LightElement.Water], out var consumed))
             return;
 
-        var remaining = state.LightEnergy.Items
-            .Where(item => !LightElementExtensions.Matches(LightElement.Water, item))
-            .ToList();
-        state.LightEnergy.ReplaceAll(remaining);
-
-        foreach (var element in waterEnergy)
-        {
-            var kind = hasPoisonPool
-                ? AlchemyStarsPoisonFlowerPoolPower.ResolveSpawnKind(AttributeCellKind.Normal)
-                : AttributeCellKind.Normal;
-            state.AddAttributeCell(element, kind);
-        }
+        foreach (var element in consumed)
+            state.AddAttributeCell(element, AttributeCellKind.Dark);
 
         LightMechanicUiBootstrap.RefreshForPlayer(player);
-        LightMechanic.NotifyLightEnergyConsumed(player, waterEnergy);
+        LightMechanic.NotifyLightEnergyConsumed(player, consumed);
     }
 }

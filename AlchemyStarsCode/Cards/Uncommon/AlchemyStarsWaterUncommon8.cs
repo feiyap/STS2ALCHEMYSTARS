@@ -15,7 +15,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 盘旋之翼·贝尔塔：南极光绒针基底；造成水伤并施加绒针，消耗水光能可再攻击一次�?/// </summary>
+/// 盘旋之翼·贝尔塔：绒针基用；造成水伤并施加南极光绒针，消耗水光能可再攻击一次。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterUncommon8 : ModCardTemplate
 {
@@ -49,8 +50,6 @@ public sealed class AlchemyStarsWaterUncommon8 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.VelvetNeedleBase)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.VelvetNeedle)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
         HoverTipFactory.FromPower<AlchemyStarsVelvetNeedlePower>()
     ];
 

@@ -1,10 +1,11 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Rooms;
+using AlchemyStars.Keywords;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
 
@@ -21,7 +22,7 @@ public sealed class AlchemyStarsSupremeCodexPower : ModPowerTemplate
     public override PowerStackType StackType => PowerStackType.Single;
 
     protected override System.Collections.Generic.IEnumerable<string> RegisteredKeywordIds =>
-        ["supreme_codex"];
+        [AlchemyStarsKeywordIds.SupremeCodex];
 
     public override async Task AfterCombatVictory(CombatRoom room)
     {

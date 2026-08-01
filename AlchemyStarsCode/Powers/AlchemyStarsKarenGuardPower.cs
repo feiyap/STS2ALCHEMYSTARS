@@ -43,7 +43,7 @@ public sealed class AlchemyStarsKarenGuardPower : ModPowerTemplate
             return;
         }
 
-        var waterCells = LightMechanic.CountWaterAttributeCells(player);
+        var waterCells = LightMechanic.CountEffectiveWaterCells(player);
         var block = waterCells * DynamicVars.Block.BaseValue;
         if (block > 0)
             await CreatureCmd.GainBlock(Owner, new BlockVar(block, ValueProp.Move), null);

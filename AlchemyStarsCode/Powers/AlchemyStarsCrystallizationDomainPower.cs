@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AlchemyStars.Cards;
@@ -25,7 +25,7 @@ public sealed class AlchemyStarsCrystallizationDomainPower : ModPowerTemplate
 
     public override PowerStackType StackType => PowerStackType.Single;
 
-    protected override IEnumerable<string> RegisteredKeywordIds => ["crystallization_domain"];
+    protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.CrystallizationDomain];
 
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {

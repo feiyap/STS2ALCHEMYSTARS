@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Extensions;
@@ -36,19 +36,20 @@ public sealed class AlchemyStarsForestUncommon11 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new PowerVar<AlchemyStarsLightSwordArmorPower>(SwordArmorHp),
+        AlchemyStarsKeywordText.InlineTitleVar("LightSwordArmor", AlchemyStarsKeywordIds.LightSwordArmor),
         AlchemyStarsKeywordText.InlineTitleVar("ForestTitle", AlchemyStarsKeywordIds.Forest)
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
-        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest)
+        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest),
+        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightSwordArmor)
     ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.AttributeCell)),
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightSwordArmor)),
         HoverTipFactory.FromPower<AlchemyStarsLightSwordArmorPower>()
     ];
 

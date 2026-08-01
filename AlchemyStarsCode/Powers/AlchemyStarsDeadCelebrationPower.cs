@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -12,7 +12,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 亡者庆典：下次洗牌后，消耗一半抽牌堆（优先状态与诅咒）。
+/// 冥河列车·卡戎：下次洗牌时，消耗一半抽牌堆（优先状态与诅咒）。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsDeadCelebrationPower : ModPowerTemplate
@@ -20,9 +20,6 @@ public sealed class AlchemyStarsDeadCelebrationPower : ModPowerTemplate
     public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Single;
-
-    protected override System.Collections.Generic.IEnumerable<string> RegisteredKeywordIds =>
-        ["dead_celebration"];
 
     public override async Task AfterShuffle(PlayerChoiceContext choiceContext, Player shuffler)
     {

@@ -13,7 +13,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// °ð°ðàÔàÔ¡¤ÈûÌá£ºÑ¡Ôñ»ñµÃàÔàÔ·É»ò°ð°ð´à£»Éý¼¶Ê±½«ÔÎÑ£·ÅÈëÆúÅÆ¶Ñ¡£ÏûºÄ¡£
+/// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¡ï¿½ï¿½ï¿½ï¿½á£ºÑ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô·É»ï¿½ï¿½ï¿½à£»ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ñ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶Ñ¡ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderCommon7 : ModCardTemplate
@@ -37,7 +37,7 @@ public sealed class AlchemyStarsThunderCommon7 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
+        
         HoverTipFactory.FromCard<AlchemyStarsGenerated1>(),
         HoverTipFactory.FromCard<AlchemyStarsGenerated2>(),
         HoverTipFactory.FromCard<Dazed>()

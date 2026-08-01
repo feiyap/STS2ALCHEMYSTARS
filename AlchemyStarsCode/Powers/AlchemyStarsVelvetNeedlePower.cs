@@ -1,6 +1,7 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AlchemyStars.Keywords;
 using AlchemyStars.Mechanics;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
@@ -13,7 +14,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 南极光绒针：回合结束时爆裂，每层造成 1 点水属性伤害并恢复持有�?1 点生命�?/// </summary>
+/// 南极光绒针：敌人回合结束时一次性引爆全部层数，造成等额水属性伤害并为施加者恢复等额生命。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsVelvetNeedlePower : ModPowerTemplate
 {
@@ -21,38 +23,43 @@ public sealed class AlchemyStarsVelvetNeedlePower : ModPowerTemplate
 
     public override PowerStackType StackType => PowerStackType.Counter;
 
-    protected override IEnumerable<string> RegisteredKeywordIds => ["velvet_needle"];
+    protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.VelvetNeedle];
 
     public override async Task AfterSideTurnEnd(
         PlayerChoiceContext choiceContext,
         CombatSide side,
         IEnumerable<Creature> participants)
     {
-        if (side != CombatSide.Enemy || Owner.IsDead || Amount <= 0)
+        // 挂在敌人身上：在敌方回合结束时结算；施加者不在 participants 中，需用 Applier。
+        if (side != CombatSide.Enemy || !participants.Contains(Owner) || Owner.IsDead || Amount <= 0)
             return;
 
-        var applier = participants.FirstOrDefault(creature => creature.IsPlayer && creature.IsAlive);
+        var applier = ResolveApplier();
         if (applier?.Player == null)
             return;
 
-        var stacks = (int)Amount;
+        Flash();
+        var stacks = Amount;
         await PowerCmd.Remove(this);
 
-        for (var i = 0; i < stacks; i++)
-        {
-            if (Owner.IsDead)
-                break;
+        await LightMechanic.DealElementalAttackDamage(
+            choiceContext,
+            applier.Player,
+            null,
+            Owner,
+            stacks,
+            LightElement.Water);
 
-            await LightMechanic.DealElementalAttackDamage(
-                choiceContext,
-                applier.Player,
-                null,
-                Owner,
-                1m,
-                LightElement.Water);
+        if (!applier.IsDead)
+            await CreatureCmd.Heal(applier, stacks);
+    }
 
-            if (!applier.IsDead)
-                await CreatureCmd.Heal(applier, 1);
-        }
+    private Creature? ResolveApplier()
+    {
+        if (Applier is { IsAlive: true, Player: not null })
+            return Applier;
+
+        return Owner.CombatState?.PlayerCreatures
+            .FirstOrDefault(creature => creature.IsAlive && creature.IsPlayer);
     }
 }

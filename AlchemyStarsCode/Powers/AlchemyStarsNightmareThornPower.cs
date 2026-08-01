@@ -1,10 +1,11 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
+using AlchemyStars.Keywords;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
 
@@ -19,7 +20,7 @@ public sealed class AlchemyStarsNightmareThornPower : ModPowerTemplate
 
     public override PowerStackType StackType => PowerStackType.Single;
 
-    protected override IEnumerable<string> RegisteredKeywordIds => ["nightmare_thorn"];
+    protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.NightmareThorn];
 
     public override decimal ModifyDamageMultiplicative(
         Creature? target,

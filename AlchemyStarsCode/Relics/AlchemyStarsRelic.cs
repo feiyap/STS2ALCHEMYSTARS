@@ -9,10 +9,10 @@ using STS2RitsuLib.Scaffolding.Content;
 
 namespace AlchemyStars.Relics;
 
-// RegisterRelic 会把遗物注册进指定遗物池。
-// RegisterCharacterStarterRelic 会把它作为 AlchemyStarsCharacter 的初始遗物。
+/// <summary>
+/// 脚手架示例遗物：仅保留在遗物池中，不再作为初始遗物发放。
+/// </summary>
 [RegisterRelic(typeof(AlchemyStarsRelicPool))]
-[RegisterCharacterStarterRelic(typeof(AlchemyStarsCharacter))]
 public sealed class AlchemyStarsRelic : ModRelicTemplate
 {
     // 稀有度。

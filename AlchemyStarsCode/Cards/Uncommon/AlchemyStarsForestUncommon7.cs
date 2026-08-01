@@ -28,7 +28,7 @@ public sealed class AlchemyStarsForestUncommon7 : ModCardTemplate
 {
     private static readonly AttachedState<CardModel, bool> GrantedDomainPower = new(_ => false);
 
-    private const int BaseEnergyCost = 2;
+    private const int BaseEnergyCost = 3;
     private const CardType CardKind = CardType.Attack;
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.AllEnemies;
@@ -62,7 +62,7 @@ public sealed class AlchemyStarsForestUncommon7 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
+        
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.CrystallizationDomain)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Crystallization)),
         HoverTipFactory.FromPower<AlchemyStarsCrystallizationDomainPower>(),

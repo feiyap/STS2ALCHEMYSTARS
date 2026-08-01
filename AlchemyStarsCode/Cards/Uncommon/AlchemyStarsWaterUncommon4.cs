@@ -48,8 +48,8 @@ public sealed class AlchemyStarsWaterUncommon4 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.StrangeAnimal)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.AttributeCell)),
+        
+        
         HoverTipFactory.FromPower<AlchemyStarsVictorDrawPower>(),
         HoverTipFactory.FromCard<AlchemyStarsGeneratedStrangeAnimalFurball>(),
         HoverTipFactory.FromCard<AlchemyStarsGeneratedStrangeAnimalBica>(),

@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 冥河列车·卡戎：亡者庆典；将消耗牌堆洗入弃牌堆并赋予虚无，获得亡者庆典能力。消耗。
+/// 冥河列车·卡戎：亡者庆典（消耗牌洗入弃牌堆并赋予虚无）；下次洗牌时消耗一半抽牌堆。消耗。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireUncommon11 : ModCardTemplate

@@ -47,8 +47,8 @@ public sealed class AlchemyStarsFireRare1 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.BloomingBegonia)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.AttributeCell)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
+        
+        
         HoverTipFactory.FromPower<AlchemyStarsBloomingBegoniaPower>(),
         HoverTipFactory.FromPower<AlchemyStarsIgnitionPower>()
     ];

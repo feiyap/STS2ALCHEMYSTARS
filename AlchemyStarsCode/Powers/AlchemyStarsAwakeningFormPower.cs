@@ -1,6 +1,7 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using AlchemyStars.Mechanics;
 using MegaCrit.Sts2.Core.Entities.Powers;
+using AlchemyStars.Keywords;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
 
@@ -21,7 +22,7 @@ public sealed class AlchemyStarsAwakeningFormPower : ModPowerTemplate
 
     public override PowerStackType StackType => PowerStackType.Single;
 
-    protected override IEnumerable<string> RegisteredKeywordIds => ["awakening_form"];
+    protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.AwakeningForm];
 
     /// <summary>升级后重置时有概率生成深色格与强化格。</summary>
     public void Configure(bool allowSpecialCells) => _allowSpecialCells = allowSpecialCells;

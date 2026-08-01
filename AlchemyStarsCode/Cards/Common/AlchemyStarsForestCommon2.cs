@@ -1,5 +1,6 @@
 using System.Linq;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
@@ -14,7 +15,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 商者游行·狡木：群体森伤，单目标时伤害翻倍；回合结束时消耗森光能保留�?/// </summary>
+/// 商者游行·狡木：群体森伤，单目标时伤害翻倍；弃牌前消耗森光能获得单回合保留。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestCommon2 : ModCardTemplate
 {
@@ -25,8 +27,6 @@ public sealed class AlchemyStarsForestCommon2 : ModCardTemplate
     private const bool ShowInCardLibrary = true;
     private const decimal SingleTargetDamage = 14m;
     private const decimal SingleTargetDamageUpgradeBy = 4m;
-
-    public override bool HasTurnEndInHandEffect => true;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -46,7 +46,7 @@ public sealed class AlchemyStarsForestCommon2 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy))
+        HoverTipFactory.FromKeyword(CardKeyword.Retain),
     ];
 
     public AlchemyStarsForestCommon2()
@@ -74,8 +74,12 @@ public sealed class AlchemyStarsForestCommon2 : ModCardTemplate
         }
     }
 
-    protected override Task OnTurnEndInHand(PlayerChoiceContext choiceContext)
+    // 不能用 OnTurnEndInHand：引擎会把卡移到 Play 再强制弃掉，GiveSingleTurnRetain 无效。
+    public override Task BeforeFlushLate(PlayerChoiceContext choiceContext, Player player)
     {
+        if (player != Owner || Pile?.Type != PileType.Hand || ShouldRetainThisTurn)
+            return Task.CompletedTask;
+
         if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Forest]))
             GiveSingleTurnRetain();
 

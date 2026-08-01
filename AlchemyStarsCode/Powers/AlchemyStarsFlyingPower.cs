@@ -14,7 +14,9 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 飞行：受到的攻击伤害减半；回合开始时失去 1 层�?/// </summary>
+/// 飞行：受到的攻击伤害减半；回合开始时失去 1 层。
+/// 图标借用原版翱翔（SoarPower）。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsFlyingPower : ModPowerTemplate
 {
@@ -24,7 +26,11 @@ public sealed class AlchemyStarsFlyingPower : ModPowerTemplate
 
     public override PowerStackType StackType => PowerStackType.Counter;
 
-    protected override IEnumerable<string> RegisteredKeywordIds => ["flying"];
+    // 借用原版翱翔图标；效果仍为本 Mod 的飞行（回合开始掉层）。
+    public override PowerAssetProfile AssetProfile => ContentAssetProfiles.Power("soar_power");
+
+    // 能力自身已有 title/description；勿再挂短词条 id「flying」，
+    // 否则会 mint 未注册 CardKeyword，悬停出现 card_keywords.<数字>.title 原文。
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [

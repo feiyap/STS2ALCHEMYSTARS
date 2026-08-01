@@ -55,7 +55,7 @@ public sealed class AlchemyStarsThunderUncommon4 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
+        
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Overload)),
         HoverTipFactory.FromCard<AlchemyStarsGeneratedOverload>(),
         HoverTipFactory.FromPower<SlipperyPower>(),
@@ -100,7 +100,12 @@ public sealed class AlchemyStarsThunderUncommon4 : ModCardTemplate
             cardPlay);
 
         var overload = CombatState!.CreateCard<AlchemyStarsGeneratedOverload>(Owner);
-        overload.GrantsThunderAttackReplay = IsUpgraded;
+        if (IsUpgraded)
+        {
+            overload.GrantsThunderAttackReplay = true;
+            CardCmd.Upgrade(overload);
+        }
+
         await CardPileCmd.AddGeneratedCardToCombat(overload, PileType.Draw, Owner);
     }
 }

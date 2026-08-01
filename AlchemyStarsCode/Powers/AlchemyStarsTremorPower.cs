@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using AlchemyStars.Keywords;
 using MegaCrit.Sts2.Core.Commands;
@@ -22,7 +22,7 @@ public sealed class AlchemyStarsTremorPower : ModPowerTemplate
 
     public override PowerStackType StackType => PowerStackType.Counter;
 
-    protected override IEnumerable<string> RegisteredKeywordIds => ["tremor"];
+    protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.Tremor];
 
     public static async Task TryTriggerStunThreshold(
         PlayerChoiceContext choiceContext,

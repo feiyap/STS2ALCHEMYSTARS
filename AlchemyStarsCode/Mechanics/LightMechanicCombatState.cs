@@ -112,67 +112,110 @@ public sealed class LightMechanicCombatState
         UpdateRainbowState();
     }
 
+    /// <summary>
+    /// 统计指定属性的有效格数：自身匹配，或邻接同属性棱镜格（邻格视为同属性）。
+    /// 深色格权重为 2。
+    /// </summary>
     public int GetEffectiveCount(LightElement element)
     {
         var cells = AttributeCells.Items;
         if (cells.Count == 0)
             return 0;
 
-        var counts = new int[cells.Count];
-        for (var i = 0; i < cells.Count; i++)
-            counts[i] = cells[i].Kind == AttributeCellKind.Dark ? 2 : 1;
-
-        var claimed = new bool[cells.Count];
         var total = 0;
-
         for (var i = 0; i < cells.Count; i++)
         {
-            if (cells[i].Kind != AttributeCellKind.Prism)
-                continue;
-
-            var prismElement = cells[i].Element;
-            if (!ElementMatchesTarget(prismElement, element))
-                continue;
-
-            for (var offset = -1; offset <= 1; offset += 2)
+            // 万色格不享受深色格双倍权重。
+            var weight = cells[i].Kind == AttributeCellKind.Dark &&
+                         cells[i].Element != LightElement.Prismatic
+                ? 2
+                : 1;
+            if (ElementMatchesTarget(cells[i].Element, element) ||
+                IsAdjacentToMatchingPrism(cells, i, element))
             {
-                var neighbor = i + offset;
-                if (neighbor < 0 || neighbor >= cells.Count || claimed[neighbor])
-                    continue;
-
-                if (ElementMatchesTarget(cells[neighbor].Element, prismElement))
-                {
-                    total += counts[neighbor];
-                    claimed[neighbor] = true;
-                }
+                total += weight;
             }
-        }
-
-        for (var i = 0; i < cells.Count; i++)
-        {
-            if (claimed[i])
-                continue;
-
-            if (ElementMatchesTarget(cells[i].Element, element))
-                total += counts[i];
         }
 
         return total;
     }
 
-    public int GetTotalEffectiveCellCount()
+    /// <summary>
+    /// 虹光增伤用的加权格数：按实体格子计数（深色×2；万色固定×1，且只计一次）。
+    /// 不可对四属性分别 <see cref="GetEffectiveCount"/> 再求和，否则万色会被重复计入 4 次。
+    /// </summary>
+    public int GetRainbowWeightedCellCount()
     {
-        return LightElementExtensions.BaseElements.Sum(GetEffectiveCount);
+        var total = 0;
+        foreach (var cell in AttributeCells.Items)
+        {
+            if (cell.Element == LightElement.Prismatic)
+                total += 1;
+            else if (cell.Kind == AttributeCellKind.Dark)
+                total += 2;
+            else
+                total += 1;
+        }
+
+        return total;
     }
 
+    /// <summary>
+    /// 统计万色格数量（每格权重 1，用于虹光补缺口）。
+    /// </summary>
+    public int CountPrismaticCells()
+    {
+        return AttributeCells.Items.Count(cell => cell.Element == LightElement.Prismatic);
+    }
+
+    /// <summary>
+    /// 统计真实属性有效格数（不含万色；万色仅在虹光判定中补缺口）。
+    /// </summary>
+    public int GetRealEffectiveCount(LightElement element)
+    {
+        if (!element.IsBaseElement())
+            return 0;
+
+        var cells = AttributeCells.Items;
+        if (cells.Count == 0)
+            return 0;
+
+        var total = 0;
+        for (var i = 0; i < cells.Count; i++)
+        {
+            if (cells[i].Element == LightElement.Prismatic)
+                continue;
+
+            var weight = cells[i].Kind == AttributeCellKind.Dark ? 2 : 1;
+            if (cells[i].Element == element ||
+                IsAdjacentToMatchingPrism(cells, i, element))
+            {
+                total += weight;
+            }
+        }
+
+        return total;
+    }
+
+    /// <summary>
+    /// 虹光四色：真实属性齐全；缺口可由万色格按 1:1 补足。
+    /// </summary>
     public bool HasAllBaseElements()
     {
-        return LightElementExtensions.BaseElements.All(e => GetEffectiveCount(e) > 0);
+        var missing = LightElementExtensions.BaseElements.Count(e => GetRealEffectiveCount(e) <= 0);
+        return CountPrismaticCells() >= missing;
     }
 
+    /// <summary>
+    /// 虹光翻倍：每种真实属性有效格数达到 2；不足部分由万色格按 1:1 补足。
+    /// </summary>
     public bool HasRainbowDoubleCondition()
     {
-        return LightElementExtensions.BaseElements.All(e => GetEffectiveCount(e) >= 2);
+        var deficit = 0;
+        foreach (var element in LightElementExtensions.BaseElements)
+            deficit += Math.Max(0, 2 - GetRealEffectiveCount(element));
+
+        return CountPrismaticCells() >= deficit;
     }
 
     public void UpdateRainbowState()
@@ -192,6 +235,34 @@ public sealed class LightMechanicCombatState
         cellElement == target ||
         cellElement == LightElement.Prismatic ||
         target == LightElement.Prismatic;
+
+    /// <summary>
+    /// 棱镜格：相邻格子视为与棱镜同属性。
+    /// </summary>
+    private static bool IsAdjacentToMatchingPrism(
+        IReadOnlyList<AttributeCell> cells,
+        int index,
+        LightElement element)
+    {
+        for (var offset = -1; offset <= 1; offset += 2)
+        {
+            var neighbor = index + offset;
+            if (neighbor < 0 || neighbor >= cells.Count)
+                continue;
+
+            if (cells[neighbor].Kind != AttributeCellKind.Prism)
+                continue;
+
+            // 万色不与棱镜叠加以生效：万色棱镜格不向邻格传导属性。
+            if (cells[neighbor].Element == LightElement.Prismatic)
+                continue;
+
+            if (ElementMatchesTarget(cells[neighbor].Element, element))
+                return true;
+        }
+
+        return false;
+    }
 
     /// <summary>
     /// 随机将非目标属性的格子转化为目标属性格�?
@@ -229,7 +300,7 @@ public sealed class LightMechanicCombatState
     }
 
     /// <summary>
-    /// 移除所有非目标属性格，并按概率重新生成目标属性格�?
+    /// 按概率将非目标属性格重置为目标属性格；未命中时原格不变。
     /// </summary>
     public void ResetNonElementCells(LightElement targetElement, Rng rng, int normalChancePercent, int prismChancePercent)
     {
@@ -249,6 +320,45 @@ public sealed class LightMechanicCombatState
                 rebuilt.Add(new AttributeCell(targetElement, AttributeCellKind.Prism));
             else if (roll < prismChancePercent + normalChancePercent)
                 rebuilt.Add(new AttributeCell(targetElement));
+            else
+                rebuilt.Add(cell);
+        }
+
+        AttributeCells.ReplaceAll(rebuilt);
+        UpdateRainbowState();
+    }
+
+    /// <summary>
+    /// 重置所有非火属性格：先 roll 是否出火；未出火再等概率出森/雷/水。
+    /// </summary>
+    public void ResetNonFireCellsWithRandomOther(Rng rng, int fireChancePercent = 60)
+    {
+        var cells = AttributeCells.Items.ToList();
+        var rebuilt = new List<AttributeCell>(cells.Count);
+        var otherElements = new[]
+        {
+            LightElement.Forest,
+            LightElement.Thunder,
+            LightElement.Water,
+        };
+
+        foreach (var cell in cells)
+        {
+            if (IsElementCell(cell, LightElement.Fire))
+            {
+                rebuilt.Add(cell);
+                continue;
+            }
+
+            // 第一次 roll：是否出火
+            if (rng.NextInt(100) < fireChancePercent)
+            {
+                rebuilt.Add(new AttributeCell(LightElement.Fire));
+                continue;
+            }
+
+            // 第二次 roll：其余三属性等概率
+            rebuilt.Add(new AttributeCell(otherElements[rng.NextInt(otherElements.Length)]));
         }
 
         AttributeCells.ReplaceAll(rebuilt);
@@ -415,7 +525,7 @@ public sealed class LightMechanicCombatState
         cell.Element == element || cell.Element == LightElement.Prismatic;
 
     /// <summary>
-    /// 重置非目标属性格，按概率生成普通格或强化格�?
+    /// 重置非目标属性格，按概率生成普通格或强化格；未命中时原格不变。
     /// </summary>
     public int ResetNonElementCellsWithEnhanced(
         LightElement targetElement,
@@ -436,7 +546,6 @@ public sealed class LightMechanicCombatState
                 continue;
             }
 
-            reset++;
             var roll = rng.NextInt(100);
             if (roll < enhancedChancePercent)
             {
@@ -444,9 +553,17 @@ public sealed class LightMechanicCombatState
                     targetElement,
                     AttributeCellKind.Enhanced,
                     enhancedCardTypeName));
+                reset++;
             }
             else if (roll < enhancedChancePercent + normalChancePercent)
+            {
                 rebuilt.Add(new AttributeCell(targetElement));
+                reset++;
+            }
+            else
+            {
+                rebuilt.Add(cell);
+            }
         }
 
         AttributeCells.ReplaceAll(rebuilt);
@@ -543,7 +660,8 @@ public sealed class LightMechanicCombatState
             if (!IsElementCell(cell, LightElement.Forest))
                 continue;
 
-            if (cell.Kind == AttributeCellKind.Dark)
+            // 万色格不享受深色格双倍权重。
+            if (cell.Kind == AttributeCellKind.Dark && cell.Element != LightElement.Prismatic)
                 total += 2;
             else if (cell.Kind == AttributeCellKind.Enhanced)
                 total += 2;

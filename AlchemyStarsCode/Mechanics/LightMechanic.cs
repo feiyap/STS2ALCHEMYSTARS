@@ -422,7 +422,7 @@ public static class LightMechanic
     }
 
     /// <summary>
-    /// 转色栏中火或水（含万色）属性格数量。
+    /// 转色栏中火或水（含万色）的有效格数；深色格权重为 2。
     /// </summary>
     public static int CountFireAndWaterAttributeCells(Player player)
     {
@@ -430,8 +430,19 @@ public static class LightMechanic
         if (state == null)
             return 0;
 
-        return state.AttributeCells.Items.Count(cell =>
-            cell.Element is LightElement.Fire or LightElement.Water or LightElement.Prismatic);
+        var total = 0;
+        foreach (var cell in state.AttributeCells.Items)
+        {
+            if (cell.Element is not (LightElement.Fire or LightElement.Water or LightElement.Prismatic))
+                continue;
+
+            // 万色格不享受深色格双倍权重。
+            total += cell.Kind == AttributeCellKind.Dark && cell.Element != LightElement.Prismatic
+                ? 2
+                : 1;
+        }
+
+        return total;
     }
 
     /// <summary>
@@ -528,19 +539,17 @@ public static class LightMechanic
         TryConvertRandomNonElementCells(player, LightElement.Fire, maxCount);
 
     /// <summary>
-    /// 重置所有非火属性格，大概率出现火属性格。
+    /// 重置所有非火属性格：60% 出火；未出火时再等概率出森/雷/水。
     /// </summary>
-    public static void ResetNonFireCells(Player player, int normalChancePercent = 65, int prismChancePercent = 10)
+    public static void ResetNonFireCells(Player player, int fireChancePercent = 60)
     {
         var state = GetActiveState(player);
         if (state == null)
             return;
 
-        state.ResetNonElementCells(
-            LightElement.Fire,
+        state.ResetNonFireCellsWithRandomOther(
             player.RunState.Rng.Niche,
-            normalChancePercent,
-            prismChancePercent);
+            fireChancePercent);
         LightMechanicUiBootstrap.RefreshForPlayer(player);
     }
 
@@ -919,6 +928,9 @@ public static class LightMechanic
         if (state == null)
             return 1m;
 
+        // 按当前格子重算虹光，避免缓存的 RainbowActive 在格子变化后仍错误增伤。
+        state.UpdateRainbowState();
+
         var multiplier = 1m;
 
         if (element != null)
@@ -937,7 +949,7 @@ public static class LightMechanic
 
         if (state.RainbowActive)
         {
-            var bonus = state.GetTotalEffectiveCellCount() * 0.08m;
+            var bonus = state.GetRainbowWeightedCellCount() * 0.08m;
             if (state.RainbowDoubled)
                 bonus *= 2m;
 
@@ -1020,25 +1032,43 @@ public static class LightMechanic
                 await CreatureCmd.GainBlock(player.Creature, new BlockVar(block, ValueProp.Move), null);
         }
 
-        if (state.RainbowActive)
+        // 结算前按当前格子重算，避免缓存状态与「万色补缺口」规则不一致。
+        state.UpdateRainbowState();
+        if (!state.RainbowActive)
+            return;
+
+        // 虹光：先结算伤害，无论成败都必须清空转色栏并刷新 UI。
+        var slotLimit = state.AttributeCells.MaxSlots;
+        var damage = slotLimit * 5m;
+        var enemies = player.Creature.CombatState?.HittableEnemies.ToList()
+                      ?? [];
+
+        try
         {
-            var slotLimit = state.AttributeCells.MaxSlots;
-            var damage = slotLimit * 5m;
-            var enemies = player.Creature.CombatState!.HittableEnemies.ToList();
             foreach (var enemy in enemies)
             {
+                if (enemy.IsDead)
+                    continue;
+
                 await CreatureCmd.Damage(
                     choiceContext,
                     enemy,
                     damage,
                     ValueProp.Unblockable | ValueProp.Unpowered,
-                    null,
-                    null);
+                    player.Creature);
             }
-
+        }
+        finally
+        {
+            var removed = state.AttributeCells.Items.ToList();
             state.AttributeCells.Clear();
             state.RainbowActive = false;
             state.RainbowDoubled = false;
+
+            if (removed.Count > 0)
+                NotifyAttributeCellsRemoved(player, removed);
+
+            LightMechanicUiBootstrap.RefreshForPlayer(player);
         }
     }
 }

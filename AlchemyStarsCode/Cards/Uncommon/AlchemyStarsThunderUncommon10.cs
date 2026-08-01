@@ -53,7 +53,7 @@ public sealed class AlchemyStarsThunderUncommon10 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
+        
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Overload)),
         HoverTipFactory.FromCard<AlchemyStarsGeneratedOverload>(),
         HoverTipFactory.FromPower<VulnerablePower>(),

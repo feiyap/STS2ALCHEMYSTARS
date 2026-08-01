@@ -16,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 默然负火·乌列尔：高庭卫队；群体火伤与灼燃，可选消耗火光能重置非火格。
+/// 默然负火·乌列尔：高庭卫队；群体火伤与灼燃，可选消耗火光能重置非火格（60% 火，否则等概率森/雷/水）。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireUncommon1 : ModCardTemplate
@@ -51,8 +51,8 @@ public sealed class AlchemyStarsFireUncommon1 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.HighCourtGuard)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.AttributeCell)),
+        
+        
         HoverTipFactory.FromPower<AlchemyStarsIgnitionPower>()
     ];
 

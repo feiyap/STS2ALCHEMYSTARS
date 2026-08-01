@@ -15,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ·²³¾Ö®Óð¡¤°²½à¶û£ºËæ»ú¶à¶ÎÀ×ÊôÐÔÉËº¦£¬ÖØ¸´ÃüÖÐÍ¬Ò»µÐÈËÊ±ÉËº¦µÝ¼õ¡£
+/// ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ð¡¤°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëºï¿½ï¿½ï¿½ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½Í¬Ò»ï¿½ï¿½ï¿½ï¿½Ê±ï¿½Ëºï¿½ï¿½Ý¼ï¿½ï¿½ï¿½
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderCommon1 : ModCardTemplate
@@ -27,7 +27,8 @@ public sealed class AlchemyStarsThunderCommon1 : ModCardTemplate
     private const bool ShowInCardLibrary = true;
     private const int BaseHitCount = 4;
     private const decimal BaseHitDamage = 4m;
-    private const decimal MinHitDamage = 0.5m;
+    private const decimal BaseMinHitDamage = 1m;
+    private const decimal UpgradedMinHitDamage = 2m;
     private const int BonusHitCount = 2;
 
     public override CardAssetProfile AssetProfile => new(
@@ -48,8 +49,7 @@ public sealed class AlchemyStarsThunderCommon1 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy))
-    ];
+        ];
 
     public AlchemyStarsThunderCommon1() : base(BaseEnergyCost, CardKind, CardRarityValue, CardTarget, ShowInCardLibrary)
     {
@@ -62,6 +62,7 @@ public sealed class AlchemyStarsThunderCommon1 : ModCardTemplate
             hitCount += BonusHitCount;
 
         var nextHitDamage = new Dictionary<Creature, decimal>();
+        var minHitDamage = IsUpgraded ? UpgradedMinHitDamage : BaseMinHitDamage;
 
         for (var i = 0; i < hitCount; i++)
         {
@@ -81,7 +82,7 @@ public sealed class AlchemyStarsThunderCommon1 : ModCardTemplate
                 LightElement.Thunder,
                 cardPlay);
 
-            nextHitDamage[target] = Math.Max(MinHitDamage, damage / 2m);
+            nextHitDamage[target] = Math.Max(minHitDamage, damage / 2m);
         }
     }
 

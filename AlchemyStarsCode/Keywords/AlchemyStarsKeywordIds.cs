@@ -1,15 +1,26 @@
 namespace AlchemyStars.Keywords;
 
 /// <summary>
-/// 模组关键词本地化 id 常量�?
+/// 模组关键词本地化 id 常量。
 /// </summary>
 public static class AlchemyStarsKeywordIds
 {
     public const string LightEnergy = "ALCHEMY_STARS_KEYWORD_LIGHT_ENERGY";
     public const string AttributeCell = "ALCHEMY_STARS_KEYWORD_ATTRIBUTE_CELL";
+    public const string ForestLightEnergy = "ALCHEMY_STARS_KEYWORD_FOREST_LIGHT_ENERGY";
+    public const string ThunderLightEnergy = "ALCHEMY_STARS_KEYWORD_THUNDER_LIGHT_ENERGY";
+    public const string WaterLightEnergy = "ALCHEMY_STARS_KEYWORD_WATER_LIGHT_ENERGY";
+    public const string FireLightEnergy = "ALCHEMY_STARS_KEYWORD_FIRE_LIGHT_ENERGY";
+    public const string ForestAttributeCell = "ALCHEMY_STARS_KEYWORD_FOREST_ATTRIBUTE_CELL";
+    public const string ThunderAttributeCell = "ALCHEMY_STARS_KEYWORD_THUNDER_ATTRIBUTE_CELL";
+    public const string WaterAttributeCell = "ALCHEMY_STARS_KEYWORD_WATER_ATTRIBUTE_CELL";
+    public const string FireAttributeCell = "ALCHEMY_STARS_KEYWORD_FIRE_ATTRIBUTE_CELL";
+    public const string Prismatic = "ALCHEMY_STARS_KEYWORD_PRISMATIC";
+    public const string RainbowLight = "ALCHEMY_STARS_KEYWORD_RAINBOW_LIGHT";
     public const string PrismCell = "ALCHEMY_STARS_KEYWORD_PRISM_CELL";
     public const string DarkCell = "ALCHEMY_STARS_KEYWORD_DARK_CELL";
     public const string EnhancedCell = "ALCHEMY_STARS_KEYWORD_ENHANCED_CELL";
+    public const string Flying = "ALCHEMY_STARS_KEYWORD_FLYING";
     public const string Water = "ALCHEMY_STARS_KEYWORD_WATER";
     public const string Thunder = "ALCHEMY_STARS_KEYWORD_THUNDER";
     public const string Forest = "ALCHEMY_STARS_KEYWORD_FOREST";
@@ -60,7 +71,7 @@ public static class AlchemyStarsKeywordIds
     public const string VelvetNeedleBase = "ALCHEMY_STARS_KEYWORD_VELVET_NEEDLE_BASE";
     public const string VelvetNeedle = "ALCHEMY_STARS_KEYWORD_VELVET_NEEDLE";
     public const string StrangeAnimal = "ALCHEMY_STARS_KEYWORD_STRANGE_ANIMAL";
-    public const string Slow = "ALCHEMY_STARS_KEYWORD_SLOW";
+    public const string LightSwordArmor = "ALCHEMY_STARS_KEYWORD_LIGHT_SWORD_ARMOR";
     public const string AwakeningForm = "ALCHEMY_STARS_KEYWORD_AWAKENING_FORM";
     public const string Soaring = "ALCHEMY_STARS_KEYWORD_SOARING";
 

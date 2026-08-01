@@ -16,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ÆôÃ÷Ö®¹â¡¤À³Òò¹þÌØ£º¹á´©Ö®ÐÇ£»¶ÎÊýËæ±¾»ØºÏÀ×ÉË´ÎÊýÔö³¤¡£
+/// ï¿½ï¿½ï¿½ï¿½Ö®ï¿½â¡¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø£ï¿½ï¿½á´©Ö®ï¿½Ç£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ±¾ï¿½Øºï¿½ï¿½ï¿½ï¿½Ë´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderRare3 : ModCardTemplate
@@ -49,7 +49,7 @@ public sealed class AlchemyStarsThunderRare3 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
+        
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.PenetratingStar)),
         HoverTipFactory.FromCard<AlchemyStarsGeneratedRebellionBurningDay>(),
         HoverTipFactory.FromCard<AlchemyStarsGeneratedRebellionBurningReinhardt>()
@@ -103,6 +103,6 @@ public sealed class AlchemyStarsThunderRare3 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        // Éý¼¶Ð§¹ûÎªÏûºÄÀ×¹âÄÜºó¹éÁãÊ±»ñµÃ·´ÅÑ×ÆÈ¼Ö®ÈÕ¡£
+        // ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½×¹ï¿½ï¿½Üºï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ã·ï¿½ï¿½ï¿½ï¿½ï¿½È¼Ö®ï¿½Õ¡ï¿½
     }
 }

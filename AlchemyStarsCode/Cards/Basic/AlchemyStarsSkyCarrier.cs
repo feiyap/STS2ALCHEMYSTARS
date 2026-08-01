@@ -31,10 +31,15 @@ public sealed class AlchemyStarsSkyCarrier : ModCardTemplate
         new PowerVar<AlchemyStarsFlyingPower>(1m)
     ];
 
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+    [
+        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Prismatic)
+    ];
+
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromPower<AlchemyStarsFlyingPower>(),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy))
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Prismatic))
     ];
 
     public AlchemyStarsSkyCarrier() : base(BaseEnergyCost, CardKind, CardRarityValue, CardTarget, ShowInCardLibrary)
@@ -50,7 +55,7 @@ public sealed class AlchemyStarsSkyCarrier : ModCardTemplate
             Owner.Creature,
             this);
 
-        LightMechanic.TryGrantRandomBaseLightEnergy(Owner);
+        LightMechanic.TryGrantLightEnergy(Owner, LightElement.Prismatic);
     }
 
     protected override void OnUpgrade()

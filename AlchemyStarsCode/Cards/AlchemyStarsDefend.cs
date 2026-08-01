@@ -9,9 +9,9 @@ using STS2RitsuLib.Scaffolding.Content;
 
 namespace AlchemyStars.Cards;
 
-// 防御牌和打击一样注册到角色卡池，并作为 4 张初始卡加入角色卡组。
-[RegisterCard(typeof(AlchemyStarsCardPool))]
-[RegisterCharacterStarterCard(typeof(AlchemyStarsCharacter), 4)]
+/// <summary>
+/// 脚手架遗留防御牌，已由 <see cref="AlchemyStarsDefense"/> 替代；保留文件仅供参考，不再注册。
+/// </summary>
 public sealed class AlchemyStarsDefend : ModCardTemplate
 {
     // 基础耗能。

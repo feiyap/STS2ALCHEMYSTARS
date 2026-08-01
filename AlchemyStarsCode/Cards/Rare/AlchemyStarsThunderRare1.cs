@@ -18,7 +18,7 @@ using STS2RitsuLib.Utils;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// °ëÉú÷öÐÇ¡¤ÒÁÜ½£º¶à¶ÎÀ×ÉË£¬»÷É±ºóËæ»úÐø´ò£»¿ÉÏûºÄ¹âÄÜÓÀ¾ÃÔö¼Ó¶ÎÊý¡£
+/// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¡ï¿½ï¿½ï¿½Ü½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë£ï¿½ï¿½ï¿½É±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ò£»¿ï¿½ï¿½ï¿½ï¿½Ä¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¶ï¿½ï¿½ï¿½ï¿½ï¿½
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderRare1 : ModCardTemplate
@@ -51,8 +51,7 @@ public sealed class AlchemyStarsThunderRare1 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy))
-    ];
+        ];
 
     public AlchemyStarsThunderRare1()
         : base(BaseEnergyCost, CardKind, CardRarityValue, CardTarget, ShowInCardLibrary)

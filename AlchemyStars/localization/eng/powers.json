@@ -1,4 +1,4 @@
-﻿{
+{
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_SCORCH_POWER.title": "Scorch",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_SCORCH_POWER.description": "At the start of turn, lose [blue]1%[/blue] Max HP per stack.",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_PARALYSIS_POWER.title": "Paralysis",
@@ -59,8 +59,8 @@
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_TINA_TURN_START_POWER.description": "At turn start, gain 1 Water Dark Cell. When stacks expire, return the Exhausted card to your hand.",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_CHARLOTTE_CONVERT_POWER.title": "Snowbreak Radiance",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_CHARLOTTE_CONVERT_POWER.description": "At turn start, convert Thunder and Forest cells to Water Dark Cells; otherwise gain {Energy:energyIcons()} and draw 1 card.",
-  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_VELVET_NEEDLE_POWER.title": "Velvet Needle",
-  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_VELVET_NEEDLE_POWER.description": "At turn end, burst: deal 1 Water damage per stack and heal the applier for 1 HP per stack.",
+  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_VELVET_NEEDLE_POWER.title": "Antarctic Aurora Velvet Needle",
+  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_VELVET_NEEDLE_POWER.description": "At turn end, detonate all stacks at once: deal Water damage equal to stacks and heal the applier for the same amount.",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_CHLOE_DAMAGE_POWER.title": "Sorrowful Strings",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_CHLOE_DAMAGE_POWER.description": "Attacks deal 15% more damage.",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_NORTHERN_REALM_POWER.title": "Northern Realm",
@@ -68,13 +68,11 @@
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_CAPITAL_TAX_POWER.title": "Capital Tax",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_CAPITAL_TAX_POWER.description": "When an On Capital card is drawn, pay 20 Gold; each payment increases its damage by 20%. Gold is refunded on victory.",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_NIGHTMARE_THORN_POWER.title": "Nightmare Thorn",
-  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_NIGHTMARE_THORN_POWER.description": "Each debuff stack on an enemy increases your final damage against it by 2%.",
+  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_NIGHTMARE_THORN_POWER.description": "Each debuff stack on an enemy increases Knarla's final damage by [blue]2%[/blue].",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_DRAGON_FANG_MARK_POWER.title": "Dragon Fang Mark",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_DRAGON_FANG_MARK_POWER.description": "Each stack increases final damage against this target by 2%.",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_FELICIA_HEAL_POWER.title": "Phantom Twin Blades",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_FELICIA_HEAL_POWER.description": "At turn start, heal all teammates for 1% of lost HP; upgraded also heals 1% of Max HP.",
-  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_SLOW_POWER.title": "Slow",
-  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_SLOW_POWER.description": "Reduces the target action speed.",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_AWAKENING_FORM_POWER.title": "Awakened Form",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_AWAKENING_FORM_POWER.description": "Whenever you spend [blue]15[/blue] Light Energy, reset the Conversion bar with [blue]4[/blue] different Attributes.",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_SOARING_POWER.title": "Soar",
@@ -91,8 +89,8 @@
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_BLUE_FIRE_THERAPY_POWER.description": "When you lose HP, spend {fireLightPrefix:lightIcons(1)} to convert half of that loss into Plating. Lose 1 stack at turn start.",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_PANACEA_POWER.title": "Panacea",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_PANACEA_POWER.description": "Unblocked damage dealt to the marked target heals you, up to remaining stacks.",
-  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_DEAD_CELEBRATION_POWER.title": "Dead Celebration",
-  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_DEAD_CELEBRATION_POWER.description": "After you next shuffle, Exhaust half your draw pile, prioritizing Statuses and Curses.",
+  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_DEAD_CELEBRATION_POWER.title": "Styx Train · Charon",
+  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_DEAD_CELEBRATION_POWER.description": "The next time you shuffle, [gold]Exhaust[/gold] half of your [gold]draw pile[/gold], prioritizing [gold]Status[/gold] and [purple]Curse[/purple] cards.",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_SUPREME_CODEX_POWER.title": "Supreme Codex",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_SUPREME_CODEX_POWER.description": "At the end of this combat, upgrade 1 random card."
 }

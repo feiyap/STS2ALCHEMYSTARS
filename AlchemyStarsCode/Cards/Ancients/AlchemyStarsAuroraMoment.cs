@@ -28,7 +28,7 @@ public sealed class AlchemyStarsAuroraMoment : ModCardTemplate
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightEnergy)),
+        
         HoverTipFactory.FromKeyword(CardKeyword.Ethereal),
         HoverTipFactory.FromPower<AlchemyStarsAuroraMomentPower>()
     ];

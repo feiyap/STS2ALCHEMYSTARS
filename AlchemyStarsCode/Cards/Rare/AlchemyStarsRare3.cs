@@ -34,7 +34,7 @@ public sealed class AlchemyStarsRare3 : ModCardTemplate
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.AttributeCell)),
+        
         HoverTipFactory.Static(StaticHoverTip.Fatal)
     ];
 

@@ -76,7 +76,8 @@ public static class LightMechanicUiBootstrap
         {
             Name = BarNodeName,
             MouseFilter = Control.MouseFilterEnum.Ignore,
-            ZIndex = 40,
+            // 保持默认层级，避免盖住遗物/能力悬停说明。
+            ZIndex = 0,
         };
         bar.ApplyLeftScreenLayout();
         return bar;
