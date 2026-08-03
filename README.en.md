@@ -2,260 +2,214 @@
 
 Languages: [中文](README.md) | English
 
-A copyable, buildable RitsuLib mod template providing a general Godot/C# project layout, sample content, and static placeholder assets.
+A *Slay the Spire 2* character mod built on [STS2-RitsuLib](https://github.com/BAKAOLC/STS2-RitsuLib). It adds the playable character **Void Descendant** (空裔) and a Forest / Thunder / Water / Fire light-energy and conversion-bar system.
 
-**What the template includes:**
+> A void-born descendant from the Hollow Valley, living earnestly and cheerfully as they embark on an unknown journey alongside their companions.
 
-- A `[ModInitializer]` entry point plus a minimal custom character (with character card pool, relic pool, and potion pool).
-- Four starter strikes, four starter defends, and one starter relic as samples.
-- Minimal static Godot placeholder scenes for the combat character, energy counter, character select background, merchant, and rest site.
-- Placeholder PNG files copied from vanilla resources and renamed for the template. Replace them after copying.
-- Basic English and Simplified Chinese localization files.
-- A complete Godot project, export preset, mod manifest, and MSBuild scripts.
+| Item | Value |
+|---|---|
+| Mod ID | `AlchemyStars` |
+| Character | Void Descendant (`AlchemyStarsCharacter`) |
+| Stack | C# + Godot PCK + RitsuLib |
+| Dependency | `STS2-RitsuLib` (see [`AlchemyStars.json`](AlchemyStars.json)) |
 
-## Learning Resources
+---
 
-- [STS2-RitsuLib](https://github.com/BAKAOLC/STS2-RitsuLib): the shared framework library for Slay the Spire 2 mods. This template uses it for content registration, character scaffolding, and Godot resource integration.
-- [RitsuLib Documentation](https://github.com/GlitchedReme/SlayTheSpire2ModdingTutorials/tree/master/RitsuLib): tutorials and examples by file.
-- [Slay the Spire 2 Modding Tutorials site](https://glitchedreme.github.io/SlayTheSpire2ModdingTutorials/index.html): the full tutorial site.
-- Template Wiki (Rider-first): [Chinese Home](https://github.com/alkaid616/AlchemyStars/wiki/Home) | [English Home](https://github.com/alkaid616/AlchemyStars/wiki/Home-EN).
+## Character
 
-## Install and Use
+| Item | Details |
+|---|---|
+| Starting HP / Gold | 75 / 99 |
+| Starter relic | **Innate Shackles** (`AlchemyStarsLumenRelic`): light-energy and conversion bars capped at 4 each; combat start grants 1 Forest / Thunder / Water / Fire light energy. Orobas can refine it into **Chord of Freedom** (cap 8). |
+| Starter deck | Shoot ×4, Defense ×4, Sky Carrier ×1, **Vice** ×1, **Karen** ×1 |
+| Partner transcendence | Archaic Tooth can transform Vice / Karen into Ancient forms; this mod also transforms the remaining second starter |
 
-You can get this project two ways: via the NuGet template (automatic rename), or by copying the directory manually.
+After picking a Neow relic, Void Descendant enters **The Enlightener** follow-up page and chooses one of four light-tracking plans that shape which attribute cards appear in rewards / the shop.
 
-### Option A: NuGet template (recommended)
+---
 
-```powershell
-# Install the template
-dotnet new install STS2.RitsuLib.ModTemplate
+## Mechanics
 
-# Create a new mod
-dotnet new ritsulibmod -n MyMod
+Combat shows a light-energy bar and conversion bar on the left (enabled by the starter relic).
 
-# Uninstall the template
-dotnet new uninstall STS2.RitsuLib.ModTemplate
+```text
+Play cards → spend light energy → create attribute cells on the conversion bar
+                ↓
+     same-attribute damage / element passives / Rainbow Light
 ```
 
-`dotnet new ritsulibmod -n MyMod` generates a project called `MyMod` and renames `AlchemyStars`, sample class names, sample resource file names, resource folders, manifest names, namespaces, and localization IDs to match the new name.
+### Light energy
 
-### Option B: manual copy
+Four types: **Forest, Thunder, Water, Fire**. Some cards spend light energy for bonus effects; if you lack enough, the bonus does not apply. Each spent point creates a matching **attribute cell** on the conversion bar. **Prismatic** light counts as any attribute.
 
-1. Copy the whole directory and rename it to your mod name.
-2. Edit `AlchemyStars.json` and update `id`, `name`, `author`, and `description`.
-3. Edit `AlchemyStarsCode/Entry.cs` and update `ModId`.
-4. For a full rename, also update the project name and namespace in `.csproj`, `.sln`, and `project.godot`.
-5. Rename the resource directory `AlchemyStars/` to your `ModId`, then update the related `Entry.ResPath` paths in code.
+### Attribute cells
 
-## Local Path Configuration
+- Each cell grants **+4%** damage of that attribute.
+- Every **4** cells of one attribute trigger a passive:
+  - **Fire**: apply Burn when dealing Fire damage
+  - **Water**: heal at end of turn
+  - **Forest**: gain Block based on hand size at end of turn
+  - **Thunder**: apply Paralysis when dealing Thunder damage
+- Special cells: **Prism** (adjacent cells count as the same attribute), **Dark** (counts as 2), **Enhanced** (powers specific cards)
+
+### Rainbow Light
+
+Triggers when the conversion bar has all four real attributes (Prismatic can fill gaps 1:1): cells grant a stronger all-damage bonus this turn (can double under stricter conditions). At end of turn, deal AoE damage and reset the cells.
+
+### Enlightener tracking plans
+
+| Plan | Effect |
+|---|---|
+| A | Lock one or more attributes; shop and reward attribute cards are limited to those attributes |
+| B | Same as A, but only rewards (shop unaffected) |
+| C | Each time you pick up an attribute card, that attribute’s weight +15% |
+| D | No tracking; original-flavor challenge |
+
+The card pool is organized around the four attributes, plus keywords such as Lock, Flying, and Aurora Moment. Full text lives in-game and under [`AlchemyStars/localization/`](AlchemyStars/localization/).
+
+---
+
+## Folder layout
+
+```text
+AlchemyStars/
+├── AlchemyStarsCode/          # C# game logic
+│   ├── Cards/                 # Cards (subfolders by rarity)
+│   │   ├── Basic/             # Starters
+│   │   ├── Common/
+│   │   ├── Uncommon/
+│   │   ├── Rare/
+│   │   ├── Ancients/          # Ancient / transcendence cards
+│   │   └── Generated/         # Runtime / event-generated cards
+│   ├── Characters/            # Character + card / relic / potion pools
+│   ├── Mechanics/             # Light-energy & conversion-bar core
+│   ├── Powers/
+│   ├── Relics/                # Includes Enlightener/ tracking plans
+│   ├── Patches/               # RitsuLib IPatchMethod + helpers
+│   ├── Keywords/              # CardKeyword / CardTag registration
+│   ├── UI/                    # Light-bar Godot UI
+│   ├── Localization/          # Light-icon formatters, etc.
+│   ├── Events/                # Enlightener event template (not in map pool)
+│   └── Entry.cs               # Mod entry
+├── AlchemyStars/              # Godot PCK assets (res://AlchemyStars)
+│   ├── images/
+│   ├── scenes/characters/
+│   └── localization/          # zhs / eng JSON
+├── AlchemyStars.csproj
+├── AlchemyStars.json          # Mod manifest
+├── project.godot
+├── export_presets.cfg
+├── local.props.template
+└── README.md / README.en.md
+```
+
+`res://AlchemyStars/...` is the in-PCK asset path for the repo’s `AlchemyStars/` folder — **not** a C# namespace.
+
+---
+
+## Code architecture
+
+### Entry
+
+[`AlchemyStarsCode/Entry.cs`](AlchemyStarsCode/Entry.cs) runs via `[ModInitializer]` and:
+
+1. `RitsuLibFramework.EnsureGodotScriptsRegistered` — register Godot C# script types
+2. `ModTypeDiscoveryHub.RegisterModAssembly` — scan `[RegisterCard]` / `[RegisterRelic]` etc. for auto-registration
+3. `LightMechanicUiBootstrap.Register()` — mount combat light / conversion UI
+4. Create a patcher, register and apply the three patches below (critical patch failure triggers `DisableMod`)
+
+New content classes usually need correct attributes only; no hand-written registry in the entry point.
+
+### Layers
+
+| Layer | Namespace / folder | Role |
+|---|---|---|
+| Characters | `AlchemyStars.Characters` | Character template and pools |
+| Mechanics | `AlchemyStars.Mechanics` | Light state, cell queues, damage, combat hooks |
+| Cards | `AlchemyStars.Cards` | Card effects (folders by `CardRarity`; shared namespace) |
+| Powers | `AlchemyStars.Powers` | Powers |
+| Relics | `AlchemyStars.Relics` / `.Enlightener` | Starter lumen relic, tracking plans |
+| Keywords | `AlchemyStars.Keywords` | Custom CardKeywords and CardTags |
+| UI / Localization | `AlchemyStars.UI` / `.Localization` | Combat UI, light icons in descriptions |
+| Patches | `AlchemyStars.Patches` | Vanilla flow injection (below) |
+
+### Core mechanic types
+
+| Type | Role |
+|---|---|
+| `LightMechanic` | Static API for light / cells / conversion / damage |
+| `LightMechanicCombatState` | Per-combat bar state |
+| `AlchemyStarsLightMechanicService` | `[RegisterSingleton]` combat hooks |
+| `LightMechanicUiBootstrap` | Combat UI register / refresh |
+| `AttributeCardTracking` | Reward / shop attribute filtering & weights for Enlightener plans |
+
+### Content scale (approx.)
+
+| Category | Scale |
+|---|---|
+| Cards | Basic 5 + Common ~34 + Uncommon ~50 + Rare ~25 + Ancients 3 + Generated ~15 |
+| Powers | ~60 |
+| Relics | Starter lumen (and upgrade) + Enlightener plans A–D, etc. |
+
+---
+
+## Patches
+
+Registered in `Entry.Initialize` via `RitsuLibFramework.CreatePatcher`. There are **3** `IPatchMethod` classes.
+
+| Patch | File | Target | Critical | Purpose |
+|---|---|---|---|---|
+| `ArchaicToothTransformRemainingStartersPatch` | [`Patches/ArchaicToothTransformRemainingStartersPatch.cs`](AlchemyStarsCode/Patches/ArchaicToothTransformRemainingStartersPatch.cs) | `ArchaicTooth.AfterObtained` (Postfix) | Yes | Vanilla Archaic Tooth transforms only the first starter; after the original Task, also transform remaining Vice / Karen into Ancient forms, keeping upgrades and enchantments |
+| `EnlightenerFollowUpDonePatch` | [`Patches/Enlightener/EnlightenerFollowUpDonePatch.cs`](AlchemyStarsCode/Patches/Enlightener/EnlightenerFollowUpDonePatch.cs) | `AncientEventModel.Done` (Prefix) | Yes | After Void Descendant finishes Neow relic choice, intercept `Done` and inject The Enlightener four-option page; on failure, fall back to vanilla |
+| `EnlightenerRefreshVisualPatch` | [`Patches/Enlightener/EnlightenerRefreshVisualPatch.cs`](AlchemyStarsCode/Patches/Enlightener/EnlightenerRefreshVisualPatch.cs) | `NEventRoom.RefreshEventState(EventModel)` (Postfix) | No | While the follow-up is active, refresh the event room title to “The Enlightener” |
+
+### Patch helpers (not IPatchMethod)
+
+| Class | Role |
+|---|---|
+| `EnlightenerFollowUpState` | Per-run flag: whether Enlightener follow-up already triggered for a player |
+| `EnlightenerFollowUpVisualState` | Weak-maps `AncientEventModel` to visual entry |
+| `EnlightenerFollowUpVisuals` | Loads `ancients` localization and sets `NEventRoom` title |
+
+---
+
+## Build & local setup
+
+### Paths
 
 ```powershell
 Copy-Item .\local.props.template .\local.props
 ```
 
-Set these values in `local.props` (the file is in `.gitignore`; do not commit it):
+Set in `local.props` (gitignored):
 
-| Field | Description |
+| Field | Meaning |
 |---|---|
 | `Sts2Dir` | Slay the Spire 2 install directory |
-| `Sts2DataDir` | Game DLL directory, usually `$(Sts2Dir)/data_sts2_windows_x86_64` |
-| `GodotExe` | MegaDot/Godot executable used to export the PCK |
-| `RitsuLibDeployDir` | Local RitsuLib deployment directory, defaulting to `$(Sts2Dir)/mods/STS2-RitsuLib`. Used by RitsuLib package/build logic to copy RitsuLib into the game's mods directory — **not** this mod's output directory |
+| `Sts2DataDir` | Game DLL directory (usually `$(Sts2Dir)/data_sts2_windows_x86_64`) |
+| `GodotExe` | MegaDot / Godot executable for PCK export |
+| `RitsuLibDeployDir` | Optional; RitsuLib deploy dir, default `$(Sts2Dir)/mods/STS2-RitsuLib` |
 
-## RitsuLib Version Compatibility
-
-> ⚠️ **Important: align the manifest's RitsuLib version with the csproj before release**
->
-> `dependencies[STS2-RitsuLib].version` in `AlchemyStars.json` **must exactly match** the `STS2.RitsuLib` version your `.csproj` actually compiles against. The two are independent and **never auto-synced** — mismatches let players pass the manifest check and crash at runtime, or get wrongly rejected when their RitsuLib would have worked. See [Pre-release checklist: version alignment](#pre-release-checklist-version-alignment) below for the step-by-step procedure.
-
-### Current version snapshot (as of 2026-05-22)
-
-| Item | Value |
-|---|---|
-| Current STS2 game version | `0.106.0` |
-| Current RitsuLib version | `0.3.0` |
-| Template manifest status | `min_game_version` and `dependencies[STS2-RitsuLib].version` are aligned |
-
-### Version mapping
-
-The table summarizes the mainline STS2 target for each boundary RitsuLib release, sourced from the [STS2-RitsuLib Releases](https://github.com/BAKAOLC/STS2-RitsuLib/releases) page. Patch versions not listed follow the range they sit in; check the relevant release notes for boundary versions.
-
-| RitsuLib version | Mainline STS2 target | Compat packages |
-|---|---|---|
-| `v0.3.0+` (since 2026-05-22) | `0.106.0` | `0.103.2`; `0.104.0` compat removed |
-| `v0.2.29` ~ `v0.2.40` | `0.105.1` | `0.104.0`, `0.103.2` |
-| `v0.2.27` ~ `v0.2.28` | `0.105.0` | `0.104.0`, `0.103.2` |
-| `v0.2.0` ~ `v0.2.26` | `0.104.0` | `0.103.2` (experimental from `v0.2.6`); `0.99.1` compat removed in this range |
-| `v0.0.x` / `v0.1.x` | `0.99.1` and earlier | — |
-
-### Package selection: mainline and compat
-
-The template references mainline `STS2.RitsuLib` by default, tracking the latest NuGet version:
-
-```xml
-<PackageReference Include="STS2.RitsuLib" Version="*" />
-```
-
-**Only enable one RitsuLib package at a time.** If your code still targets an older branch, comment out the mainline and enable the matching compat package:
-
-```xml
-<!-- STS2 0.104.0 compatibility branch (no longer maintained since v0.3.0) -->
-<PackageReference Include="STS2.RitsuLib.Compat.0.104.0" Version="*" />
-
-<!-- STS2 0.103.2 compatibility branch -->
-<PackageReference Include="STS2.RitsuLib.Compat.0.103.2" Version="*" />
-```
-
-Compatibility packages only select the matching game branch; they do not restore every old API. Some old mods still need code changes and recompilation.
-
-The template also references `Nothing.STS2RitsuLib.ModAnalyzers` — an AI-written helper analyzer that reports common manifest and resource configuration issues during development.
-
-### Pre-release checklist: version alignment
-
-> **`PackageReference` in `.csproj` only controls compile-time resolution; `dependencies` in `AlchemyStars.json` is what the game loader checks at runtime. The two are independent and never auto-synced.**
-
-If you compile against a new RitsuLib but forget to bump the manifest, players with an old RitsuLib will pass the manifest check and crash at runtime due to missing APIs or signature drift. Conversely, an over-tight manifest will reject players who could otherwise run the mod.
-
-Before every release:
-
-1. Confirm the actual `STS2.RitsuLib` version `dotnet restore` resolved (look in `obj/project.assets.json` or your IDE's NuGet view).
-2. Write that version into `dependencies[STS2-RitsuLib].version` in `AlchemyStars.json`.
-3. When you switch to a compatibility package (`Compat.0.104.0` / `Compat.0.103.2`), also adjust `min_game_version` to the matching branch. Keep `dependencies[].id` as `STS2-RitsuLib` (compatibility packages expose the same mod id to the loader).
-4. If you intentionally want the manifest version to act as a **runtime floor** (e.g. declaring "`0.3.0+` works"), document this in your release notes and verify the mod runs against the declared floor.
-
-### Upgrade notes
-
-#### Upgrading to RitsuLib `v0.3.0` / STS2 `0.106.0`
-
-Major changes (from the [v0.3.0 release notes](https://github.com/BAKAOLC/STS2-RitsuLib/releases/tag/v0.3.0)):
-
-- **Breaking**: `RunSidecar` removed, fully replaced by `RunSavedData`.
-- New `TargetType` registration capability for custom `TargetType`s.
-- Loader target detection strengthened: branch version files now use hash verification, and mismatched versions are discarded.
-- `0.104.0` compatibility removed.
-
-#### Upgrading to RitsuLib `v0.2.27` / STS2 `0.105.0` (historical)
-
-When migrating from an earlier branch (`v0.2.0` ~ `v0.2.26` / STS2 `0.104.0`), check the following:
-
-- Version conditional compilation switched to cumulative interval macros `STS2_AT_LEAST_<ver>`; legacy `STS2_V_<ver>` macros are no longer recommended.
-- AnyPlayer / AnyAny targeting logic changed; legacy card targets, base constructor signatures, and registration flows should be checked against the new API.
-- Cards support extra icon count labels in the lower-right corner with vanilla UI conflict handling; verify display order and placement for custom UI / icon patches.
-- Retain / flush hooks and events have replacements, removals, or `[Obsolete]` markers; migrate legacy uses of `CardRetainedEvent`, `CardsFlushedEvent`, or legacy `Hook.*` entry points.
-- `Badge`, `BadgeRuntimeTemplate`, `BadgePool.CreateAll`, and `ModBadgeTemplate` constructor signatures changed; legacy code may need updates to avoid `MissingMethodException`.
-
-## Build
+### Common commands
 
 | Command | Behavior |
 |---|---|
 | `dotnet build .\AlchemyStars.csproj` | Full build: compile + `CopyMod` + `ExportPCK` |
-| `... /p:RunPckExport=false` | Skip PCK export (no `GodotExe` needed) |
-| `... /p:CopyModOnBuild=false` | Skip copying to the game's mods directory (output stays in `bin/`) |
-| `... /p:RunPckExport=false /p:CopyModOnBuild=false` | C# compile validation only |
+| `... /p:RunPckExport=false` | Skip PCK export |
+| `... /p:CopyModOnBuild=false` | Do not copy into the game `mods/` folder |
+| `... /p:RunPckExport=false /p:CopyModOnBuild=false` | C# compile only |
 
-A full build runs two MSBuild targets after `Build`:
+Default output: `$(Sts2Dir)/mods/AlchemyStars` (dll, manifest, pck).
 
-- **`CopyMod`**: copies the DLL and manifest to the game's `mods/AlchemyStars` directory.
-- **`ExportPCK`**: calls `GodotExe` and exports the PCK to the same mod directory.
+### Before release: version alignment
 
-> `RitsuLibDeployDir` only controls where the RitsuLib framework itself is deployed locally. This mod's DLL, manifest, and PCK are controlled by `ModOutputDir` (default `$(Sts2Dir)/mods/$(MSBuildProjectName)`).
+`dependencies[STS2-RitsuLib].version` in `AlchemyStars.json` and the `STS2.RitsuLib` NuGet version in `.csproj` are **independent and not auto-synced**. Align them before publishing, or players may pass the manifest check and crash at runtime—or be rejected despite a working build.
 
-## Directory Layout
+---
 
-```text
-AlchemyStars/
-├── AlchemyStarsCode/   # C# source
-├── AlchemyStars/       # Godot resources, localization, and placeholder scenes
-├── AlchemyStars.csproj
-├── AlchemyStars.json   # Mod manifest
-├── project.godot
-└── local.props.template
-```
+## Learning resources
 
-`res://AlchemyStars/...` is the Godot/PCK resource path, mapping to the repository resource directory `AlchemyStars/`, **not** to the C# namespace. When you create a project from the NuGet template, these directory names, file names, and namespaces are renamed consistently to match the new mod name.
-
-## Template Contents
-
-### Sample character
-
-| Property | Value |
-|---|---|
-| Type | `AlchemyStarsCharacter` |
-| Expected ID | `ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER` |
-| Starter deck | 4 × `AlchemyStarsStrike`, 4 × `AlchemyStarsDefend`, 1 × `AlchemyStarsRelic` |
-| Assets | Configured via `CharacterAssetProfile`. The template only specifies static placeholder assets; unspecified audio, trail, transition, etc. fall back through `PlaceholderCharacterId` |
-
-### Sample cards and relic
-
-| Type | Pool | Expected ID |
-|---|---|---|
-| `AlchemyStarsStrike` (attack) | character card pool | `ALCHEMY_STARS_CARD_ALCHEMY_STARS_STRIKE` |
-| `AlchemyStarsDefend` (skill) | character card pool | `ALCHEMY_STARS_CARD_ALCHEMY_STARS_DEFEND` |
-| `AlchemyStarsRelic` | `AlchemyStarsRelicPool` | `ALCHEMY_STARS_RELIC_ALCHEMY_STARS_RELIC` |
-
-### Static placeholder assets
-
-**Images** (`res://AlchemyStars/images/...`):
-
-- `cards/AlchemyStarsStrike.png`, `cards/AlchemyStarsDefend.png`: sample card art.
-- `relics/AlchemyStarsRelic.png`: sample relic icon.
-- `characters/AlchemyStars_character_*.png`: character icons, select art, map marker, and energy icons.
-
-**Scenes** (`res://AlchemyStars/scenes/characters/...`):
-
-| Scene | Purpose | Placeholder structure |
-|---|---|---|
-| `AlchemyStars_character.tscn` | Combat character | `%Visuals`, `%Bounds`, `%IntentPos`, `%CenterPos`, `%TalkPos` |
-| `AlchemyStars_energy_counter.tscn` | Energy counter | `%EnergyVfxBack`, `%Layers`, `%RotationLayers`, `%EnergyVfxFront`, `Label` |
-| `AlchemyStars_merchant.tscn` | Merchant | — |
-| `AlchemyStars_rest_site.tscn` | Rest site | `%ControlRoot`, `%SelectionReticle`, `%Hitbox`, `%ThoughtBubbleRight`, `%ThoughtBubbleLeft` |
-| `AlchemyStars_character_select_bg.tscn` | Character select background | — |
-
-These resources only exist to make the template visible and replaceable; they do not try to reproduce vanilla animation quality. After copying the template, replace them with your own assets. If you change paths, update the corresponding `AssetProfile` fields.
-
-## Manifest Format
-
-`AlchemyStars.json` is the mod manifest. The game loader reads it at startup to identify the mod, check dependencies, and decide whether to load. Full example:
-
-```json
-{
-  "id": "AlchemyStars",
-  "name": "AlchemyStars",
-  "pck_name": "AlchemyStars",
-  "author": "Author",
-  "description": "A starter Slay the Spire 2 mod template built on RitsuLib.",
-  "version": "0.0.0",
-  "has_pck": true,
-  "has_dll": true,
-  "affects_gameplay": true,
-  "min_game_version": "0.106.0",
-  "dependencies": [
-    { "id": "STS2-RitsuLib", "version": "0.3.0" }
-  ]
-}
-```
-
-### Field reference
-
-| Field | Type | Description |
-|---|---|---|
-| `id` | string | Unique mod identifier. **Must match `Entry.ModId` exactly**, and should also match the `mods/<id>` directory name. In-game dependency lookups, localization key prefixes, and resource paths all depend on this value |
-| `name` | string | Display name shown in the mod list. May contain spaces and non-ASCII characters |
-| `pck_name` | string | `.pck` file name (without extension). **Must match the actual PCK file produced by `.csproj`**, or resources will not load even with `has_pck=true` |
-| `author` | string | Display-only author name |
-| `description` | string | Short description shown in the mod list |
-| `version` | string | Version of this mod itself. SemVer (`MAJOR.MINOR.PATCH`) is recommended. Bump on every release |
-| `has_pck` | bool | Whether the mod ships a `.pck`. Code-only mods can set `false` and skip `ExportPCK` |
-| `has_dll` | bool | Whether the mod ships a `.dll`. Resource-only mods can set `false` |
-| `affects_gameplay` | bool | Whether the mod affects gameplay. When enabled, the game flags saves/achievements/etc.; only purely cosmetic / localization mods should set this to `false` |
-| `min_game_version` | string | Minimum compatible STS2 version. Older games refuse to load. **Must align with the game branch targeted by the RitsuLib package selected in `.csproj`** (see [RitsuLib Version Compatibility](#ritsulib-version-compatibility) above) |
-| `dependencies` | array | Dependency list. Each entry uses `id` + `version`. **The legacy single-object `min_version` form is no longer supported** |
-| `dependencies[].id` | string | The depended-on mod's `id`. RitsuLib itself uses `STS2-RitsuLib` |
-| `dependencies[].version` | string | Minimum runtime version of the dependency. **The `STS2-RitsuLib` value must exactly match the NuGet version your `.csproj` actually compiles against** — see [Pre-release checklist: version alignment](#pre-release-checklist-version-alignment) above |
-
-## Development Tips
-
-- Prefer `AssetProfile` for new content; only override legacy `Custom...Path` fields for individual compatibility cases.
-- If a character resource field is not specified, RitsuLib fills it from the vanilla character config referenced by `PlaceholderCharacterId`.
-- Resource paths must start with `res://`; verify the directory name and casing inside the PCK are correct.
-- For `.tscn` files, make sure the scene is packed into the mod resources. If it needs a script, prefer a local wrapper class and call `EnsureGodotScriptsRegistered(...)` from `Entry.Initialize()`.
+- [STS2-RitsuLib](https://github.com/BAKAOLC/STS2-RitsuLib) — shared framework
+- [RitsuLib docs](https://github.com/GlitchedReme/SlayTheSpire2ModdingTutorials/tree/master/RitsuLib)
+- [Slay the Spire 2 Modding Tutorials](https://glitchedreme.github.io/SlayTheSpire2ModdingTutorials/index.html)
+- Project Wiki: [Chinese](https://github.com/alkaid616/AlchemyStars/wiki/Home) | [English](https://github.com/alkaid616/AlchemyStars/wiki/Home-EN)
