@@ -2,7 +2,7 @@
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_SCORCH_POWER.title": "灼烧",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_SCORCH_POWER.description": "回合开始时，每层失去 [blue]1%[/blue] 最大生命值。",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_PARALYSIS_POWER.title": "麻痹",
-  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_PARALYSIS_POWER.description": "每层使受到的雷属性伤害增加 [blue]1%[/blue]。",
+  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_PARALYSIS_POWER.description": "每层使受到的雷属性伤害增加 [blue]2%[/blue]。",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_LOCK_POWER.title": "锁定",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_LOCK_POWER.description": "卡牌对被锁定敌人造成的伤害增加锁定层数 × [blue]5%[/blue]。",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_TIMELESS_SEAL_POWER.title": "无时之印",

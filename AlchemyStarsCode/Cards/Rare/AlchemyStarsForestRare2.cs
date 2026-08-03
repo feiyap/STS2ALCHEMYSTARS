@@ -100,6 +100,6 @@ public sealed class AlchemyStarsForestRare2 : ModCardTemplate
         if (IsUpgraded)
             card.UpgradeInternal();
 
-        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Draw, Owner);
+        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Draw, Owner, CardPilePosition.Random);
     }
 }

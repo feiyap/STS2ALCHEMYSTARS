@@ -1,6 +1,7 @@
 using System.Reflection;
 using AlchemyStars.Mechanics;
 using AlchemyStars.Patches;
+using AlchemyStars.Patches.Enlightener;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Modding;
 using STS2RitsuLib;
@@ -39,8 +40,10 @@ public partial class Entry
         // 注册战斗左侧的光能 / 转色栏 UI。
         LightMechanicUiBootstrap.Register();
 
-        var patcher = RitsuLibFramework.CreatePatcher(ModId, "archaic_tooth");
+        var patcher = RitsuLibFramework.CreatePatcher(ModId, "core");
         patcher.RegisterPatch<ArchaicToothTransformRemainingStartersPatch>();
+        patcher.RegisterPatch<EnlightenerFollowUpDonePatch>();
+        patcher.RegisterPatch<EnlightenerRefreshVisualPatch>();
         RitsuLibFramework.ApplyRequiredPatcher(patcher, DisableMod);
 
         Logger.Info("AlchemyStars initialized.");
@@ -48,6 +51,6 @@ public partial class Entry
 
     private static void DisableMod()
     {
-        Logger.Warn("AlchemyStars required patch failed; leaving content registered but transcendence dual-transform disabled.");
+        Logger.Warn("AlchemyStars required patch failed; content stays registered but critical patches are disabled.");
     }
 }

@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using AlchemyStars.Mechanics;
 using MegaCrit.Sts2.Core.Entities.Powers;
-using AlchemyStars.Keywords;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
 
@@ -15,8 +14,6 @@ public sealed class AlchemyStarsPoisonFlowerPoolPower : ModPowerTemplate
     public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Single;
-
-    protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.PoisonFlowerPool];
 
     public static AttributeCellKind ResolveSpawnKind(AttributeCellKind defaultKind) =>
         defaultKind == AttributeCellKind.Normal ? AttributeCellKind.Dark : defaultKind;

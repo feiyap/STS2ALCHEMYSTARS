@@ -7,5 +7,23 @@
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LUMEN_RELIC_UPGRADED.flavor": "枷锁化作和弦，四色光能在更宽广的栏位里彼此应和。",
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_RELIC.title": "示例遗物",
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_RELIC.description": "每回合开始时，抽 {Cards:diff()} 张牌。",
-  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_RELIC.flavor": "模组脚手架自带的示例遗物。"
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_RELIC.flavor": "模组脚手架自带的示例遗物。",
+
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_A.title": "光能追踪方案A",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_A.description": "拾起时，选择锁定一种或多种属性。接下来的[gold]商店[/gold]与[gold]奖励[/gold]出现的属性卡只会是所选属性。不影响无属性卡牌。",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_A.flavor": "那些人曾经被称为「无色者」。\n但人们更熟悉的称呼，是「空裔」。",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_A.selectionScreenPrompt": "选择要锁定的属性（可多选），然后确认。",
+
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_B.title": "光能追踪方案B",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_B.description": "拾起时，选择锁定一种或多种属性。接下来的[gold]奖励[/gold]出现的属性卡只会是所选属性。不影响无属性卡牌。",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_B.flavor": "「空裔」的特别之处，在于无法运用光能，但却拥有能看见光能色彩的眼眸。",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_B.selectionScreenPrompt": "选择要锁定的属性（可多选），然后确认。",
+
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_C.title": "光能追踪方案C",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_C.description": "每拾取1种属性的卡牌，该属性出现权重增加 [blue]15%[/blue]。不影响无属性卡牌。",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_C.flavor": "某一天，「空裔们」在自己的家园中遇袭，一度被视为已经灭绝。",
+
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_D.title": "光能追踪方案D",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_D.description": "不做任何特定追踪，以原初风味进行挑战。",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_D.flavor": "直到「最后的空之末裔」出现。\n于是，故事开始了。"
 }

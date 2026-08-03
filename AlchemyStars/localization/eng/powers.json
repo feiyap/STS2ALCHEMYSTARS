@@ -2,7 +2,7 @@
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_SCORCH_POWER.title": "Scorch",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_SCORCH_POWER.description": "At the start of turn, lose [blue]1%[/blue] Max HP per stack.",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_PARALYSIS_POWER.title": "Paralysis",
-  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_PARALYSIS_POWER.description": "Each stack increases Thunder damage taken by [blue]1%[/blue].",
+  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_PARALYSIS_POWER.description": "Each stack increases Thunder damage taken by [blue]2%[/blue].",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_LOCK_POWER.title": "Lock",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_LOCK_POWER.description": "Cards deal +[blue]5%[/blue] damage per stack of Lock to locked enemies.",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_TIMELESS_SEAL_POWER.title": "Timeless Seal",

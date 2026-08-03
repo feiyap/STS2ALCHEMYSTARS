@@ -1,6 +1,7 @@
 using System.Linq;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
@@ -21,6 +22,7 @@ namespace AlchemyStars.Cards;
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsKarenBrightSoul : ModCardTemplate
 {
+    private const string CalculatedHitsKey = "CalculatedHits";
     private const int BaseEnergyCost = 1;
     private const CardType CardKind = CardType.Skill;
     private const CardRarity CardRarityValue = CardRarity.Ancient;
@@ -35,6 +37,9 @@ public sealed class AlchemyStarsKarenBrightSoul : ModCardTemplate
     [
         new EnergyVar(1),
         new DamageVar(HitDamage, ValueProp.Move),
+        new CalculationBaseVar(0m),
+        new CalculationExtraVar(1m),
+        new CalculatedVar(CalculatedHitsKey).WithMultiplier(CountFireAndWaterHits),
         AlchemyStarsKeywordText.InlineTitleVar("HighCourtGuard", AlchemyStarsKeywordIds.HighCourtGuard),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
@@ -93,6 +98,7 @@ public sealed class AlchemyStarsKarenBrightSoul : ModCardTemplate
         if (target == null || target.IsDead)
             return;
 
+        // 升级火格已在上方加入转色栏；此处按当前格数结算，避免与预览中的 +1 重复。
         var hitCount = LightMechanic.CountFireAndWaterAttributeCells(Owner);
         var hitDamage = DynamicVars.Damage.BaseValue;
 
@@ -123,5 +129,20 @@ public sealed class AlchemyStarsKarenBrightSoul : ModCardTemplate
             if (totalDamage > 0m)
                 await CreatureCmd.GainBlock(Owner.Creature, new BlockVar(totalDamage, ValueProp.Move), cardPlay);
         }
+    }
+
+    /// <summary>
+    /// 当前火/水属性格加权数量；升级时打出前会先生成 1 个火格，预览一并计入。
+    /// </summary>
+    private static decimal CountFireAndWaterHits(CardModel card, Creature? _)
+    {
+        if (card.Owner == null)
+            return 0m;
+
+        var hits = LightMechanic.CountFireAndWaterAttributeCells(card.Owner);
+        if (card.IsUpgraded)
+            hits += 1;
+
+        return hits;
     }
 }

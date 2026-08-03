@@ -23,7 +23,7 @@ public sealed class AlchemyStarsJudgmentPower : ModPowerTemplate
 
     public override PowerStackType StackType => PowerStackType.Counter;
 
-    protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.Judgment];
+    protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.Tremor];
 
     public override async Task AfterDamageReceived(
         PlayerChoiceContext choiceContext,

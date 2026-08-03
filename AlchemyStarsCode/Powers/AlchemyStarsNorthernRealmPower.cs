@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AlchemyStars.Cards;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
-using AlchemyStars.Keywords;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
 using STS2RitsuLib.Utils;
@@ -23,8 +22,6 @@ public sealed class AlchemyStarsNorthernRealmPower : ModPowerTemplate
     public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Single;
-
-    protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.NorthernRealm];
 
     public override Task BeforeCardPlayed(CardPlay cardPlay)
     {

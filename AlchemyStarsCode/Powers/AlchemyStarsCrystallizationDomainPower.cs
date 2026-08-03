@@ -25,7 +25,7 @@ public sealed class AlchemyStarsCrystallizationDomainPower : ModPowerTemplate
 
     public override PowerStackType StackType => PowerStackType.Single;
 
-    protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.CrystallizationDomain];
+    protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.Crystallization];
 
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {

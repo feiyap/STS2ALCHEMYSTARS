@@ -1,10 +1,10 @@
-using System.Linq;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Extensions;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
@@ -16,17 +16,19 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ����֮�⡤������أ��ᴩ֮�ǣ������汾�غ����˴���������
+/// 启明之光·莱因哈特：贯通之星；按本回合雷伤次数追加攻击。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderRare3 : ModCardTemplate
 {
+    private const string CalculatedHitsKey = "CalculatedHits";
     private const int BaseEnergyCost = 1;
     private const CardType CardKind = CardType.Attack;
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
     private const decimal BaseDamage = 5m;
+    private const decimal BaseHitCount = 1m;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -34,6 +36,9 @@ public sealed class AlchemyStarsThunderRare3 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new DamageVar(BaseDamage, ValueProp.Move),
+        new CalculationBaseVar(BaseHitCount),
+        new CalculationExtraVar(1m),
+        new CalculatedVar(CalculatedHitsKey).WithMultiplier(CountBonusHitsFromThunderDamage),
         AlchemyStarsKeywordText.InlineTitleVar("PenetratingStar", AlchemyStarsKeywordIds.PenetratingStar),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
     ];
@@ -67,7 +72,7 @@ public sealed class AlchemyStarsThunderRare3 : ModCardTemplate
         if (IsUpgraded)
             await TryGrantRebellionBurningDayIfEmptiedThunderLightAsync(choiceContext);
 
-        var hitCount = 1 + LightMechanic.GetThunderDamageDealtThisTurn(Owner);
+        var hitCount = (int)((CalculatedVar)DynamicVars[CalculatedHitsKey]).Calculate(cardPlay.Target);
         for (var i = 0; i < hitCount; i++)
         {
             if (cardPlay.Target.IsDead)
@@ -103,6 +108,17 @@ public sealed class AlchemyStarsThunderRare3 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        // ����Ч��Ϊ�����׹��ܺ����ʱ��÷�����ȼ֮�ա�
+        // 升级效果为：刚好把雷光能耗尽时获得反叛灼燃之日。
+    }
+
+    /// <summary>
+    /// 本回合已造成的雷属性伤害次数，作为额外攻击次数。
+    /// </summary>
+    private static decimal CountBonusHitsFromThunderDamage(CardModel card, Creature? _)
+    {
+        if (card.Owner == null)
+            return 0m;
+
+        return LightMechanic.GetThunderDamageDealtThisTurn(card.Owner);
     }
 }

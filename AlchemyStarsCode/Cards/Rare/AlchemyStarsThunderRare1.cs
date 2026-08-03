@@ -1,6 +1,5 @@
 using System.Linq;
 using AlchemyStars.Mechanics;
-using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -18,13 +17,14 @@ using STS2RitsuLib.Utils;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// �������ǡ���ܽ��������ˣ���ɱ��������򣻿����Ĺ����������Ӷ�����
+/// 半生黯星·伊芙：多段雷伤；击杀后换目标；可消耗雷光能永久增加攻击次数。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderRare1 : ModCardTemplate
 {
     private static readonly AttachedState<CardModel, int> BonusHitCount = new(_ => 0);
 
+    private const string CalculatedHitsKey = "CalculatedHits";
     private const int BaseEnergyCost = 1;
     private const CardType CardKind = CardType.Attack;
     private const CardRarity CardRarityValue = CardRarity.Rare;
@@ -38,7 +38,9 @@ public sealed class AlchemyStarsThunderRare1 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new RepeatVar(BaseHitCount),
+        new CalculationBaseVar(BaseHitCount),
+        new CalculationExtraVar(1m),
+        new CalculatedVar(CalculatedHitsKey).WithMultiplier(CountCurrentHits),
         new DamageVar(1m, ValueProp.Move),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
     ];
@@ -63,7 +65,8 @@ public sealed class AlchemyStarsThunderRare1 : ModCardTemplate
         if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
             BonusHitCount[this] += BonusHitPerUse;
 
-        var hitCount = DynamicVars.Repeat.IntValue + BonusHitCount[this];
+        // 实际次数只取基础+已累计；预览里的「即将消耗光能+4」不能在此再算一次。
+        var hitCount = DynamicVars.CalculationBase.IntValue + BonusHitCount[this];
         var damage = DynamicVars.Damage.BaseValue;
         var target = cardPlay.Target;
 
@@ -110,5 +113,17 @@ public sealed class AlchemyStarsThunderRare1 : ModCardTemplate
     protected override void OnUpgrade()
     {
         DynamicVars.Damage.UpgradeValueBy(1m);
+    }
+
+    /// <summary>
+    /// 已累计的额外次数；若当前可消耗雷光能，再计入即将获得的 +4。
+    /// </summary>
+    private static decimal CountCurrentHits(CardModel card, Creature? _)
+    {
+        var bonus = BonusHitCount[card];
+        if (card.Owner != null && LightMechanic.HasThunderLightEnergy(card.Owner))
+            bonus += BonusHitPerUse;
+
+        return bonus;
     }
 }

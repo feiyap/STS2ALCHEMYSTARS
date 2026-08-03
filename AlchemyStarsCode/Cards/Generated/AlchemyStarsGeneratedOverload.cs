@@ -39,6 +39,7 @@ public sealed class AlchemyStarsGeneratedOverload : ModCardTemplate
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
+        CardKeyword.Unplayable,
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Overload)
     ];
 

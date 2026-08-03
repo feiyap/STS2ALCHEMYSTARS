@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MegaCrit.Sts2.Core.Entities.Powers;
-using AlchemyStars.Keywords;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
 
@@ -15,6 +14,4 @@ public sealed class AlchemyStarsTimelessSealPower : ModPowerTemplate
     public override PowerType Type => PowerType.Debuff;
 
     public override PowerStackType StackType => PowerStackType.Counter;
-
-    protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.TimelessSeal];
 }

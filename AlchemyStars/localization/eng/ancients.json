@@ -4,5 +4,27 @@
   "NEOW.talk.ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.0-1.ancient": "[sine]Go... build your character from this template...[/sine]",
   "DARV.talk.ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.0-0.char": "This place is still empty.",
   "DARV.talk.ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.0-0.next": "Continue",
-  "DARV.talk.ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.0-1.ancient": "Empty is useful! Take something and fill it in!"
+  "DARV.talk.ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.0-1.ancient": "Empty is useful! Take something and fill it in!",
+
+  "ALCHEMY_STARS_ENLIGHTENER.title": "The Enlightener",
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.description": "Light streams through your eyes. Choose a tracking plan to shape the attributes of this journey.",
+  "ALCHEMY_STARS_ENLIGHTENER.pages.DONE.description": "The plan is set. May your eyes see the path ahead.",
+
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_A.title": "Light Tracking Plan A",
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_A.description": "On pickup, choose one or more attributes to lock. Attribute cards in shops and rewards will only be of the chosen attributes.",
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_B.title": "Light Tracking Plan B",
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_B.description": "On pickup, choose one or more attributes to lock. Attribute cards in rewards will only be of the chosen attributes.",
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_C.title": "Light Tracking Plan C",
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_C.description": "Each time you pick up a card of an attribute, that attribute's appearance weight increases by 15%.",
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_D.title": "Light Tracking Plan D",
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_D.description": "No special tracking. Challenge the run in its original flavor.",
+
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_LIGHT_TRACKING_PLAN_A.title": "Light Tracking Plan A",
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_LIGHT_TRACKING_PLAN_A.description": "On pickup, choose one or more attributes to lock. Attribute cards in shops and rewards will only be of the chosen attributes.",
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_LIGHT_TRACKING_PLAN_B.title": "Light Tracking Plan B",
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_LIGHT_TRACKING_PLAN_B.description": "On pickup, choose one or more attributes to lock. Attribute cards in rewards will only be of the chosen attributes.",
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_LIGHT_TRACKING_PLAN_C.title": "Light Tracking Plan C",
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_LIGHT_TRACKING_PLAN_C.description": "Each time you pick up a card of an attribute, that attribute's appearance weight increases by 15%.",
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_LIGHT_TRACKING_PLAN_D.title": "Light Tracking Plan D",
+  "ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_LIGHT_TRACKING_PLAN_D.description": "No special tracking. Challenge the run in its original flavor."
 }

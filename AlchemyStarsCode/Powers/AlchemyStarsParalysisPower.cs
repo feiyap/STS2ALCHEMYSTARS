@@ -10,7 +10,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 麻痹：每层使受到的雷属性伤害增�?1%�?
+/// 麻痹：每层使受到的雷属性伤害增加 2%。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsParalysisPower : ModPowerTemplate
@@ -34,6 +34,6 @@ public sealed class AlchemyStarsParalysisPower : ModPowerTemplate
             LightMechanicDamageContext.CurrentElement != LightElement.Prismatic)
             return 1m;
 
-        return 1m + Amount * 0.01m;
+        return 1m + Amount * 0.02m;
     }
 }

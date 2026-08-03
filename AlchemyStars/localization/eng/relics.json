@@ -7,5 +7,23 @@
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LUMEN_RELIC_UPGRADED.flavor": "The shackles become a chord, and four colors of light answer one another across a wider bar.",
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_RELIC.title": "Sample Relic",
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_RELIC.description": "At the start of each turn, draw {Cards:diff()} cards.",
-  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_RELIC.flavor": "A sample relic from the mod scaffold."
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_RELIC.flavor": "A sample relic from the mod scaffold.",
+
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_A.title": "Light Tracking Plan A",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_A.description": "On pickup, choose one or more attributes to lock. Attribute cards in [gold]shops[/gold] and [gold]rewards[/gold] will only be of the chosen attributes. Does not affect colorless cards.",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_A.flavor": "Those people were once called \"the Colorless.\"\nBut they are better known as the \"Celestites.\"",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_A.selectionScreenPrompt": "Choose attributes to lock (multi-select), then confirm.",
+
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_B.title": "Light Tracking Plan B",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_B.description": "On pickup, choose one or more attributes to lock. Attribute cards in [gold]rewards[/gold] will only be of the chosen attributes. Does not affect colorless cards.",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_B.flavor": "What makes Celestites unique is that they cannot wield Light, yet possess eyes that can see its colors.",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_B.selectionScreenPrompt": "Choose attributes to lock (multi-select), then confirm.",
+
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_C.title": "Light Tracking Plan C",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_C.description": "Each time you pick up a card of an attribute, that attribute's appearance weight increases by [blue]15%[/blue]. Does not affect colorless cards.",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_C.flavor": "One day, the Celestites were attacked in their homeland and were once believed extinct.",
+
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_D.title": "Light Tracking Plan D",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_D.description": "No special tracking. Challenge the run in its original flavor.",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LIGHT_TRACKING_PLAN_D.flavor": "Until the last descendant of the sky appeared.\nAnd so the story began."
 }

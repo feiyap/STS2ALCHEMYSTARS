@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AlchemyStars.Keywords;
 using AlchemyStars.Mechanics;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
@@ -22,8 +21,6 @@ public sealed class AlchemyStarsVelvetNeedlePower : ModPowerTemplate
     public override PowerType Type => PowerType.Debuff;
 
     public override PowerStackType StackType => PowerStackType.Counter;
-
-    protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.VelvetNeedle];
 
     public override async Task AfterSideTurnEnd(
         PlayerChoiceContext choiceContext,

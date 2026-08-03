@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
@@ -21,12 +22,14 @@ namespace AlchemyStars.Cards;
 [RegisterArchaicToothTranscendence(typeof(AlchemyStarsViceEmptyPupil))]
 public sealed class AlchemyStarsVice : ModCardTemplate
 {
+    private const string CalculatedHitsKey = "CalculatedHits";
     private const int BaseEnergyCost = 1;
     private const CardType CardKind = CardType.Attack;
     private const CardRarity CardRarityValue = CardRarity.Basic;
     private const TargetType CardTarget = TargetType.RandomEnemy;
     private const bool ShowInCardLibrary = true;
     private const int BaseHitCount = 5;
+    private const int BonusHitCount = 1;
     private const decimal HitDamage = 1m;
 
     public override CardAssetProfile AssetProfile => new(
@@ -34,7 +37,9 @@ public sealed class AlchemyStarsVice : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new RepeatVar(BaseHitCount),
+        new CalculationBaseVar(BaseHitCount),
+        new CalculationExtraVar(BonusHitCount),
+        new CalculatedVar(CalculatedHitsKey).WithMultiplier(CountLightBonusMultiplier),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water),
         AlchemyStarsKeywordText.InlineTitleVar("LockTitle", AlchemyStarsKeywordIds.Lock)
     ];
@@ -57,9 +62,9 @@ public sealed class AlchemyStarsVice : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        var hitCount = DynamicVars.Repeat.IntValue;
+        var hitCount = DynamicVars.CalculationBase.IntValue;
         if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Water]))
-            hitCount++;
+            hitCount += DynamicVars.CalculationExtra.IntValue;
 
         for (var i = 0; i < hitCount; i++)
         {
@@ -95,5 +100,13 @@ public sealed class AlchemyStarsVice : ModCardTemplate
             return null;
 
         return Owner.RunState.Rng.CombatTargets.NextItem(enemies);
+    }
+
+    private static decimal CountLightBonusMultiplier(CardModel card, Creature? _)
+    {
+        if (card.Owner == null)
+            return 0m;
+
+        return LightMechanic.HasWaterLightEnergy(card.Owner) ? 1m : 0m;
     }
 }

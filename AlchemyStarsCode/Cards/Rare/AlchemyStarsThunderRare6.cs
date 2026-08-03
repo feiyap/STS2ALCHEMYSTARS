@@ -63,4 +63,9 @@ public sealed class AlchemyStarsThunderRare6 : ModCardTemplate
             Owner.Creature,
             this);
     }
+
+    protected override void OnUpgrade()
+    {
+        EnergyCost.UpgradeBy(-1);
+    }
 }

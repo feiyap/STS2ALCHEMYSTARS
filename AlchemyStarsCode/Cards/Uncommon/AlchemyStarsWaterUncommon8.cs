@@ -1,8 +1,10 @@
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
@@ -20,12 +22,15 @@ namespace AlchemyStars.Cards;
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterUncommon8 : ModCardTemplate
 {
+    private const string CalculatedHitsKey = "CalculatedHits";
     private const int BaseEnergyCost = 1;
     private const CardType CardKind = CardType.Attack;
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
     private const decimal BaseDamage = 4m;
+    private const decimal BaseHitCount = 1m;
+    private const decimal BonusHitCount = 1m;
     private const decimal VelvetNeedleStacks = 1m;
 
     public override CardAssetProfile AssetProfile => new(
@@ -34,6 +39,9 @@ public sealed class AlchemyStarsWaterUncommon8 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new DamageVar(BaseDamage, ValueProp.Move),
+        new CalculationBaseVar(BaseHitCount),
+        new CalculationExtraVar(BonusHitCount),
+        new CalculatedVar(CalculatedHitsKey).WithMultiplier(CountLightBonusMultiplier),
         AlchemyStarsKeywordText.InlineTitleVar("VelvetNeedleBase", AlchemyStarsKeywordIds.VelvetNeedleBase),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
     ];
@@ -90,5 +98,13 @@ public sealed class AlchemyStarsWaterUncommon8 : ModCardTemplate
     protected override void OnUpgrade()
     {
         DynamicVars.Damage.UpgradeValueBy(2m);
+    }
+
+    private static decimal CountLightBonusMultiplier(CardModel card, Creature? _)
+    {
+        if (card.Owner == null)
+            return 0m;
+
+        return LightMechanic.HasWaterLightEnergy(card.Owner) ? 1m : 0m;
     }
 }
