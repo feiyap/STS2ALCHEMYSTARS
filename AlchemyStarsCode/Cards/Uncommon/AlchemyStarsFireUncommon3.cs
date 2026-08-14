@@ -16,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 炽情长殷·仲胥：炽焰断灭；获火光能并按本场打出次数翻倍施加灼烧，按被灼烧敌人数获格挡。
+/// 炽情长殷·仲胥：炽焰断灭对全体施加 3 层灼烧；获火光能，按被灼烧敌人数获格挡。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireUncommon3 : ModCardTemplate
@@ -27,9 +27,9 @@ public sealed class AlchemyStarsFireUncommon3 : ModCardTemplate
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
     private const int FireEnergyGain = 2;
-    private const int BlockPerScorchedEnemy = 5;
-
-    private int _playCount;
+    private const int ScorchAmount = 3;
+    private const decimal BaseBlockPerEnemy = 4m;
+    private const decimal BlockPerEnemyUpgradeBy = 1m;
 
     public override bool GainsBlock => true;
 
@@ -38,7 +38,7 @@ public sealed class AlchemyStarsFireUncommon3 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new PowerVar<AlchemyStarsScorchPower>(2m),
+        new BlockVar(BaseBlockPerEnemy, ValueProp.Move),
         AlchemyStarsKeywordText.InlineTitleVar("BlazingSeverance", AlchemyStarsKeywordIds.BlazingSeverance),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
     ];
@@ -53,7 +53,6 @@ public sealed class AlchemyStarsFireUncommon3 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.BlazingSeverance)),
-        
         HoverTipFactory.FromPower<AlchemyStarsScorchPower>()
     ];
 
@@ -66,26 +65,21 @@ public sealed class AlchemyStarsFireUncommon3 : ModCardTemplate
     {
         LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Fire, FireEnergyGain);
 
-        var baseScorch = DynamicVars["AlchemyStarsScorchPower"].IntValue;
-        var scorchStacks = baseScorch * (1 << _playCount);
         var scorchedCount = 0;
-
         foreach (var enemy in CombatState!.HittableEnemies.ToList())
         {
             await PowerCmd.Apply<AlchemyStarsScorchPower>(
                 choiceContext,
                 enemy,
-                scorchStacks,
+                ScorchAmount,
                 Owner.Creature,
                 this);
             scorchedCount++;
         }
 
-        _playCount++;
-
         if (scorchedCount > 0)
         {
-            var block = scorchedCount * BlockPerScorchedEnemy;
+            var block = scorchedCount * DynamicVars.Block.IntValue;
             if (scorchedCount == 1)
                 block *= 2;
 
@@ -98,6 +92,6 @@ public sealed class AlchemyStarsFireUncommon3 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        DynamicVars["AlchemyStarsScorchPower"].UpgradeValueBy(1m);
+        DynamicVars.Block.UpgradeValueBy(BlockPerEnemyUpgradeBy);
     }
 }

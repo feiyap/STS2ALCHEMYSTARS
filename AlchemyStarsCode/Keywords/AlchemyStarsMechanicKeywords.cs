@@ -270,6 +270,10 @@ namespace AlchemyStars.Keywords;
     "box_melody",
     CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
 
+[RegisterOwnedCardKeyword(
+    "spirit_staff_blessing",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
 public sealed class AlchemyStarsMechanicKeywords;
 
 

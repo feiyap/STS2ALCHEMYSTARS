@@ -15,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 红油甜心·芭芭拉：消耗火光能后抽牌、放入晕眩并获得灼燃。消耗。
+/// 红油甜心·芭芭拉：消耗火光能后抽牌、放入晕眩并获得灼燃。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireCommon8 : ModCardTemplate
@@ -25,8 +25,8 @@ public sealed class AlchemyStarsFireCommon8 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int DrawCount = 4;
-    private const int DazedCount = 1;
+    private const int DrawCount = 3;
+    private const int DazedCount = 2;
     private const int IgnitionGain = 2;
 
     protected override bool IsPlayable => LightMechanic.HasFireLightEnergy(Owner);
@@ -43,13 +43,11 @@ public sealed class AlchemyStarsFireCommon8 : ModCardTemplate
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
-        CardKeyword.Exhaust,
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)
     ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        HoverTipFactory.FromKeyword(CardKeyword.Exhaust),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
         HoverTipFactory.FromCard<Dazed>(),
         HoverTipFactory.FromPower<AlchemyStarsIgnitionPower>()

@@ -9,7 +9,6 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models.Powers;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
-using AlchemyStars.Mechanics;
 using AlchemyStars.Powers;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Keywords;
@@ -18,17 +17,18 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 躁动炎雀·匹皮：消耗 1 张手牌，对目标施加易伤并获得飞行；打出前已飞行则获得万色光能。
+/// 躁动炎雀·匹皮：消耗 1 张手牌，对目标施加易伤并获得飞行；已飞行则额外易伤；升级获能。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireCommon6 : ModCardTemplate
 {
-    private const int BaseEnergyCost = 1;
+    private const int BaseEnergyCost = 0;
     private const CardType CardKind = CardType.Skill;
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
-    private const decimal VulnerableAmount = 2m;
+    private const decimal VulnerableAmount = 1m;
+    private const decimal ExtraVulnerableWhenFlying = 1m;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -37,6 +37,7 @@ public sealed class AlchemyStarsFireCommon6 : ModCardTemplate
     [
         new PowerVar<VulnerablePower>(VulnerableAmount),
         new PowerVar<AlchemyStarsFlyingPower>(1m),
+        new EnergyVar(1),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
     ];
 
@@ -48,7 +49,6 @@ public sealed class AlchemyStarsFireCommon6 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
-        
         HoverTipFactory.FromPower<AlchemyStarsFlyingPower>(),
         HoverTipFactory.FromPower<VulnerablePower>()
     ];
@@ -79,11 +79,14 @@ public sealed class AlchemyStarsFireCommon6 : ModCardTemplate
         }
 
         var hadFlying = Owner.Creature.GetPowerAmount<AlchemyStarsFlyingPower>() > 0;
+        var vulnerable = DynamicVars.Vulnerable.BaseValue;
+        if (hadFlying)
+            vulnerable += ExtraVulnerableWhenFlying;
 
         await PowerCmd.Apply<VulnerablePower>(
             choiceContext,
             cardPlay.Target,
-            DynamicVars.Vulnerable.BaseValue,
+            vulnerable,
             Owner.Creature,
             this);
 
@@ -94,7 +97,11 @@ public sealed class AlchemyStarsFireCommon6 : ModCardTemplate
             Owner.Creature,
             this);
 
-        if (hadFlying)
-            LightMechanic.TryGrantLightEnergy(Owner, LightElement.Prismatic);
+        if (IsUpgraded)
+            await PlayerCmd.GainEnergy(DynamicVars.Energy.IntValue, Owner);
+    }
+
+    protected override void OnUpgrade()
+    {
     }
 }

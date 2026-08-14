@@ -1,8 +1,6 @@
 using System.Linq;
-using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
@@ -19,7 +17,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 熔岩黑兽·贾尔斯：将 1 张手牌变为灼伤，再造成火属性伤害并施加易伤。
+/// 熔岩黑兽·贾尔斯：将抽牌堆 1 张牌变为灼伤，再造成火属性伤害并施加易伤。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireCommon4 : ModCardTemplate
@@ -35,7 +33,7 @@ public sealed class AlchemyStarsFireCommon4 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(8m, ValueProp.Move),
+        new DamageVar(6m, ValueProp.Move),
         new PowerVar<VulnerablePower>(1m),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
     ];
@@ -62,19 +60,12 @@ public sealed class AlchemyStarsFireCommon4 : ModCardTemplate
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
-        // 无可变形手牌时跳过选牌，避免 FromHand 内 CancelAllCardPlay 把出牌动画卡死。
-        var selectable = PileType.Hand.GetPile(Owner).Cards
-            .Where(card => !ReferenceEquals(card, this) && card.IsTransformable)
+        var transformable = PileType.Draw.GetPile(Owner).Cards
+            .Where(card => card.IsTransformable)
             .ToList();
-        if (selectable.Count > 0)
+        if (transformable.Count > 0)
         {
-            var selected = (await CardSelectCmd.FromHand(
-                choiceContext,
-                Owner,
-                new CardSelectorPrefs(SelectionScreenPrompt, 1, 1),
-                card => !ReferenceEquals(card, this) && card.IsTransformable,
-                this)).FirstOrDefault();
-
+            var selected = Owner.RunState.Rng.CombatTargets.NextItem(transformable);
             if (selected != null)
             {
                 var burn = CombatState!.CreateCard<Burn>(Owner);

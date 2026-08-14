@@ -16,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 逐焰黑犬·哈提：需有效火属性格不少于 2 个；对所有敌人造成火伤并将灼伤放入手牌。
+/// 逐焰黑犬·哈提：需有效火属性格不少于 2 个；对所有敌人造成火伤并将灼伤放入弃牌堆。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireCommon5 : ModCardTemplate
@@ -39,7 +39,7 @@ public sealed class AlchemyStarsFireCommon5 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(12m, ValueProp.Move),
+        new DamageVar(10m, ValueProp.Move),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
     ];
 
@@ -51,7 +51,6 @@ public sealed class AlchemyStarsFireCommon5 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
-        
         HoverTipFactory.FromCard<Burn>()
     ];
 
@@ -76,13 +75,13 @@ public sealed class AlchemyStarsFireCommon5 : ModCardTemplate
 
         await CardPileCmd.AddToCombatAndPreview<Burn>(
             Owner.Creature,
-            PileType.Hand,
+            PileType.Discard,
             BurnGain,
             null);
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Damage.UpgradeValueBy(3m);
+        DynamicVars.Damage.UpgradeValueBy(4m);
     }
 }

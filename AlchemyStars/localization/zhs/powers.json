@@ -113,10 +113,12 @@
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_FIRE_DOUBLE_DAMAGE_POWER.description": "本回合内，你的火属性伤害翻倍。",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_BLUE_FIRE_THERAPY_POWER.title": "蓝火疗心",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_BLUE_FIRE_THERAPY_POWER.description": "本能力持续期间，每次损失生命值时消耗{fireLightPrefix:lightIcons(1)}，将损失生命值的一半转化为[gold]覆甲[/gold]。回合开始时失去 [blue]1[/blue] 层。",
+  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_SPIRIT_STAFF_BLESSING_POWER.title": "灵杖庇佑",
+  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_SPIRIT_STAFF_BLESSING_POWER.description": "每回合开始时，选择[gold]消耗[/gold] [blue]1[/blue] 张牌，获得 [blue]1[/blue] 层[gold]灼燃[/gold]并恢复 [blue]2[/blue] 点体力。",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_PANACEA_POWER.title": "万应灵药",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_PANACEA_POWER.description": "对标记目标造成的未被格挡伤害转化为生命，剩余上限等于层数。",
-  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_DEAD_CELEBRATION_POWER.title": "冥河列车·卡戎",
-  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_DEAD_CELEBRATION_POWER.description": "下次洗牌时，[gold]消耗[/gold]一半的[gold]抽牌堆[/gold]，优先[gold]消耗[/gold][gold]状态[/gold]牌与[purple]诅咒[/purple]牌。",
+  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_DEAD_CELEBRATION_POWER.title": "亡者庆典",
+  "ALCHEMY_STARS_POWER_ALCHEMY_STARS_DEAD_CELEBRATION_POWER.description": "[gold]消耗[/gold]一半的卡组（[gold]抽牌堆[/gold]与[gold]弃牌堆[/gold]），优先[gold]消耗[/gold][gold]状态[/gold]牌与[purple]诅咒[/purple]牌。",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_SUPREME_CODEX_POWER.title": "至高宝典",
   "ALCHEMY_STARS_POWER_ALCHEMY_STARS_SUPREME_CODEX_POWER.description": "本场战斗结束时，随机升级 [blue]1[/blue] 张牌。"
 }

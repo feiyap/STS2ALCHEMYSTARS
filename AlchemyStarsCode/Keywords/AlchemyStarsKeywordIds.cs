@@ -90,5 +90,6 @@ public static class AlchemyStarsKeywordIds
     public const string NoSurvivors = "ALCHEMY_STARS_KEYWORD_NO_SURVIVORS";
     public const string DeadCelebration = "ALCHEMY_STARS_KEYWORD_DEAD_CELEBRATION";
     public const string BoxMelody = "ALCHEMY_STARS_KEYWORD_BOX_MELODY";
+    public const string SpiritStaffBlessing = "ALCHEMY_STARS_KEYWORD_SPIRIT_STAFF_BLESSING";
 }
 

@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 空虚之瞳·艾希：获得火光能与格挡，并生成 2 个火属性格（小概率深色格）。
+/// 空虚之瞳·艾希：获得火光能与格挡，并生成 1 个火属性格（小概率深色格）。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireUncommon4 : ModCardTemplate
@@ -25,7 +25,7 @@ public sealed class AlchemyStarsFireUncommon4 : ModCardTemplate
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
     private const int FireEnergyGain = 2;
-    private const int FireCellsToCreate = 2;
+    private const int FireCellsToCreate = 1;
     private const int DarkCellChancePercent = 15;
 
     public override bool GainsBlock => true;

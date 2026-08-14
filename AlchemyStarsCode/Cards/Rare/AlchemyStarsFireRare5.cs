@@ -26,14 +26,14 @@ public sealed class AlchemyStarsFireRare5 : ModCardTemplate
 {
     private static readonly AttachedState<CardModel, int> Bullets = new(_ => 0);
 
-    private const int BaseEnergyCost = 2;
+    private const int BaseEnergyCost = 1;
     private const CardType CardKind = CardType.Attack;
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
-    private const int RequiredFireCells = 4;
+    private const int RequiredFireCells = 3;
     private const decimal BaseBulletDamage = 2m;
-    private const int BulletsPerExhaustCard = 2;
+    private const int BulletsPerExhaustCard = 1;
     private const decimal IgnitionBonusRate = 0.15m;
 
     protected override bool IsPlayable =>

@@ -13,7 +13,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 蓝火疗心·诺维亚：获得蓝火疗心能力，升级后固有。
+/// 蓝火疗心·诺维亚：灵杖庇佑；恢复体力，每回合开始消耗牌获灼燃并回血。升级后固有。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireUncommon8 : ModCardTemplate
@@ -23,27 +23,31 @@ public sealed class AlchemyStarsFireUncommon8 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const decimal TherapyTurns = 3m;
+    private const int PlayHealAmount = 4;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new PowerVar<AlchemyStarsBlueFireTherapyPower>(TherapyTurns),
+        new HealVar(PlayHealAmount),
+        new PowerVar<AlchemyStarsSpiritStaffBlessingPower>(1m),
+        AlchemyStarsKeywordText.InlineTitleVar("SpiritStaffBlessing", AlchemyStarsKeywordIds.SpiritStaffBlessing),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
-        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)
+        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire),
+        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.SpiritStaffBlessing)
     ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
-        
-        HoverTipFactory.FromPower<AlchemyStarsBlueFireTherapyPower>()
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.SpiritStaffBlessing)),
+        HoverTipFactory.FromPower<AlchemyStarsSpiritStaffBlessingPower>(),
+        HoverTipFactory.FromPower<AlchemyStarsIgnitionPower>()
     ];
 
     public AlchemyStarsFireUncommon8()
@@ -53,10 +57,11 @@ public sealed class AlchemyStarsFireUncommon8 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        await PowerCmd.Apply<AlchemyStarsBlueFireTherapyPower>(
+        await CreatureCmd.Heal(Owner.Creature, PlayHealAmount);
+        await PowerCmd.Apply<AlchemyStarsSpiritStaffBlessingPower>(
             choiceContext,
             Owner.Creature,
-            DynamicVars["AlchemyStarsBlueFireTherapyPower"].BaseValue,
+            DynamicVars["AlchemyStarsSpiritStaffBlessingPower"].BaseValue,
             Owner.Creature,
             this);
     }
