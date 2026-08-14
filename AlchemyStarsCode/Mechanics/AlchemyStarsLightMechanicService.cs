@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using AlchemyStars.Cards;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -12,7 +14,7 @@ using STS2RitsuLib.Models;
 namespace AlchemyStars.Mechanics;
 
 /// <summary>
-/// 协调光能/属性格战斗钩子�?
+/// 协调光能/属性格战斗钩子。
 /// </summary>
 [RegisterSingleton]
 public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
@@ -37,9 +39,28 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
 
             LightMechanicCombatState.Reset(player);
             LightMechanic.InitializeForCombat(player);
+            AlchemyStarsForestState.ResetCombatTracking(player);
         }
 
         await Task.CompletedTask;
+    }
+
+    public override Task AfterFlush(
+        PlayerChoiceContext choiceContext,
+        Player player,
+        IReadOnlyCollection<CardModel> flushedCards,
+        IReadOnlyCollection<CardModel> retainedCards)
+    {
+        if (!LightMechanic.IsMechanicActive(player))
+            return Task.CompletedTask;
+
+        var retainCount = retainedCards.Count;
+        if (retainCount <= 0)
+            return Task.CompletedTask;
+
+        AlchemyStarsForestState.NotifyCardsRetained(player, retainCount);
+        AlchemyStarsForestUncommon9.SyncAllThornSealDamageDisplays(player);
+        return Task.CompletedTask;
     }
 
     public override decimal ModifyDamageMultiplicative(
@@ -50,7 +71,7 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
         CardModel? cardSource,
         CardPlay? cardPlay)
     {
-        if (dealer?.Player == null || !LightMechanic.HasMechanicRelic(dealer.Player))
+        if (dealer?.Player == null || !LightMechanic.IsMechanicActive(dealer.Player))
             return 1m;
 
         var element = LightMechanicDamageContext.CurrentElement;
@@ -77,7 +98,7 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
         foreach (var creature in participants)
         {
             var player = creature.Player;
-            if (player == null || !LightMechanic.HasMechanicRelic(player))
+            if (player == null || creature.IsDead || !LightMechanic.IsMechanicActive(player))
                 continue;
 
             await LightMechanic.ResolvePlayerTurnEnd(choiceContext, player);
@@ -86,11 +107,28 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {
-        if (!LightMechanic.HasMechanicRelic(player))
+        if (!LightMechanic.IsMechanicActive(player))
             return;
 
         LightMechanic.ResetTurnCounters(player);
         AlchemyStarsForestState.TickTeaPartyCooldown(player);
         await Task.CompletedTask;
+    }
+
+    public override Task AfterDeath(
+        PlayerChoiceContext choiceContext,
+        Creature creature,
+        bool wasRemovalPrevented,
+        float deathAnimLength)
+    {
+        if (wasRemovalPrevented)
+            return Task.CompletedTask;
+
+        var player = creature.Player;
+        if (player == null || !LightMechanic.HasMechanicRelic(player))
+            return Task.CompletedTask;
+
+        LightMechanic.ClearOnDeath(player);
+        return Task.CompletedTask;
     }
 }

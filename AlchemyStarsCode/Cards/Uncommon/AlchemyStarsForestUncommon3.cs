@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using System.Linq;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Entities.RestSite;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
@@ -8,6 +11,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
 using AlchemyStars.Mechanics;
+using AlchemyStars.RestSite;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Keywords;
 using STS2RitsuLib.Scaffolding.Content;
@@ -90,5 +94,13 @@ public sealed class AlchemyStarsForestUncommon3 : ModCardTemplate
     protected override void OnUpgrade()
     {
         AddKeyword(CardKeyword.Retain);
+    }
+
+    public override bool TryModifyRestSiteOptions(Player player, ICollection<RestSiteOption> options)
+    {
+        if (player != Owner)
+            return false;
+
+        return AlchemyStarsBartonFusionRestSiteOption.TryAddOption(player, options);
     }
 }

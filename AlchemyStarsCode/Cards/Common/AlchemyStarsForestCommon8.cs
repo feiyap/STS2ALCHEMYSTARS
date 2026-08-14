@@ -29,8 +29,6 @@ public sealed class AlchemyStarsForestCommon8 : ModCardTemplate
     private const int MaxDiscardCount = 2;
     private const int HitCount = 2;
     private const decimal CurseStatusDamage = 5m;
-    private const int TeaPartyCooldownTurns = 2;
-
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
@@ -52,8 +50,7 @@ public sealed class AlchemyStarsForestCommon8 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.ShadowTownTeaParty)),
-        HoverTipFactory.FromPower<AlchemyStarsTeaPartyDiscountPower>()
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.ShadowTownTeaParty))
     ];
 
     public AlchemyStarsForestCommon8()
@@ -65,11 +62,7 @@ public sealed class AlchemyStarsForestCommon8 : ModCardTemplate
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
-        await AlchemyStarsCardHelpers.TryTriggerTeaPartyOnPlay(
-            choiceContext,
-            this,
-            Owner,
-            TeaPartyCooldownTurns);
+        await AlchemyStarsCardHelpers.TryTriggerTeaPartyOnPlay(choiceContext, this, Owner);
 
         var discarded = (await CardSelectCmd.FromHandForDiscard(
             choiceContext,

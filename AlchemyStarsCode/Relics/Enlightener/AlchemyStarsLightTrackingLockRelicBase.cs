@@ -110,25 +110,11 @@ public abstract class AlchemyStarsLightTrackingLockRelicBase : AlchemyStarsEnlig
         return options.Where(card => AttributeCardTracking.PassesAttributeLock(card, LockedAttributeMask));
     }
 
-    private static List<CardModel> BuildAttributeChoices(Player owner)
-    {
-        var pool = AttributeCardTracking.GetCharacterPoolCards(owner).ToList();
-        var result = new List<CardModel>(4);
-
-        TryAdd(AlchemyStarsCardHelpers.HasFireKeyword);
-        TryAdd(AlchemyStarsCardHelpers.HasWaterKeyword);
-        TryAdd(AlchemyStarsCardHelpers.HasThunderKeyword);
-        TryAdd(AlchemyStarsCardHelpers.HasForestKeyword);
-
-        return result;
-
-        void TryAdd(Func<CardModel, bool> predicate)
-        {
-            var template = pool.FirstOrDefault(predicate);
-            if (template == null)
-                return;
-
-            result.Add(owner.RunState.CreateCard(template, owner));
-        }
-    }
+    private static List<CardModel> BuildAttributeChoices(Player owner) =>
+    [
+        owner.RunState.CreateCard<AlchemyStarsEnlightenerChoiceHeichao>(owner),
+        owner.RunState.CreateCard<AlchemyStarsEnlightenerChoiceNadine>(owner),
+        owner.RunState.CreateCard<AlchemyStarsEnlightenerChoiceEureka>(owner),
+        owner.RunState.CreateCard<AlchemyStarsEnlightenerChoiceMuYuebai>(owner),
+    ];
 }

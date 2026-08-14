@@ -15,7 +15,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 盛装之触·克莱肯：获得格挡并随机转化非水属性格，成功转�?2 格时获得敏捷与水光能�?/// </summary>
+/// 盛装之触·克莱肯：获得格挡，将非水光能（含万色）转化为水格，成功 2 格时获敏捷并获得水光能。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterCommon5 : ModCardTemplate
 {
@@ -24,7 +25,7 @@ public sealed class AlchemyStarsWaterCommon5 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int ConvertCellCount = 2;
+    private const int ConvertLightEnergyCount = 2;
 
     public override bool GainsBlock => true;
 
@@ -46,8 +47,6 @@ public sealed class AlchemyStarsWaterCommon5 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
-        
-        
         HoverTipFactory.FromPower<DexterityPower>()
     ];
 
@@ -60,8 +59,10 @@ public sealed class AlchemyStarsWaterCommon5 : ModCardTemplate
     {
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
 
-        var converted = LightMechanic.TryConvertRandomNonWaterCells(Owner, ConvertCellCount);
-        if (converted >= ConvertCellCount)
+        var converted = LightMechanic.TryConvertRandomNonWaterLightEnergyToWaterCells(
+            Owner,
+            ConvertLightEnergyCount);
+        if (converted >= ConvertLightEnergyCount)
         {
             await PowerCmd.Apply<DexterityPower>(
                 choiceContext,

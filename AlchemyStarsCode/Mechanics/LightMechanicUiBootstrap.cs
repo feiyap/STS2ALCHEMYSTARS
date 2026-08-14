@@ -2,6 +2,7 @@ using AlchemyStars.Characters;
 using AlchemyStars.Mechanics;
 using AlchemyStars.UI;
 using Godot;
+using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Nodes.Combat;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
@@ -41,7 +42,10 @@ public static class LightMechanicUiBootstrap
                 if (ctx.Node is not LightMechanicUiBar bar)
                     return;
 
-                if (ctx.Player == null || !LightMechanic.HasMechanicRelic(ctx.Player))
+                // 主战斗 UI 只绑定本地存活玩家，避免多人时显示/覆盖成队友状态。
+                if (ctx.Player == null ||
+                    !ShouldUpdateLocalCombatUi(ctx.Player) ||
+                    !LightMechanic.IsMechanicActive(ctx.Player))
                 {
                     bar.Visible = false;
                     return;
@@ -61,13 +65,31 @@ public static class LightMechanicUiBootstrap
             });
     }
 
+    /// <summary>
+    /// 刷新指定玩家的光能/转色 UI。
+    /// 主战斗栏仅在本地玩家变化时更新，避免多人时被队友状态覆盖。
+    /// </summary>
     public static void RefreshForPlayer(Player player)
     {
+        ArgumentNullException.ThrowIfNull(player);
+
         var ui = NCombatRoom.Instance?.Ui;
         if (ui == null || !GodotObject.IsInstanceValid(ui))
             return;
 
+        if (!ShouldUpdateLocalCombatUi(player))
+            return;
+
         SecondaryResourceUiRuntime.UpdateCombatUi(ui, player);
+    }
+
+    private static bool ShouldUpdateLocalCombatUi(Player player)
+    {
+        if (LocalContext.IsMe(player))
+            return true;
+
+        // 单人 / LocalContext 尚未绑定时：仅有一名玩家则刷新。
+        return player.RunState?.Players.Count == 1;
     }
 
     private static LightMechanicUiBar CreateBar()

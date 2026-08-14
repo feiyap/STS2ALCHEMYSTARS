@@ -13,7 +13,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 灿烂雨露·拉斐尔：高庭卫队；手牌另有高庭卫队时获能，获得水光能并按水属性格数量治疗�?/// </summary>
+/// 灿烂雨露·拉斐尔：高庭卫队；获得水属性格并按有效水格数量治疗。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterUncommon1 : ModCardTemplate
 {
@@ -22,7 +23,7 @@ public sealed class AlchemyStarsWaterUncommon1 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int WaterEnergyGain = 2;
+    private const int WaterCellGain = 2;
     private const int HealPerWaterCell = 1;
     private const int UpgradedHealPerWaterCell = 2;
 
@@ -49,8 +50,7 @@ public sealed class AlchemyStarsWaterUncommon1 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.HighCourtGuard)),
-        
-        ];
+    ];
 
     public AlchemyStarsWaterUncommon1()
         : base(BaseEnergyCost, CardKind, CardRarityValue, CardTarget, ShowInCardLibrary)
@@ -62,9 +62,10 @@ public sealed class AlchemyStarsWaterUncommon1 : ModCardTemplate
         if (AlchemyStarsCardHelpers.HasOtherTagInHand(this, Owner, AlchemyStarsCardTags.HighCourtGuard))
             await PlayerCmd.GainEnergy(1, Owner);
 
-        LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Water, WaterEnergyGain);
+        for (var i = 0; i < WaterCellGain; i++)
+            LightMechanic.TryAddAttributeCell(Owner, LightElement.Water);
 
-        var waterCells = LightMechanic.CountWaterAttributeCells(Owner);
+        var waterCells = LightMechanic.CountEffectiveWaterCells(Owner);
         var heal = waterCells * DynamicVars.Heal.IntValue;
         if (heal > 0)
             await CreatureCmd.Heal(Owner.Creature, heal);

@@ -76,7 +76,6 @@ public sealed class AlchemyStarsForestRare4 : ModCardTemplate
             return;
 
         AlchemyStarsForestState.IncrementJenoRetainCount(this);
-        AlchemyStarsForestState.IncrementRetainEffectCount(player);
         InvokeEnergyCostChanged();
         await Task.CompletedTask;
     }

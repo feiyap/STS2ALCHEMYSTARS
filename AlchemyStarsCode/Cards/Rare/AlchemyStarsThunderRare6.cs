@@ -43,10 +43,7 @@ public sealed class AlchemyStarsThunderRare6 : ModCardTemplate
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.WorkshopPrep)),
-        
-        HoverTipFactory.FromPower<AlchemyStarsWorkshopPrepPower>()
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder))
     ];
 
     public AlchemyStarsThunderRare6()

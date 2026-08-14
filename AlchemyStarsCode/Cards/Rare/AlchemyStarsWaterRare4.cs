@@ -29,8 +29,6 @@ public sealed class AlchemyStarsWaterRare4 : ModCardTemplate
     private const decimal BaseTremorAmount = 1m;
     private const decimal TremorAmountUpgradeBy = 1m;
     private const int StunThreshold = 4;
-    private const int TeaPartyCooldownTurns = 2;
-
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
@@ -38,6 +36,7 @@ public sealed class AlchemyStarsWaterRare4 : ModCardTemplate
     [
         new DamageVar(BaseDamage, ValueProp.Move),
         new PowerVar<AlchemyStarsTremorPower>(BaseTremorAmount),
+        new PowerVar<AlchemyStarsNightmareThornPower>(1m),
         AlchemyStarsKeywordText.InlineTitleVar("ShadowTownTeaParty", AlchemyStarsKeywordIds.ShadowTownTeaParty),
         AlchemyStarsKeywordText.InlineTitleVar("NightmareThorn", AlchemyStarsKeywordIds.NightmareThorn),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
@@ -55,11 +54,7 @@ public sealed class AlchemyStarsWaterRare4 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.NightmareThorn)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.ShadowTownTeaParty)),
-        HoverTipFactory.FromPower<AlchemyStarsNightmareThornPower>(),
-        HoverTipFactory.FromPower<AlchemyStarsTremorPower>(),
-        HoverTipFactory.FromPower<AlchemyStarsTeaPartyDiscountPower>()
+        HoverTipFactory.FromPower<AlchemyStarsTremorPower>()
     ];
 
     public AlchemyStarsWaterRare4()
@@ -76,15 +71,18 @@ public sealed class AlchemyStarsWaterRare4 : ModCardTemplate
             Owner.Creature,
             this);
 
-        await AlchemyStarsCardHelpers.TryTriggerTeaPartyOnPlay(
-            choiceContext,
-            this,
-            Owner,
-            TeaPartyCooldownTurns);
+        await AlchemyStarsCardHelpers.TryTriggerTeaPartyOnPlay(choiceContext, this, Owner);
 
         var tremorAmount = DynamicVars["AlchemyStarsTremorPower"].BaseValue;
         foreach (var enemy in CombatState!.HittableEnemies.ToList())
         {
+            await PowerCmd.Apply<AlchemyStarsTremorPower>(
+                choiceContext,
+                enemy,
+                tremorAmount,
+                Owner.Creature,
+                this);
+
             await LightMechanic.DealElementalAttackDamage(
                 choiceContext,
                 Owner,
@@ -93,13 +91,6 @@ public sealed class AlchemyStarsWaterRare4 : ModCardTemplate
                 DynamicVars.Damage.BaseValue,
                 LightElement.Water,
                 cardPlay);
-
-            await PowerCmd.Apply<AlchemyStarsTremorPower>(
-                choiceContext,
-                enemy,
-                tremorAmount,
-                Owner.Creature,
-                this);
 
             await AlchemyStarsTremorPower.TryTriggerStunThreshold(choiceContext, enemy, StunThreshold);
         }

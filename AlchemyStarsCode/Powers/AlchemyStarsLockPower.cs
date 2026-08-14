@@ -1,3 +1,4 @@
+using AlchemyStars.Cards;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
@@ -9,7 +10,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 锁定：卡牌对被锁定敌人造成的伤害增加锁定层�?× 5%�?
+/// 锁定：仅薇丝/薇丝·空瞳对被锁定敌人造成的伤害增加锁定层数 × 5%。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsLockPower : ModPowerTemplate
@@ -27,6 +28,9 @@ public sealed class AlchemyStarsLockPower : ModPowerTemplate
         CardPlay? cardPlay)
     {
         if (target != Owner || cardSource == null || !props.IsPoweredAttack())
+            return 1m;
+
+        if (cardSource is not (AlchemyStarsVice or AlchemyStarsViceEmptyPupil))
             return 1m;
 
         return 1m + Amount * 0.05m;

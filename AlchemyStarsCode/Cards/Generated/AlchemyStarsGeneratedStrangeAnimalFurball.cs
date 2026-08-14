@@ -16,7 +16,7 @@ namespace AlchemyStars.Cards;
 
 /// <summary>
 /// 小毛球：获得能量；被消耗或丢弃时获得格挡。消耗�?/// </summary>
-[RegisterCard(typeof(AlchemyStarsCardPool))]
+[RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedStrangeAnimalFurball : ModCardTemplate
 {
     private const int BaseEnergyCost = 1;
@@ -26,6 +26,8 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalFurball : ModCardTemplate
     private const bool ShowInCardLibrary = false;
     private const int EnergyGain = 2;
     private const decimal BlockAmount = 3m;
+
+    public override bool CanBeGeneratedInCombat => false;
 
     public override CardPoolModel VisualCardPool => ModelDb.CardPool<ColorlessCardPool>();
 

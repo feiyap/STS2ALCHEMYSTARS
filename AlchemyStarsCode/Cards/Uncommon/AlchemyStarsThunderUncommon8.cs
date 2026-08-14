@@ -27,7 +27,7 @@ public sealed class AlchemyStarsThunderUncommon8 : ModCardTemplate
     private const bool ShowInCardLibrary = true;
     private const int HitCount = 4;
     private const int MinDamage = 3;
-    private const int MaxDamage = 5;
+    private const int MaxDamage = 4;
     private const int MaxDamageUpgradeBy = 1;
 
     protected override bool ShouldGlowGoldInternal =>

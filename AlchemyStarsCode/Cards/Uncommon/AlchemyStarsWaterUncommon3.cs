@@ -69,24 +69,37 @@ public sealed class AlchemyStarsWaterUncommon3 : ModCardTemplate
     {
         ConsumeOneWaterLightEnergyAsDarkCell(Owner);
 
-        var damage = DynamicVars.Damage.BaseValue;
+        var baseDamage = DynamicVars.Damage.BaseValue;
         foreach (var enemy in CombatState!.HittableEnemies.ToList())
         {
-            await LightMechanic.DealElementalAttackDamage(
+            decimal actualDamage;
+            using (LightMechanicDamageContext.Use(LightElement.Water))
+            {
+                var attack = DamageCmd.Attack(baseDamage)
+                    .FromCard(this, cardPlay)
+                    .Targeting(enemy);
+                await attack.Execute(choiceContext);
+                actualDamage = attack.Results
+                    .SelectMany(result => result)
+                    .Sum(result => (decimal)result.TotalDamage);
+            }
+
+            await LightMechanic.ApplyElementalHitEffects(
                 choiceContext,
                 Owner,
-                this,
                 enemy,
-                damage,
                 LightElement.Water,
-                cardPlay);
-
-            await PowerCmd.Apply<PoisonPower>(
-                choiceContext,
-                enemy,
-                damage,
-                Owner.Creature,
                 this);
+
+            if (actualDamage > 0m)
+            {
+                await PowerCmd.Apply<PoisonPower>(
+                    choiceContext,
+                    enemy,
+                    actualDamage,
+                    Owner.Creature,
+                    this);
+            }
 
             if (IsUpgraded)
             {

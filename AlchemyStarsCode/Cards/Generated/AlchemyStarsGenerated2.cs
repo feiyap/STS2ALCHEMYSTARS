@@ -15,7 +15,7 @@ namespace AlchemyStars.Cards;
 
 /// <summary>
 /// 梆梆脆：消耗弃牌堆内所有状态牌，每张抽 1 张牌并获�?1 点能量。保留，消耗�?/// </summary>
-[RegisterCard(typeof(AlchemyStarsCardPool))]
+[RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGenerated2 : ModCardTemplate
 {
     private const int BaseEnergyCost = 0;
@@ -23,6 +23,8 @@ public sealed class AlchemyStarsGenerated2 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Token;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = false;
+
+    public override bool CanBeGeneratedInCombat => false;
 
     public override CardPoolModel VisualCardPool => ModelDb.CardPool<ColorlessCardPool>();
 

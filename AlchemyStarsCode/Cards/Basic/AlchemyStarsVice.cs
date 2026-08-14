@@ -28,15 +28,17 @@ public sealed class AlchemyStarsVice : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Basic;
     private const TargetType CardTarget = TargetType.RandomEnemy;
     private const bool ShowInCardLibrary = true;
-    private const int BaseHitCount = 5;
+    private const int BaseHitCount = 4;
     private const int BonusHitCount = 1;
-    private const decimal HitDamage = 1m;
+    private const int MaxWaterLightConsume = 2;
+    private const decimal HitDamage = 2m;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
+        new DamageVar(HitDamage, ValueProp.Move),
         new CalculationBaseVar(BaseHitCount),
         new CalculationExtraVar(BonusHitCount),
         new CalculatedVar(CalculatedHitsKey).WithMultiplier(CountLightBonusMultiplier),
@@ -52,7 +54,6 @@ public sealed class AlchemyStarsVice : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
-        
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Lock))
     ];
 
@@ -63,8 +64,13 @@ public sealed class AlchemyStarsVice : ModCardTemplate
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         var hitCount = DynamicVars.CalculationBase.IntValue;
-        if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Water]))
+        for (var n = 0; n < MaxWaterLightConsume; n++)
+        {
+            if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Water]))
+                break;
+
             hitCount += DynamicVars.CalculationExtra.IntValue;
+        }
 
         for (var i = 0; i < hitCount; i++)
         {
@@ -77,7 +83,7 @@ public sealed class AlchemyStarsVice : ModCardTemplate
                 Owner,
                 this,
                 target,
-                HitDamage,
+                DynamicVars.Damage.BaseValue,
                 LightElement.Water,
                 cardPlay);
 
@@ -107,6 +113,6 @@ public sealed class AlchemyStarsVice : ModCardTemplate
         if (card.Owner == null)
             return 0m;
 
-        return LightMechanic.HasWaterLightEnergy(card.Owner) ? 1m : 0m;
+        return Math.Min(MaxWaterLightConsume, LightMechanic.CountWaterLightEnergy(card.Owner));
     }
 }

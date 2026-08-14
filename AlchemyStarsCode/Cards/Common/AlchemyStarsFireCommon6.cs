@@ -2,6 +2,7 @@ using System.Linq;
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
@@ -61,15 +62,21 @@ public sealed class AlchemyStarsFireCommon6 : ModCardTemplate
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
-        var selected = (await CardSelectCmd.FromHand(
-            choiceContext,
-            Owner,
-            new CardSelectorPrefs(SelectionScreenPrompt, 1, 1),
-            card => !ReferenceEquals(card, this),
-            this)).ToList();
+        var selectable = PileType.Hand.GetPile(Owner).Cards
+            .Where(card => !ReferenceEquals(card, this))
+            .ToList();
+        if (selectable.Count > 0)
+        {
+            var selected = (await CardSelectCmd.FromHand(
+                choiceContext,
+                Owner,
+                new CardSelectorPrefs(SelectionScreenPrompt, 1, 1),
+                card => !ReferenceEquals(card, this),
+                this)).ToList();
 
-        foreach (var card in selected)
-            await CardCmd.Exhaust(choiceContext, card);
+            foreach (var card in selected)
+                await CardCmd.Exhaust(choiceContext, card);
+        }
 
         var hadFlying = Owner.Creature.GetPowerAmount<AlchemyStarsFlyingPower>() > 0;
 

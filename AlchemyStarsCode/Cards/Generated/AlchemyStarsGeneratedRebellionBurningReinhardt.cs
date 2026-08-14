@@ -18,7 +18,7 @@ namespace AlchemyStars.Cards;
 
 /// <summary>
 /// ????�??????????????????????????????/// </summary>
-[RegisterCard(typeof(AlchemyStarsCardPool))]
+[RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedRebellionBurningReinhardt : ModCardTemplate
 {
     private const int BaseEnergyCost = 0;
@@ -28,6 +28,8 @@ public sealed class AlchemyStarsGeneratedRebellionBurningReinhardt : ModCardTemp
     private const bool ShowInCardLibrary = false;
     private const decimal BaseHpCost = 10m;
     private const decimal BaseDamage = 10m;
+
+    public override bool CanBeGeneratedInCombat => false;
 
     public override CardPoolModel VisualCardPool => ModelDb.CardPool<ColorlessCardPool>();
 

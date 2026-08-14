@@ -16,7 +16,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 静默雷霆·米歇尔：高庭卫队；群体雷伤与回合末回响；可获静声之雷�?/// </summary>
+/// 静默雷霆·米歇尔：高庭卫队；对全体造成 2 段雷伤，可先施加静声之雷。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon2 : ModCardTemplate
 {
@@ -32,7 +33,8 @@ public sealed class AlchemyStarsThunderUncommon2 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new EnergyVar(1),
-        new DamageVar(7m, ValueProp.Move),
+        new DamageVar(9m, ValueProp.Move),
+        new RepeatVar(2),
         new PowerVar<AlchemyStarsSilentThunderPower>(5m),
         AlchemyStarsKeywordText.InlineTitleVar("HighCourtGuard", AlchemyStarsKeywordIds.HighCourtGuard),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
@@ -49,7 +51,6 @@ public sealed class AlchemyStarsThunderUncommon2 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        
         HoverTipFactory.FromPower<AlchemyStarsSilentThunderPower>()
     ];
 
@@ -63,41 +64,39 @@ public sealed class AlchemyStarsThunderUncommon2 : ModCardTemplate
         if (AlchemyStarsCardHelpers.HasOtherTagInHand(this, Owner, AlchemyStarsCardTags.HighCourtGuard))
             await PlayerCmd.GainEnergy(1, Owner);
 
+        var enemies = CombatState!.HittableEnemies.ToList();
         if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
         {
             await PowerCmd.Apply<AlchemyStarsSilentThunderPower>(
                 choiceContext,
-                Owner.Creature,
+                enemies,
                 DynamicVars["AlchemyStarsSilentThunderPower"].BaseValue,
                 Owner.Creature,
                 this);
         }
 
-        foreach (var enemy in CombatState!.HittableEnemies.ToList())
+        var hitCount = DynamicVars.Repeat.IntValue;
+        foreach (var enemy in enemies)
         {
-            await LightMechanic.DealElementalAttackDamage(
-                choiceContext,
-                Owner,
-                this,
-                enemy,
-                DynamicVars.Damage.BaseValue,
-                LightElement.Thunder,
-                cardPlay);
+            for (var i = 0; i < hitCount; i++)
+            {
+                if (enemy.IsDead)
+                    break;
+
+                await LightMechanic.DealElementalAttackDamage(
+                    choiceContext,
+                    Owner,
+                    this,
+                    enemy,
+                    DynamicVars.Damage.BaseValue,
+                    LightElement.Thunder,
+                    cardPlay);
+            }
         }
-
-        var echo = await PowerCmd.Apply<AlchemyStarsMichelleEchoPower>(
-            choiceContext,
-            Owner.Creature,
-            1m,
-            Owner.Creature,
-            this);
-
-        echo?.SetEchoDamage(DynamicVars.Damage.BaseValue, this);
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Damage.UpgradeValueBy(2m);
         DynamicVars["AlchemyStarsSilentThunderPower"].UpgradeValueBy(5m);
     }
 }

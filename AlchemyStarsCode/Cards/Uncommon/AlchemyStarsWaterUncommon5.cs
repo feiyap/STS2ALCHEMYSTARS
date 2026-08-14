@@ -25,8 +25,6 @@ public sealed class AlchemyStarsWaterUncommon5 : ModCardTemplate
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
     private const decimal BaseDamage = 6m;
-    private const int TeaPartyCooldownTurns = 2;
-
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
@@ -49,9 +47,6 @@ public sealed class AlchemyStarsWaterUncommon5 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.ShadowTownTeaParty)),
-        
-        HoverTipFactory.FromPower<AlchemyStarsTeaPartyDiscountPower>(),
         HoverTipFactory.FromPower<AlchemyStarsFrankClawPower>()
     ];
 
@@ -64,11 +59,7 @@ public sealed class AlchemyStarsWaterUncommon5 : ModCardTemplate
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
-        await AlchemyStarsCardHelpers.TryTriggerTeaPartyOnPlay(
-            choiceContext,
-            this,
-            Owner,
-            TeaPartyCooldownTurns);
+        await AlchemyStarsCardHelpers.TryTriggerTeaPartyOnPlay(choiceContext, this, Owner);
 
         await LightMechanic.DealElementalAttackDamage(
             choiceContext,

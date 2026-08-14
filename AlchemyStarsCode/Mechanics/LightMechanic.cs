@@ -97,10 +97,169 @@ public static class LightMechanic
     }
 
     /// <summary>
-    /// 随机转化非雷属性格为雷属性格；成功时刷新 UI�?
+    /// 随机转化非雷属性格为雷属性格；成功时刷新 UI。
     /// </summary>
     public static int TryConvertRandomNonThunderCells(Player player, int maxCount) =>
         TryConvertRandomNonElementCells(player, LightElement.Thunder, maxCount);
+
+    /// <summary>
+    /// 随机消耗最多 maxCount 点非雷光能（含万色），每点生成 1 雷属性格；返回成功生成的格数。
+    /// </summary>
+    public static int TryConvertRandomNonThunderLightEnergyToThunderCells(Player player, int maxCount)
+    {
+        var state = GetActiveState(player);
+        if (state == null || maxCount <= 0)
+            return 0;
+
+        var energy = state.LightEnergy.Items.ToList();
+        var candidateIndices = new List<int>();
+        for (var i = 0; i < energy.Count; i++)
+        {
+            if (energy[i] != LightElement.Thunder)
+                candidateIndices.Add(i);
+        }
+
+        if (candidateIndices.Count == 0)
+            return 0;
+
+        var rng = player.RunState.Rng.Niche;
+        var take = Math.Min(maxCount, candidateIndices.Count);
+        var pickedIndices = new List<int>(take);
+        for (var n = 0; n < take; n++)
+        {
+            var pick = rng.NextInt(candidateIndices.Count);
+            pickedIndices.Add(candidateIndices[pick]);
+            candidateIndices.RemoveAt(pick);
+        }
+
+        pickedIndices.Sort((a, b) => b.CompareTo(a));
+        var consumed = new List<LightElement>(pickedIndices.Count);
+        foreach (var index in pickedIndices)
+        {
+            consumed.Add(energy[index]);
+            energy.RemoveAt(index);
+        }
+
+        state.LightEnergy.ReplaceAll(energy);
+
+        var created = 0;
+        foreach (var _ in consumed)
+        {
+            if (TryAddAttributeCell(player, LightElement.Thunder))
+                created++;
+        }
+
+        NotifyLightEnergyConsumed(player, consumed);
+        return created;
+    }
+
+    /// <summary>
+    /// 生成若干雷属性格，按概率出现深色格；返回成功生成数量。
+    /// </summary>
+    public static int TryAddThunderCellsWithDarkChance(
+        Player player,
+        int count,
+        int darkChancePercent = 15)
+    {
+        if (count <= 0)
+            return 0;
+
+        var rng = player.RunState.Rng.Niche;
+        var created = 0;
+        for (var i = 0; i < count; i++)
+        {
+            var kind = rng.NextInt(100) < darkChancePercent
+                ? AttributeCellKind.Dark
+                : AttributeCellKind.Normal;
+            if (TryAddAttributeCell(player, LightElement.Thunder, kind))
+                created++;
+        }
+
+        return created;
+    }
+
+    /// <summary>
+    /// 统计转色栏中的雷属性格数量（含万色格）。
+    /// </summary>
+    public static int CountThunderAttributeCells(Player player)
+    {
+        var state = GetActiveState(player);
+        if (state == null)
+            return 0;
+
+        return state.AttributeCells.Items.Count(cell =>
+            cell.Element is LightElement.Thunder or LightElement.Prismatic);
+    }
+
+    /// <summary>
+    /// 转色栏是否已满且全部为雷属性深色格。
+    /// </summary>
+    public static bool IsAllThunderDarkCells(Player player)
+    {
+        var state = GetActiveState(player);
+        if (state == null)
+            return false;
+
+        var cells = state.AttributeCells.Items;
+        var maxSlots = state.AttributeCells.MaxSlots;
+        if (cells.Count < maxSlots || maxSlots <= 0)
+            return false;
+
+        return cells.All(cell =>
+            cell.Element == LightElement.Thunder && cell.Kind == AttributeCellKind.Dark);
+    }
+
+    /// <summary>
+    /// 添加雷属性格；栏满时将非雷深色格转为雷深色格。
+    /// 若已全部为雷深色格则返回 AllDarkThunder=true（不添加）。
+    /// </summary>
+    public static (bool AllDarkThunder, int Changed) TryAddThunderCellsOrDarkWhenFull(
+        Player player,
+        int count)
+    {
+        var state = GetActiveState(player);
+        if (state == null || count <= 0)
+            return (false, 0);
+
+        if (IsAllThunderDarkCells(player))
+            return (true, 0);
+
+        var changed = 0;
+        var rng = player.RunState.Rng.Niche;
+        for (var i = 0; i < count; i++)
+        {
+            if (state.AttributeCells.Items.Count < state.AttributeCells.MaxSlots)
+            {
+                if (TryAddAttributeCell(player, LightElement.Thunder))
+                    changed++;
+                continue;
+            }
+
+            var cells = state.AttributeCells.Items.ToList();
+            var candidateIndices = cells
+                .Select((cell, index) => (cell, index))
+                .Where(pair => !(pair.cell.Element == LightElement.Thunder &&
+                                 pair.cell.Kind == AttributeCellKind.Dark))
+                .Select(pair => pair.index)
+                .ToList();
+
+            if (candidateIndices.Count == 0)
+                break;
+
+            var cellIndex = candidateIndices[rng.NextInt(candidateIndices.Count)];
+            var original = cells[cellIndex];
+            cells[cellIndex] = new AttributeCell(
+                LightElement.Thunder,
+                AttributeCellKind.Dark,
+                original.EnhancedCardTypeName);
+            state.AttributeCells.ReplaceAll(cells);
+            state.UpdateRainbowState();
+            LightMechanicUiBootstrap.RefreshForPlayer(player);
+            changed++;
+        }
+
+        return (false, changed);
+    }
 
     /// <summary>
     /// 随机转化非目标属性格为目标属性格；成功时刷新 UI�?
@@ -117,22 +276,257 @@ public static class LightMechanic
             player.RunState.Rng.Niche);
 
         if (converted > 0)
+        {
             LightMechanicUiBootstrap.RefreshForPlayer(player);
+            if (targetElement == LightElement.Forest)
+                AlchemyStarsForestState.NotifyForestCellProduced(player, converted);
+        }
 
         return converted;
     }
 
     /// <summary>
-    /// 随机转化非森属性格为森属性格�?
+    /// 随机转化非森属性格为森属性格。
     /// </summary>
     public static int TryConvertRandomNonForestCells(Player player, int maxCount) =>
         TryConvertRandomNonElementCells(player, LightElement.Forest, maxCount);
 
     /// <summary>
-    /// 随机转化非水属性格为水属性格�?
+    /// 随机消耗最多 maxCount 点非森光能（含万色），每点生成 1 森属性格；返回成功生成的格数。
+    /// </summary>
+    public static int TryConvertRandomNonForestLightEnergyToForestCells(Player player, int maxCount)
+    {
+        var state = GetActiveState(player);
+        if (state == null || maxCount <= 0)
+            return 0;
+
+        var energy = state.LightEnergy.Items.ToList();
+        var candidateIndices = new List<int>();
+        for (var i = 0; i < energy.Count; i++)
+        {
+            if (energy[i] != LightElement.Forest)
+                candidateIndices.Add(i);
+        }
+
+        if (candidateIndices.Count == 0)
+            return 0;
+
+        var rng = player.RunState.Rng.Niche;
+        var take = Math.Min(maxCount, candidateIndices.Count);
+        var pickedIndices = new List<int>(take);
+        for (var n = 0; n < take; n++)
+        {
+            var pick = rng.NextInt(candidateIndices.Count);
+            pickedIndices.Add(candidateIndices[pick]);
+            candidateIndices.RemoveAt(pick);
+        }
+
+        pickedIndices.Sort((a, b) => b.CompareTo(a));
+        var consumed = new List<LightElement>(pickedIndices.Count);
+        foreach (var index in pickedIndices)
+        {
+            consumed.Add(energy[index]);
+            energy.RemoveAt(index);
+        }
+
+        state.LightEnergy.ReplaceAll(energy);
+
+        var created = 0;
+        foreach (var _ in consumed)
+        {
+            if (TryAddAttributeCell(player, LightElement.Forest))
+                created++;
+        }
+
+        NotifyLightEnergyConsumed(player, consumed);
+        return created;
+    }
+
+    /// <summary>
+    /// 生成若干森属性格，按概率出现强化格；返回成功生成数量。
+    /// </summary>
+    public static int TryAddForestCellsWithEnhancedChance(
+        Player player,
+        int count,
+        int enhancedChancePercent = 30)
+    {
+        if (count <= 0)
+            return 0;
+
+        var rng = player.RunState.Rng.Niche;
+        var created = 0;
+        for (var i = 0; i < count; i++)
+        {
+            var kind = rng.NextInt(100) < enhancedChancePercent
+                ? AttributeCellKind.Enhanced
+                : AttributeCellKind.Normal;
+            if (TryAddAttributeCell(player, LightElement.Forest, kind))
+                created++;
+        }
+
+        return created;
+    }
+
+    /// <summary>
+    /// 未满则用随机属性格填满转色栏；已满则整栏重置。大概率森格、中概率强化格。
+    /// 返回成功制造的森属性格数量。
+    /// </summary>
+    public static int FillOrResetAttributeBarBiasedForest(
+        Player player,
+        int forestChancePercent = 60,
+        int enhancedChancePercent = 30)
+    {
+        var state = GetActiveState(player);
+        if (state == null)
+            return 0;
+
+        var rng = player.RunState.Rng.Niche;
+        var maxSlots = state.AttributeCells.MaxSlots;
+        if (maxSlots <= 0)
+            return 0;
+
+        var current = state.AttributeCells.Items.ToList();
+        var forestCreated = 0;
+
+        AttributeCell RollBiasedCell()
+        {
+            var roll = rng.NextInt(100);
+            if (roll < enhancedChancePercent)
+                return new AttributeCell(LightElement.Forest, AttributeCellKind.Enhanced);
+
+            if (roll < enhancedChancePercent + forestChancePercent)
+                return new AttributeCell(LightElement.Forest);
+
+            var elements = LightElementExtensions.BaseElements;
+            return new AttributeCell(elements[rng.NextInt(elements.Length)]);
+        }
+
+        if (current.Count >= maxSlots)
+        {
+            var rebuilt = new List<AttributeCell>(maxSlots);
+            for (var i = 0; i < maxSlots; i++)
+            {
+                var cell = RollBiasedCell();
+                rebuilt.Add(cell);
+                if (cell.Element == LightElement.Forest)
+                    forestCreated++;
+            }
+
+            var removed = current;
+            state.AttributeCells.ReplaceAll(rebuilt);
+            NotifyAttributeCellsRemoved(player, removed);
+        }
+        else
+        {
+            var toAdd = maxSlots - current.Count;
+            for (var i = 0; i < toAdd; i++)
+            {
+                var cell = RollBiasedCell();
+                if (cell.Kind == AttributeCellKind.Enhanced &&
+                    AlchemyStarsForestState.TryAbsorbEnhancedCellsForWordAbsolute(player, 1) > 0)
+                {
+                    if (cell.Element == LightElement.Forest)
+                        forestCreated++;
+                    continue;
+                }
+
+                var overflow = state.AddAttributeCell(cell);
+                if (overflow.Count > 0)
+                    NotifyAttributeCellsRemoved(player, overflow);
+
+                if (cell.Element == LightElement.Forest)
+                    forestCreated++;
+            }
+        }
+
+        LightMechanicUiBootstrap.RefreshForPlayer(player);
+        if (forestCreated > 0)
+            AlchemyStarsForestState.NotifyForestCellProduced(player, forestCreated);
+
+        return forestCreated;
+    }
+
+    /// <summary>
+    /// 随机转化非水属性格为水属性格。
     /// </summary>
     public static int TryConvertRandomNonWaterCells(Player player, int maxCount) =>
         TryConvertRandomNonElementCells(player, LightElement.Water, maxCount);
+
+    /// <summary>
+    /// 随机消耗最多 maxCount 点非水光能（含万色），每点生成 1 水属性格；返回成功生成的格数。
+    /// </summary>
+    public static int TryConvertRandomNonWaterLightEnergyToWaterCells(Player player, int maxCount)
+    {
+        var state = GetActiveState(player);
+        if (state == null || maxCount <= 0)
+            return 0;
+
+        var energy = state.LightEnergy.Items.ToList();
+        var candidateIndices = new List<int>();
+        for (var i = 0; i < energy.Count; i++)
+        {
+            if (energy[i] != LightElement.Water)
+                candidateIndices.Add(i);
+        }
+
+        if (candidateIndices.Count == 0)
+            return 0;
+
+        var rng = player.RunState.Rng.Niche;
+        var take = Math.Min(maxCount, candidateIndices.Count);
+        var pickedIndices = new List<int>(take);
+        for (var n = 0; n < take; n++)
+        {
+            var pick = rng.NextInt(candidateIndices.Count);
+            pickedIndices.Add(candidateIndices[pick]);
+            candidateIndices.RemoveAt(pick);
+        }
+
+        pickedIndices.Sort((a, b) => b.CompareTo(a));
+        var consumed = new List<LightElement>(pickedIndices.Count);
+        foreach (var index in pickedIndices)
+        {
+            consumed.Add(energy[index]);
+            energy.RemoveAt(index);
+        }
+
+        state.LightEnergy.ReplaceAll(energy);
+
+        var created = 0;
+        foreach (var _ in consumed)
+        {
+            if (TryAddAttributeCell(player, LightElement.Water))
+                created++;
+        }
+
+        NotifyLightEnergyConsumed(player, consumed);
+        return created;
+    }
+
+    /// <summary>
+    /// 生成若干水属性格，按概率出现深色格；返回成功生成数量。
+    /// </summary>
+    public static int TryAddWaterCellsWithDarkChance(
+        Player player,
+        int count,
+        int darkChancePercent = 30)
+    {
+        if (count <= 0)
+            return 0;
+
+        var rng = player.RunState.Rng.Niche;
+        var created = 0;
+        for (var i = 0; i < count; i++)
+        {
+            var kind = rng.NextInt(100) < darkChancePercent
+                ? AttributeCellKind.Dark
+                : AttributeCellKind.Normal;
+            if (TryAddAttributeCell(player, LightElement.Water, kind))
+                created++;
+        }
+
+        return created;
+    }
 
     public static bool HasWaterLightEnergy(Player player) =>
         HasLightEnergy(player, [LightElement.Water]);
@@ -265,6 +659,7 @@ public static class LightMechanic
         if (state == null)
             return 0;
 
+        var forestBefore = CountForestCells(state);
         var reset = state.ResetNonElementCellsWithEnhanced(
             LightElement.Forest,
             player.RunState.Rng.Niche,
@@ -272,6 +667,11 @@ public static class LightMechanic
             enhancedChancePercent,
             enhancedCardTypeName);
         LightMechanicUiBootstrap.RefreshForPlayer(player);
+
+        var produced = CountForestCells(state) - forestBefore;
+        if (produced > 0)
+            AlchemyStarsForestState.NotifyForestCellProduced(player, produced);
+
         return reset;
     }
 
@@ -289,6 +689,7 @@ public static class LightMechanic
         if (state == null)
             return 0;
 
+        var forestBefore = targetElement == LightElement.Forest ? CountForestCells(state) : 0;
         var reset = state.ResetAllCellsWithEnhanced(
             targetElement,
             player.RunState.Rng.Niche,
@@ -296,6 +697,14 @@ public static class LightMechanic
             enhancedChancePercent,
             enhancedCardTypeName);
         LightMechanicUiBootstrap.RefreshForPlayer(player);
+
+        if (targetElement == LightElement.Forest)
+        {
+            var produced = CountForestCells(state) - forestBefore;
+            if (produced > 0)
+                AlchemyStarsForestState.NotifyForestCellProduced(player, produced);
+        }
+
         return reset;
     }
 
@@ -312,6 +721,7 @@ public static class LightMechanic
         if (state == null)
             return 0;
 
+        var forestBefore = CountForestCells(state);
         var converted = state.ConvertAllCellsToElementWithEnhanced(
             LightElement.Forest,
             player.RunState.Rng.Niche,
@@ -319,8 +729,16 @@ public static class LightMechanic
             enhancedChancePercent,
             enhancedCardTypeName);
         LightMechanicUiBootstrap.RefreshForPlayer(player);
+
+        var produced = CountForestCells(state) - forestBefore;
+        if (produced > 0)
+            AlchemyStarsForestState.NotifyForestCellProduced(player, produced);
+
         return converted;
     }
+
+    private static int CountForestCells(LightMechanicCombatState state) =>
+        state.AttributeCells.Items.Count(cell => cell.Element == LightElement.Forest);
 
     public static int CountForestAttributeCells(Player player)
     {
@@ -352,13 +770,15 @@ public static class LightMechanic
     public static bool TryEnhanceRandomCell(
         Player player,
         LightElement element,
-        string? enhancedCardTypeName = null)
+        string? enhancedCardTypeName = null,
+        bool allowWordAbsoluteAbsorb = true)
     {
         var state = GetActiveState(player);
         if (state == null)
             return false;
 
-        if (AlchemyStarsForestState.TryAbsorbEnhancedCellsForWordAbsolute(player, 1) > 0)
+        if (allowWordAbsoluteAbsorb &&
+            AlchemyStarsForestState.TryAbsorbEnhancedCellsForWordAbsolute(player, 1) > 0)
             return true;
 
         var enhanced = state.TryEnhanceRandomCell(
@@ -446,11 +866,33 @@ public static class LightMechanic
     }
 
     /// <summary>
-    /// 玩家拥有光能遗物时，确保战斗状态已创建并完成栏位配置�?
+    /// 光能机制当前是否对玩家生效（有遗物且存活）。
+    /// </summary>
+    public static bool IsMechanicActive(Player player) =>
+        HasMechanicRelic(player) && player.Creature is { IsDead: false };
+
+    /// <summary>
+    /// 死亡后静默清空光能与转色栏；不触发属性格移除相关效果。
+    /// </summary>
+    public static void ClearOnDeath(Player player)
+    {
+        if (!HasMechanicRelic(player))
+            return;
+
+        if (!LightMechanicCombatState.TryGet(player, out var state))
+            return;
+
+        state.Clear();
+        LightMechanicUiBootstrap.RefreshForPlayer(player);
+    }
+
+    /// <summary>
+    /// 玩家拥有光能遗物且存活时，确保战斗状态已创建并完成栏位配置。
+    /// 死亡后返回 null，使属性格相关效果不再触发。
     /// </summary>
     internal static LightMechanicCombatState? GetActiveState(Player player)
     {
-        if (!HasMechanicRelic(player))
+        if (!IsMechanicActive(player))
             return null;
 
         var slotLimit = GetSlotLimit(player);
@@ -513,6 +955,19 @@ public static class LightMechanic
             LightElementExtensions.Matches(LightElement.Fire, item));
     }
 
+    /// <summary>
+    /// 统计火/水光能数量（含万色，每点只计 1）。
+    /// </summary>
+    public static int CountFireAndWaterLightEnergy(Player player)
+    {
+        var state = GetActiveState(player);
+        if (state == null)
+            return 0;
+
+        return state.LightEnergy.Items.Count(item =>
+            item is LightElement.Fire or LightElement.Water or LightElement.Prismatic);
+    }
+
     public static int CountFireAttributeCells(Player player)
     {
         var state = GetActiveState(player);
@@ -539,6 +994,82 @@ public static class LightMechanic
         TryConvertRandomNonElementCells(player, LightElement.Fire, maxCount);
 
     /// <summary>
+    /// 随机消耗最多 maxCount 点非火光能（含万色），每点生成 1 火属性格；返回成功生成的格数。
+    /// </summary>
+    public static int TryConvertRandomNonFireLightEnergyToFireCells(Player player, int maxCount)
+    {
+        var state = GetActiveState(player);
+        if (state == null || maxCount <= 0)
+            return 0;
+
+        var energy = state.LightEnergy.Items.ToList();
+        var candidateIndices = new List<int>();
+        for (var i = 0; i < energy.Count; i++)
+        {
+            if (energy[i] != LightElement.Fire)
+                candidateIndices.Add(i);
+        }
+
+        if (candidateIndices.Count == 0)
+            return 0;
+
+        var rng = player.RunState.Rng.Niche;
+        var take = Math.Min(maxCount, candidateIndices.Count);
+        var pickedIndices = new List<int>(take);
+        for (var n = 0; n < take; n++)
+        {
+            var pick = rng.NextInt(candidateIndices.Count);
+            pickedIndices.Add(candidateIndices[pick]);
+            candidateIndices.RemoveAt(pick);
+        }
+
+        pickedIndices.Sort((a, b) => b.CompareTo(a));
+        var consumed = new List<LightElement>(pickedIndices.Count);
+        foreach (var index in pickedIndices)
+        {
+            consumed.Add(energy[index]);
+            energy.RemoveAt(index);
+        }
+
+        state.LightEnergy.ReplaceAll(energy);
+
+        var created = 0;
+        foreach (var _ in consumed)
+        {
+            if (TryAddAttributeCell(player, LightElement.Fire))
+                created++;
+        }
+
+        NotifyLightEnergyConsumed(player, consumed);
+        return created;
+    }
+
+    /// <summary>
+    /// 生成若干火属性格，按概率出现深色格；返回成功生成数量。
+    /// </summary>
+    public static int TryAddFireCellsWithDarkChance(
+        Player player,
+        int count,
+        int darkChancePercent = 15)
+    {
+        if (count <= 0)
+            return 0;
+
+        var rng = player.RunState.Rng.Niche;
+        var created = 0;
+        for (var i = 0; i < count; i++)
+        {
+            var kind = rng.NextInt(100) < darkChancePercent
+                ? AttributeCellKind.Dark
+                : AttributeCellKind.Normal;
+            if (TryAddAttributeCell(player, LightElement.Fire, kind))
+                created++;
+        }
+
+        return created;
+    }
+
+    /// <summary>
     /// 重置所有非火属性格：60% 出火；未出火时再等概率出森/雷/水。
     /// </summary>
     public static void ResetNonFireCells(Player player, int fireChancePercent = 60)
@@ -550,6 +1081,58 @@ public static class LightMechanic
         state.ResetNonFireCellsWithRandomOther(
             player.RunState.Rng.Niche,
             fireChancePercent);
+        LightMechanicUiBootstrap.RefreshForPlayer(player);
+    }
+
+    /// <summary>
+    /// 重置全部光能与全部转色栏属性格，大概率出现火属性。
+    /// </summary>
+    public static void ResetAllLightEnergyAndAttributeCellsBiasedFire(
+        Player player,
+        int fireChancePercent = 60)
+    {
+        var state = GetActiveState(player);
+        if (state == null)
+            return;
+
+        var rng = player.RunState.Rng.Niche;
+        var otherElements = new[]
+        {
+            LightElement.Forest,
+            LightElement.Thunder,
+            LightElement.Water,
+        };
+
+        LightElement RollFireBiased()
+        {
+            if (rng.NextInt(100) < fireChancePercent)
+                return LightElement.Fire;
+
+            return otherElements[rng.NextInt(otherElements.Length)];
+        }
+
+        var energyCount = state.LightEnergy.Count;
+        if (energyCount > 0)
+        {
+            var rebuiltEnergy = new List<LightElement>(energyCount);
+            for (var i = 0; i < energyCount; i++)
+                rebuiltEnergy.Add(RollFireBiased());
+
+            state.LightEnergy.ReplaceAll(rebuiltEnergy);
+        }
+
+        var cells = state.AttributeCells.Items.ToList();
+        if (cells.Count > 0)
+        {
+            var removed = cells;
+            var rebuiltCells = new List<AttributeCell>(cells.Count);
+            for (var i = 0; i < cells.Count; i++)
+                rebuiltCells.Add(new AttributeCell(RollFireBiased()));
+
+            state.AttributeCells.ReplaceAll(rebuiltCells);
+            NotifyAttributeCellsRemoved(player, removed);
+        }
+
         LightMechanicUiBootstrap.RefreshForPlayer(player);
     }
 

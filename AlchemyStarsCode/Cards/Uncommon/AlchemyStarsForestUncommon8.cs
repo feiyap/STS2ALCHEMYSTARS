@@ -76,10 +76,7 @@ public sealed class AlchemyStarsForestUncommon8 : ModCardTemplate
         if (player != Owner || !retainedCards.Contains(this))
             return;
 
-        AlchemyStarsForestState.IncrementRetainEffectCount(player);
-
-        var bonus = AlchemyStarsForestState.GetKushkutaCombatDamageBonus(this);
-        var damage = DynamicVars.Damage.IntValue + bonus;
+        var damage = GetCombatDamage();
         var target = PickRandomEnemy();
         if (target != null)
         {
@@ -93,12 +90,14 @@ public sealed class AlchemyStarsForestUncommon8 : ModCardTemplate
         }
 
         AlchemyStarsForestState.IncrementKushkutaCombatDamageBonus(
-            this,
+            Owner,
             DynamicVars["Increase"].IntValue);
+        SyncAllKushkutaDamageDisplays(Owner);
 
         var copy = CombatState!.CreateCard<AlchemyStarsForestUncommon8>(Owner);
         if (IsUpgraded)
             copy.UpgradeInternal();
+        copy.SyncDamageDisplay();
 
         await CardPileCmd.AddGeneratedCardToCombat(copy, PileType.Discard, Owner);
     }
@@ -110,8 +109,9 @@ public sealed class AlchemyStarsForestUncommon8 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        var bonus = AlchemyStarsForestState.GetKushkutaCombatDamageBonus(this);
-        var damage = DynamicVars.Damage.IntValue + bonus;
+        await AlchemyStarsCardHelpers.TryTriggerTeaPartyOnPlay(choiceContext, this, Owner);
+
+        var damage = GetCombatDamage();
         var target = PickRandomEnemy();
         if (target == null)
             return;
@@ -124,6 +124,27 @@ public sealed class AlchemyStarsForestUncommon8 : ModCardTemplate
             damage,
             LightElement.Forest,
             cardPlay);
+    }
+
+    private decimal GetCombatDamage() =>
+        RetainBaseDamage + AlchemyStarsForestState.GetKushkutaCombatDamageBonus(Owner);
+
+    private void SyncDamageDisplay()
+    {
+        DynamicVars.Damage.BaseValue = GetCombatDamage();
+    }
+
+    private static void SyncAllKushkutaDamageDisplays(Player player)
+    {
+        var combat = player.PlayerCombatState;
+        if (combat == null)
+            return;
+
+        foreach (var card in combat.AllCards)
+        {
+            if (card is AlchemyStarsForestUncommon8 kushkuta)
+                kushkuta.SyncDamageDisplay();
+        }
     }
 
     private Creature? PickRandomEnemy()

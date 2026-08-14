@@ -15,12 +15,13 @@ internal static class LightMechanicUiAssets
 
     public static string GetLightIconPath(LightElement element) => element switch
     {
-        LightElement.Forest => $"{LightDir}/forest_light_icon_ui.png",
-        LightElement.Thunder => $"{LightDir}/thunder_light_icon_ui.png",
-        LightElement.Water => $"{LightDir}/water_light_icon_ui.png",
-        LightElement.Fire => $"{LightDir}/fire_light_icon_ui.png",
+        LightElement.Forest => $"{LightDir}/forest_light_icon.png",
+        LightElement.Thunder => $"{LightDir}/thunder_light_icon.png",
+        LightElement.Water => $"{LightDir}/water_light_icon.png",
+        LightElement.Fire => $"{LightDir}/fire_light_icon.png",
+        // 万色暂无无后缀资源，继续使用 _ui 贴图。
         LightElement.Prismatic => $"{LightDir}/prismatic_light_icon_ui.png",
-        _ => $"{LightDir}/forest_light_icon_ui.png",
+        _ => $"{LightDir}/forest_light_icon.png",
     };
 
     public static string GetCellTexturePath(LightElement element) => element switch

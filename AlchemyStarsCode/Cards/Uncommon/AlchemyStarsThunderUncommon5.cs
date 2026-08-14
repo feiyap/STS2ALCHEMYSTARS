@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
 using AlchemyStars.Mechanics;
@@ -15,7 +16,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 凌野之鹰·蕾切尔：侦察者；转化属性格并可回收弃牌堆雷牌�?/// </summary>
+/// 凌野之鹰·蕾切尔：侦察者；添加雷格（满栏转深色/全深色获格挡），并可回收弃牌堆雷牌。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
 {
@@ -25,6 +27,7 @@ public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
     private const int OverloadEnergyGain = 2;
+    private const decimal FullDarkThunderBlock = 8m;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -32,7 +35,7 @@ public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new EnergyVar(OverloadEnergyGain),
-        new RepeatVar(2),
+        new RepeatVar(1),
         new CardsVar(1),
         AlchemyStarsKeywordText.InlineTitleVar("Scout", AlchemyStarsKeywordIds.Scout),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
@@ -49,8 +52,6 @@ public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        
-        
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DarkCell)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Overload)),
         HoverTipFactory.FromCard<AlchemyStarsGeneratedOverload>()
@@ -66,9 +67,18 @@ public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
         if (await AlchemyStarsCardHelpers.TryConsumeOverloadFromHand(choiceContext, Owner))
             await PlayerCmd.GainEnergy(OverloadEnergyGain, Owner);
 
-        var convertCount = DynamicVars.Repeat.IntValue;
-        var (_, darkCreated) = LightMechanic.TryConvertRandomThunderCellsWithDark(Owner, convertCount);
-        if (darkCreated > 0 && LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
+        var (allDarkThunder, _) = LightMechanic.TryAddThunderCellsOrDarkWhenFull(
+            Owner,
+            DynamicVars.Repeat.IntValue);
+        if (allDarkThunder)
+        {
+            await CreatureCmd.GainBlock(
+                Owner.Creature,
+                new BlockVar(FullDarkThunderBlock, ValueProp.Move),
+                cardPlay);
+        }
+
+        if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
         {
             var retrieveCount = DynamicVars.Cards.IntValue;
             for (var i = 0; i < retrieveCount; i++)

@@ -20,7 +20,7 @@ namespace AlchemyStars.Cards;
 
 /// <summary>
 /// 神鹿·贝瑟：按抽牌堆规模强化格子，全强化时改为获得飞行。消耗�?/// </summary>
-[RegisterCard(typeof(AlchemyStarsCardPool))]
+[RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedForestSpiritBeth : ModCardTemplate
 {
     private const int BaseEnergyCost = 1;
@@ -30,6 +30,8 @@ public sealed class AlchemyStarsGeneratedForestSpiritBeth : ModCardTemplate
     private const bool ShowInCardLibrary = false;
     private const int DrawCount = 1;
     private const int EmeraldMarkAmount = 2;
+
+    public override bool CanBeGeneratedInCombat => false;
 
     public override CardPoolModel VisualCardPool => ModelDb.CardPool<ColorlessCardPool>();
 

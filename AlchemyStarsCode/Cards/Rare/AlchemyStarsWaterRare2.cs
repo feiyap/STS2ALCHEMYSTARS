@@ -32,7 +32,7 @@ public sealed class AlchemyStarsWaterRare2 : ModCardTemplate
     private const TargetType CardTarget = TargetType.AllEnemies;
     private const bool ShowInCardLibrary = true;
     private const decimal DamageMultiplier = 4m;
-    private const int DarkCellReplayThreshold = 4;
+    private const int DarkCellReplayThreshold = 2;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -54,11 +54,7 @@ public sealed class AlchemyStarsWaterRare2 : ModCardTemplate
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.OnCapital)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
-        
-        
-        HoverTipFactory.FromPower<AlchemyStarsCapitalTaxPower>()
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water))
     ];
 
     public AlchemyStarsWaterRare2()
@@ -107,8 +103,16 @@ public sealed class AlchemyStarsWaterRare2 : ModCardTemplate
         if (!ReferenceEquals(card, this))
             return;
 
-        if (Owner.Creature.GetPowerAmount<AlchemyStarsCapitalTaxPower>() <= 0)
-            return;
+        if (!CapitalTaxConfigured[this] || Owner.Creature.GetPowerAmount<AlchemyStarsCapitalTaxPower>() <= 0)
+        {
+            await PowerCmd.Apply<AlchemyStarsCapitalTaxPower>(
+                choiceContext,
+                Owner.Creature,
+                1m,
+                Owner.Creature,
+                this);
+            CapitalTaxConfigured[this] = true;
+        }
 
         var tax = AlchemyStarsCapitalTaxPower.TaxAmount;
         await PlayerCmd.LoseGold(tax, Owner);
@@ -117,6 +121,6 @@ public sealed class AlchemyStarsWaterRare2 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        // 升级后水深色格达到 4 个时额外重放 1 次。
+        // 升级后水深色格达到 2 个时额外重放 1 次。
     }
 }

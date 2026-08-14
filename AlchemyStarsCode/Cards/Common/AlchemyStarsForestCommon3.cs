@@ -15,7 +15,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 荆棘环架·契法：获得格挡并转化属性格，成功转�?2 格时获得敏捷与森光能�?/// </summary>
+/// 荆棘环架·契法：获得格挡，将非森光能（含万色）转化为森格，成功 2 格时获敏捷并获得森光能。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestCommon3 : ModCardTemplate
 {
@@ -24,7 +25,7 @@ public sealed class AlchemyStarsForestCommon3 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int ConvertCellCount = 2;
+    private const int ConvertLightEnergyCount = 2;
 
     public override bool GainsBlock => true;
 
@@ -60,8 +61,10 @@ public sealed class AlchemyStarsForestCommon3 : ModCardTemplate
     {
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
 
-        var converted = LightMechanic.TryConvertRandomNonForestCells(Owner, ConvertCellCount);
-        if (converted >= ConvertCellCount)
+        var converted = LightMechanic.TryConvertRandomNonForestLightEnergyToForestCells(
+            Owner,
+            ConvertLightEnergyCount);
+        if (converted >= ConvertLightEnergyCount)
         {
             await PowerCmd.Apply<DexterityPower>(
                 choiceContext,

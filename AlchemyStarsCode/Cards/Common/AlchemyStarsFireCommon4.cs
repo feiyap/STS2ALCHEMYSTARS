@@ -2,6 +2,7 @@ using System.Linq;
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
@@ -48,7 +49,8 @@ public sealed class AlchemyStarsFireCommon4 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
         HoverTipFactory.FromCard<Burn>(),
-        HoverTipFactory.FromPower<VulnerablePower>()
+        HoverTipFactory.FromPower<VulnerablePower>(),
+        HoverTipFactory.Static(StaticHoverTip.Transform)
     ];
 
     public AlchemyStarsFireCommon4()
@@ -60,17 +62,24 @@ public sealed class AlchemyStarsFireCommon4 : ModCardTemplate
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
-        var selected = (await CardSelectCmd.FromHand(
-            choiceContext,
-            Owner,
-            new CardSelectorPrefs(SelectionScreenPrompt, 1, 1),
-            card => !ReferenceEquals(card, this),
-            this)).ToList();
-
-        if (selected.Count > 0)
+        // 无可变形手牌时跳过选牌，避免 FromHand 内 CancelAllCardPlay 把出牌动画卡死。
+        var selectable = PileType.Hand.GetPile(Owner).Cards
+            .Where(card => !ReferenceEquals(card, this) && card.IsTransformable)
+            .ToList();
+        if (selectable.Count > 0)
         {
-            var burn = CombatState!.CreateCard<Burn>(Owner);
-            await CardCmd.Transform(selected[0], burn);
+            var selected = (await CardSelectCmd.FromHand(
+                choiceContext,
+                Owner,
+                new CardSelectorPrefs(SelectionScreenPrompt, 1, 1),
+                card => !ReferenceEquals(card, this) && card.IsTransformable,
+                this)).FirstOrDefault();
+
+            if (selected != null)
+            {
+                var burn = CombatState!.CreateCard<Burn>(Owner);
+                await CardCmd.Transform(selected, burn);
+            }
         }
 
         await LightMechanic.DealElementalAttackDamage(

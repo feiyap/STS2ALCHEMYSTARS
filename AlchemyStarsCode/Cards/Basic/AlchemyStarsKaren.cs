@@ -33,7 +33,7 @@ public sealed class AlchemyStarsKaren : ModCardTemplate
         new EnergyVar(1),
         AlchemyStarsKeywordText.InlineTitleVar("HighCourtGuard", AlchemyStarsKeywordIds.HighCourtGuard),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water),
-        new BlockVar("KarenBlock", 6m, ValueProp.Move)
+        new BlockVar("KarenBlock", 5m, ValueProp.Move)
     ];
 
     protected override HashSet<CardTag> CanonicalTags => [AlchemyStarsCardTags.HighCourtGuard];

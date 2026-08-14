@@ -51,14 +51,13 @@ public sealed class AlchemyStarsThunderRare7 : ModCardTemplate
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder),
-        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.ThunderMonochrome),
-        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Flaw)
+        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.ThunderMonochrome)
     ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.ThunderMonochrome)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Flaw)),
+        // 仅保留破绽 DEBUFF 能力提示，避免与破绽词条描述重复。
         HoverTipFactory.FromPower<AlchemyStarsFlawPower>()
     ];
 

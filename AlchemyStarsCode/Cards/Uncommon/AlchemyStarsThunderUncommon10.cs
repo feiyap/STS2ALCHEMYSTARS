@@ -72,14 +72,18 @@ public sealed class AlchemyStarsThunderUncommon10 : ModCardTemplate
         {
             await PlayerCmd.GainEnergy(1, Owner);
 
-            var selected = (await CardSelectCmd.FromCombatPile(
-                choiceContext,
-                PileType.Discard.GetPile(Owner),
-                Owner,
-                new CardSelectorPrefs(SelectionScreenPrompt, 1))).FirstOrDefault();
+            var discardPile = PileType.Discard.GetPile(Owner);
+            if (discardPile.Cards.Count > 0)
+            {
+                var selected = (await CardSelectCmd.FromCombatPile(
+                    choiceContext,
+                    discardPile,
+                    Owner,
+                    new CardSelectorPrefs(SelectionScreenPrompt, 1))).FirstOrDefault();
 
-            if (selected != null)
-                await CardPileCmd.Add(selected, PileType.Hand);
+                if (selected != null)
+                    await CardPileCmd.Add(selected, PileType.Hand);
+            }
         }
 
         LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Thunder, ThunderEnergyGain);

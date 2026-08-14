@@ -1,7 +1,6 @@
 using System.Linq;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
@@ -28,15 +27,15 @@ public sealed class AlchemyStarsViceEmptyPupil : ModCardTemplate
     private const TargetType CardTarget = TargetType.AllEnemies;
     private const bool ShowInCardLibrary = true;
     private const int SealStacks = 5;
-    private const decimal BaseHitDamage = 1m;
-    private const decimal UpgradedHitDamage = 2m;
+    private const int SealStacksUpgradeBy = 2;
+    private const decimal HitDamage = 2m;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(BaseHitDamage, ValueProp.Move),
+        new DamageVar(HitDamage, ValueProp.Move),
         new PowerVar<AlchemyStarsTimelessSealPower>(SealStacks),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water),
         AlchemyStarsKeywordText.InlineTitleVar("LockTitle", AlchemyStarsKeywordIds.Lock),
@@ -52,9 +51,7 @@ public sealed class AlchemyStarsViceEmptyPupil : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.TimelessSeal)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Lock)),
-        HoverTipFactory.FromPower<AlchemyStarsTimelessSealPower>(),
-        HoverTipFactory.FromPower<AlchemyStarsLockPower>()
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Lock))
     ];
 
     public AlchemyStarsViceEmptyPupil()
@@ -112,6 +109,6 @@ public sealed class AlchemyStarsViceEmptyPupil : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Damage.UpgradeValueBy(UpgradedHitDamage - BaseHitDamage);
+        DynamicVars["AlchemyStarsTimelessSealPower"].UpgradeValueBy(SealStacksUpgradeBy);
     }
 }

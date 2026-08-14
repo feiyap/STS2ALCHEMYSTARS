@@ -32,7 +32,6 @@ public sealed class AlchemyStarsFireRare4 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DynamicVar("DrawFireAttacks", FireAttackDrawCount),
         AlchemyStarsKeywordText.InlineTitleVar("ShadowHerdMajesty", AlchemyStarsKeywordIds.ShadowHerdMajesty),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
     ];
@@ -45,9 +44,6 @@ public sealed class AlchemyStarsFireRare4 : ModCardTemplate
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.ShadowHerdMajesty)),
-        
         HoverTipFactory.FromPower<AlchemyStarsFireDoubleDamagePower>()
     ];
 

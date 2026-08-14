@@ -27,11 +27,12 @@ public sealed class AlchemyStarsParalysisPower : ModPowerTemplate
         CardModel? cardSource,
         CardPlay? cardPlay)
     {
-        if (target != Owner)
+        if (target != Owner || Amount <= 0)
             return 1m;
 
-        if (LightMechanicDamageContext.CurrentElement != LightElement.Thunder &&
-            LightMechanicDamageContext.CurrentElement != LightElement.Prismatic)
+        // 雷属性被动：仅抬高雷属性（含万色光能视为雷）伤害。
+        var element = LightMechanicDamageContext.CurrentElement;
+        if (element != LightElement.Thunder && element != LightElement.Prismatic)
             return 1m;
 
         return 1m + Amount * 0.02m;

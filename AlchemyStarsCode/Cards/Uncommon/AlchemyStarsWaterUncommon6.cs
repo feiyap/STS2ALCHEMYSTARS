@@ -18,7 +18,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 安息之辉·蒂娜：从抽牌堆选牌入手后消耗自身，若干回合后回手并获得等效水格挡�?/// </summary>
+/// 安息之辉·蒂娜：从抽牌堆选牌入手后消耗自身；深色格 1/2 回合，固定 2 回合后回手。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterUncommon6 : ModCardTemplate
 {
@@ -27,8 +28,9 @@ public sealed class AlchemyStarsWaterUncommon6 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int BaseReturnTurns = 2;
-    private const int ReturnTurnsUpgradeBy = 1;
+    private const int BaseDarkTurns = 1;
+    private const int DarkTurnsUpgradeBy = 1;
+    private const int ReturnTurns = 2;
 
     public override bool GainsBlock => true;
 
@@ -37,7 +39,7 @@ public sealed class AlchemyStarsWaterUncommon6 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new PowerVar<AlchemyStarsTinaTurnStartPower>(BaseReturnTurns),
+        new IntVar("DarkTurns", BaseDarkTurns),
         AlchemyStarsKeywordText.InlineTitleVar("DivineHand", AlchemyStarsKeywordIds.DivineHand),
         AlchemyStarsKeywordText.InlineTitleVar("Sleepwalk", AlchemyStarsKeywordIds.Sleepwalk),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
@@ -45,6 +47,7 @@ public sealed class AlchemyStarsWaterUncommon6 : ModCardTemplate
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
+        CardKeyword.Exhaust,
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DivineHand),
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Sleepwalk),
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)
@@ -52,10 +55,10 @@ public sealed class AlchemyStarsWaterUncommon6 : ModCardTemplate
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
+        HoverTipFactory.FromKeyword(CardKeyword.Exhaust),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DivineHand)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Sleepwalk)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
-        
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DarkCell)),
         HoverTipFactory.FromPower<AlchemyStarsTinaTurnStartPower>()
     ];
@@ -76,12 +79,10 @@ public sealed class AlchemyStarsWaterUncommon6 : ModCardTemplate
         var power = await PowerCmd.Apply<AlchemyStarsTinaTurnStartPower>(
             choiceContext,
             Owner.Creature,
-            DynamicVars["AlchemyStarsTinaTurnStartPower"].IntValue,
+            ReturnTurns,
             Owner.Creature,
             this);
-        power?.ConfigureExhaustedCard(this);
-
-        await CardCmd.Exhaust(choiceContext, this);
+        power?.ConfigureExhaustedCard(this, DynamicVars["DarkTurns"].IntValue);
     }
 
     private async Task TryPickFromDrawPile(PlayerChoiceContext choiceContext)
@@ -105,6 +106,6 @@ public sealed class AlchemyStarsWaterUncommon6 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        DynamicVars["AlchemyStarsTinaTurnStartPower"].UpgradeValueBy(ReturnTurnsUpgradeBy);
+        DynamicVars["DarkTurns"].UpgradeValueBy(DarkTurnsUpgradeBy);
     }
 }

@@ -1,4 +1,5 @@
 using System.Linq;
+using AlchemyStars.Cards;
 using AlchemyStars.Keywords;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -14,9 +15,8 @@ public static class AlchemyStarsForestState
 {
     private static readonly AttachedState<Player, int> RetainEffectCount = new(_ => 0);
     private static readonly AttachedState<CardModel, int> PastRuptureBonus = new(_ => 0);
-    private static readonly AttachedState<CardModel, int> RadiantBloomPlays = new(_ => 0);
     private static readonly AttachedState<Player, int> TeaPartyCooldown = new(_ => 0);
-    private static readonly AttachedState<CardModel, int> KushkutaCombatDamageBonus = new(_ => 0);
+    private static readonly AttachedState<Player, int> KushkutaCombatDamageBonus = new(_ => 0);
     private static readonly AttachedState<CardModel, int> JenoRetainCount = new(_ => 0);
     private static readonly AttachedState<CardModel, int> ShinopuEnhanceUses = new(_ => 0);
     private static readonly AttachedState<CardModel, int> ReceiptMailHandSize = new(_ => 0);
@@ -27,13 +27,30 @@ public static class AlchemyStarsForestState
 
     public static void IncrementRetainEffectCount(Player player) => RetainEffectCount[player]++;
 
+    /// <summary>
+    /// 本场战斗开始时重置玩家级森系战斗追踪（保留次数、茶话会冷却、库斯库塔伤害加成）。
+    /// </summary>
+    public static void ResetCombatTracking(Player player)
+    {
+        RetainEffectCount[player] = 0;
+        TeaPartyCooldown[player] = 0;
+        KushkutaCombatDamageBonus[player] = 0;
+    }
+
+    /// <summary>
+    /// 弃牌阶段每有一张牌被保留，累加 1 次「保留效果」计数（荆印在身等）。
+    /// </summary>
+    public static void NotifyCardsRetained(Player player, int retainedCount)
+    {
+        if (retainedCount <= 0)
+            return;
+
+        RetainEffectCount[player] += retainedCount;
+    }
+
     public static int GetPastRuptureBonus(CardModel card) => PastRuptureBonus[card];
 
     public static void IncrementPastRuptureBonus(CardModel card) => PastRuptureBonus[card]++;
-
-    public static int GetRadiantBloomPlays(CardModel card) => RadiantBloomPlays[card];
-
-    public static void IncrementRadiantBloomPlays(CardModel card) => RadiantBloomPlays[card]++;
 
     public static int GetTeaPartyCooldown(Player player) => TeaPartyCooldown[player];
 
@@ -45,10 +62,10 @@ public static class AlchemyStarsForestState
             TeaPartyCooldown[player]--;
     }
 
-    public static int GetKushkutaCombatDamageBonus(CardModel card) => KushkutaCombatDamageBonus[card];
+    public static int GetKushkutaCombatDamageBonus(Player player) => KushkutaCombatDamageBonus[player];
 
-    public static void IncrementKushkutaCombatDamageBonus(CardModel card, int amount = 1) =>
-        KushkutaCombatDamageBonus[card] += amount;
+    public static void IncrementKushkutaCombatDamageBonus(Player player, int amount = 1) =>
+        KushkutaCombatDamageBonus[player] += amount;
 
     public static int GetJenoRetainCount(CardModel card) => JenoRetainCount[card];
 
@@ -73,9 +90,13 @@ public static class AlchemyStarsForestState
     public static void SetWordAbsoluteInitialCost(CardModel card, int cost) => WordAbsoluteInitialCost[card] = cost;
 
     /// <summary>
-    /// 转色栏产出森属性格时，触发手牌中「往昔溃裂」卡牌的伤害成长�?    /// </summary>
-    public static void NotifyForestCellProduced(Player player)
+    /// 转色栏产出森属性格时，触发手牌中「往昔溃裂」卡牌的伤害成长。
+    /// </summary>
+    public static void NotifyForestCellProduced(Player player, int cellsProduced = 1)
     {
+        if (cellsProduced <= 0)
+            return;
+
         var hand = player.PlayerCombatState?.Hand.Cards;
         if (hand == null)
             return;
@@ -83,11 +104,15 @@ public static class AlchemyStarsForestState
         var pastRuptureKeyword = ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.PastRupture);
         foreach (var card in hand)
         {
-            if (!card.Keywords.Contains(pastRuptureKeyword))
+            if (card is not AlchemyStarsForestRare1 &&
+                !card.Keywords.Contains(pastRuptureKeyword))
                 continue;
 
-            IncrementPastRuptureBonus(card);
-            card.InvokeEnergyCostChanged();
+            for (var i = 0; i < cellsProduced; i++)
+                IncrementPastRuptureBonus(card);
+
+            if (card is AlchemyStarsForestRare1 prima)
+                prima.SyncPastRuptureDamageDisplay();
         }
     }
 

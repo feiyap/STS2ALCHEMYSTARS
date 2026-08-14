@@ -48,9 +48,7 @@ public sealed class AlchemyStarsForestUncommon11 : ModCardTemplate
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightSwordArmor)),
-        HoverTipFactory.FromPower<AlchemyStarsLightSwordArmorPower>()
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest))
     ];
 
     public AlchemyStarsForestUncommon11()

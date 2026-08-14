@@ -14,7 +14,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 双生镜花·那席里斯：获得森光能与格挡，并将所有属性格转为森格（大概率强化格）�?/// </summary>
+/// 双生镜花·那席里斯：获得森光能与格挡，并生成 2 个森属性格（大概率强化格）。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestUncommon4 : ModCardTemplate
 {
@@ -24,6 +25,8 @@ public sealed class AlchemyStarsForestUncommon4 : ModCardTemplate
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
     private const int ForestEnergyGain = 2;
+    private const int ForestCellsToCreate = 2;
+    private const int EnhancedChancePercent = 30;
 
     public override bool GainsBlock => true;
 
@@ -56,7 +59,10 @@ public sealed class AlchemyStarsForestUncommon4 : ModCardTemplate
     {
         LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Forest, ForestEnergyGain);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
-        LightMechanic.ConvertAllCellsToForestWithEnhanced(Owner);
+        LightMechanic.TryAddForestCellsWithEnhancedChance(
+            Owner,
+            ForestCellsToCreate,
+            EnhancedChancePercent);
     }
 
     protected override void OnUpgrade()

@@ -18,7 +18,7 @@ namespace AlchemyStars.Cards;
 
 /// <summary>
 /// ???? 1 ???????????????/// </summary>
-[RegisterCard(typeof(AlchemyStarsCardPool))]
+[RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedStrangeAnimalBica : ModCardTemplate
 {
     private const int BaseEnergyCost = 0;
@@ -27,6 +27,8 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalBica : ModCardTemplate
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = false;
     private const int DrawCount = 1;
+
+    public override bool CanBeGeneratedInCombat => false;
 
     public override CardPoolModel VisualCardPool => ModelDb.CardPool<ColorlessCardPool>();
 

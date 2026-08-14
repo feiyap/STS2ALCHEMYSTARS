@@ -11,7 +11,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 查莉娅：每回合开始时，将雷与森属性格转化为水属性深色格；未完成转色则获得能量并抽牌�?/// </summary>
+/// 查莉娅：每回合开始时，将 1 个属性格转化为水属性深色格；未完成转色则获得能量并抽牌。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsCharlotteConvertPower : ModPowerTemplate
 {
@@ -29,25 +30,47 @@ public sealed class AlchemyStarsCharlotteConvertPower : ModPowerTemplate
             return;
 
         var cells = state.AttributeCells.Items.ToList();
-        var convertedAny = false;
-        for (var i = 0; i < cells.Count; i++)
+        if (cells.Count == 0)
         {
-            var cell = cells[i];
-            if (cell.Element is not (LightElement.Thunder or LightElement.Forest))
-                continue;
-
-            cells[i] = new AttributeCell(LightElement.Water, AttributeCellKind.Dark, cell.EnhancedCardTypeName);
-            convertedAny = true;
-        }
-
-        if (convertedAny)
-        {
-            state.AttributeCells.ReplaceAll(cells);
-            LightMechanicUiBootstrap.RefreshForPlayer(player);
+            await PlayerCmd.GainEnergy(1, player);
+            await CardPileCmd.Draw(choiceContext, 1, player);
             return;
         }
 
-        await PlayerCmd.GainEnergy(1, player);
-        await CardPileCmd.Draw(choiceContext, 1, player);
+        // 优先转化非水属性格；若无则转化普通水格（尚未深色）。
+        var convertIndex = -1;
+        for (var i = 0; i < cells.Count; i++)
+        {
+            if (cells[i].Element != LightElement.Water)
+            {
+                convertIndex = i;
+                break;
+            }
+        }
+
+        if (convertIndex < 0)
+        {
+            for (var i = 0; i < cells.Count; i++)
+            {
+                if (cells[i].Element == LightElement.Water && cells[i].Kind != AttributeCellKind.Dark)
+                {
+                    convertIndex = i;
+                    break;
+                }
+            }
+        }
+
+        if (convertIndex < 0)
+        {
+            await PlayerCmd.GainEnergy(1, player);
+            await CardPileCmd.Draw(choiceContext, 1, player);
+            return;
+        }
+
+        var source = cells[convertIndex];
+        cells[convertIndex] = new AttributeCell(LightElement.Water, AttributeCellKind.Dark, source.EnhancedCardTypeName);
+        state.AttributeCells.ReplaceAll(cells);
+        LightMechanicUiBootstrap.RefreshForPlayer(player);
+        Flash();
     }
 }

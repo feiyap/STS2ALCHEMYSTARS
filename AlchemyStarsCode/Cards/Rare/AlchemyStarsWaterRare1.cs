@@ -28,9 +28,7 @@ public sealed class AlchemyStarsWaterRare1 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new PowerVar<AlchemyStarsNorthernRealmPower>(1m),
-        AlchemyStarsKeywordText.InlineTitleVar("NorthernRealm", AlchemyStarsKeywordIds.NorthernRealm),
-        AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
+        new PowerVar<AlchemyStarsNorthernRealmPower>(1m)
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
@@ -41,9 +39,8 @@ public sealed class AlchemyStarsWaterRare1 : ModCardTemplate
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.NorthernRealm)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
-        HoverTipFactory.FromPower<AlchemyStarsNorthernRealmPower>()
+        // 「北境」词条由 CanonicalKeywords 自动附带提示；不再重复挂能力提示。
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water))
     ];
 
     public AlchemyStarsWaterRare1()

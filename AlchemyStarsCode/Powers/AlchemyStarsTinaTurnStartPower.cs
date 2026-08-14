@@ -12,27 +12,38 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 蒂娜：接下来若干回合开始时，获�?1 格水属性深色格；层数耗尽后将消耗的卡牌送回手牌�?/// </summary>
+/// 蒂娜：层数表示回手倒计时（固定 2）；另计深色格剩余次数（1/2）。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsTinaTurnStartPower : ModPowerTemplate
 {
     private CardModel? _exhaustedCard;
+    private int _darkCellsRemaining;
 
     public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Counter;
 
     /// <summary>
-    /// 登记待回手的消耗卡牌�?    /// </summary>
-    public void ConfigureExhaustedCard(CardModel card) => _exhaustedCard = card;
+    /// 登记待回手的消耗卡牌，以及接下来若干回合开始时获得水深色格的次数。
+    /// </summary>
+    public void ConfigureExhaustedCard(CardModel card, int darkCellTurns)
+    {
+        _exhaustedCard = card;
+        _darkCellsRemaining = darkCellTurns;
+    }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {
         if (player.Creature != Owner || Amount <= 0)
             return;
 
-        LightMechanic.TryAddAttributeCell(player, LightElement.Water, AttributeCellKind.Dark);
-        Flash();
+        if (_darkCellsRemaining > 0)
+        {
+            LightMechanic.TryAddAttributeCell(player, LightElement.Water, AttributeCellKind.Dark);
+            _darkCellsRemaining--;
+            Flash();
+        }
 
         var isLastStack = Amount <= 1;
         await PowerCmd.Decrement(this);

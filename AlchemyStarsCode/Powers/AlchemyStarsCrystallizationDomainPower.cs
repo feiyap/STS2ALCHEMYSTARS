@@ -1,23 +1,15 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AlchemyStars.Cards;
 using AlchemyStars.Keywords;
-using AlchemyStars.Mechanics;
-using MegaCrit.Sts2.Core.Commands;
-using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Models;
 using STS2RitsuLib.Interop.AutoRegistration;
-using STS2RitsuLib.Keywords;
 using STS2RitsuLib.Scaffolding.Content;
 
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 结晶领域：手牌中时，未格挡的森属性攻击施加结晶�?/// </summary>
+/// 结晶领域（遗留能力注册）：效果已改为由手牌中的结晶领域卡在 AfterCardPlayed 中触发。
+/// 保留此类以免旧存档/引用缺失；不再由拜里厄打出时施加。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsCrystallizationDomainPower : ModPowerTemplate
 {
@@ -26,26 +18,4 @@ public sealed class AlchemyStarsCrystallizationDomainPower : ModPowerTemplate
     public override PowerStackType StackType => PowerStackType.Single;
 
     protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.Crystallization];
-
-    public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
-    {
-        if (cardPlay.Card.Owner != Owner.Player)
-            return;
-
-        if (cardPlay.Card.Type != CardType.Attack || !AlchemyStarsCardHelpers.HasForestKeyword(cardPlay.Card))
-            return;
-
-        if (cardPlay.Target == null || cardPlay.Target.IsDead)
-            return;
-
-        if (cardPlay.Target.Block > 0)
-            return;
-
-        await PowerCmd.Apply<AlchemyStarsCrystallizationPower>(
-            choiceContext,
-            cardPlay.Target,
-            1m,
-            Owner,
-            cardPlay.Card);
-    }
 }

@@ -22,10 +22,10 @@ public static class LightIconPaths
     private static readonly Dictionary<string, string> IconFileByElement =
         new(StringComparer.OrdinalIgnoreCase)
         {
-            [Forest] = "forest_light_icon.png",
-            [Water] = "water_light_icon.png",
-            [Fire] = "fire_light_icon.png",
-            [Thunder] = "thunder_light_icon.png",
+            [Forest] = "forest_light_icon_ui.png",
+            [Water] = "water_light_icon_ui.png",
+            [Fire] = "fire_light_icon_ui.png",
+            [Thunder] = "thunder_light_icon_ui.png",
         };
 
     public static bool IsValidElement(string? element) =>

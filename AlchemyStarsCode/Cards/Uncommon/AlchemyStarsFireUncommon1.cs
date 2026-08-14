@@ -16,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 默然负火·乌列尔：高庭卫队；群体火伤与灼燃，可选消耗火光能重置非火格（60% 火，否则等概率森/雷/水）。
+/// 默然负火·乌列尔：高庭卫队；群体火伤与灼燃，可选消耗火光能重置全部光能与转色栏（大概率火）。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireUncommon1 : ModCardTemplate
@@ -67,7 +67,7 @@ public sealed class AlchemyStarsFireUncommon1 : ModCardTemplate
             await PlayerCmd.GainEnergy(1, Owner);
 
         if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Fire]))
-            LightMechanic.ResetNonFireCells(Owner);
+            LightMechanic.ResetAllLightEnergyAndAttributeCellsBiasedFire(Owner);
 
         foreach (var enemy in CombatState!.HittableEnemies.ToList())
         {

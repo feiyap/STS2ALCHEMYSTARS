@@ -79,13 +79,37 @@ public sealed class LightMechanicCombatState
 
     public List<AttributeCell> AddAttributeCell(AttributeCell cell)
     {
-        var overflow = AttributeCells.EnqueueReturningOverflow(cell);
+        var cellToAdd = ApplyOverflowSpecialInheritance(cell);
+        var overflow = AttributeCells.EnqueueReturningOverflow(cellToAdd);
         UpdateRainbowState();
         return overflow;
     }
 
     public List<AttributeCell> AddAttributeCell(LightElement element, AttributeCellKind kind = AttributeCellKind.Normal) =>
         AddAttributeCell(new AttributeCell(element, kind));
+
+    /// <summary>
+    /// 转色栏已满时：若将被挤掉的是深色格/强化格，且与新格属性相同，则新格继承该特殊状态。
+    /// </summary>
+    private AttributeCell ApplyOverflowSpecialInheritance(AttributeCell incoming)
+    {
+        if (AttributeCells.Count < AttributeCells.MaxSlots || AttributeCells.Count == 0)
+            return incoming;
+
+        var pushed = AttributeCells.Items[0];
+        if (pushed.Element != incoming.Element)
+            return incoming;
+
+        if (pushed.Kind is not (AttributeCellKind.Dark or AttributeCellKind.Enhanced))
+            return incoming;
+
+        return new AttributeCell(
+            incoming.Element,
+            pushed.Kind,
+            pushed.Kind == AttributeCellKind.Enhanced
+                ? pushed.EnhancedCardTypeName
+                : incoming.EnhancedCardTypeName);
+    }
 
     /// <summary>
     /// 以随机属性填满转色栏至上限。

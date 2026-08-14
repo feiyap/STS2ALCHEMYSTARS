@@ -99,12 +99,10 @@ public sealed class AlchemyStarsThunderUncommon4 : ModCardTemplate
             LightElement.Thunder,
             cardPlay);
 
+        // 升级后生成超载+（升级超载抽到时赋予雷属性攻击重放）。
         var overload = CombatState!.CreateCard<AlchemyStarsGeneratedOverload>(Owner);
         if (IsUpgraded)
-        {
-            overload.GrantsThunderAttackReplay = true;
             CardCmd.Upgrade(overload);
-        }
 
         await CardPileCmd.AddGeneratedCardToCombat(overload, PileType.Draw, Owner);
     }

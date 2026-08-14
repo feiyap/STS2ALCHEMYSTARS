@@ -18,7 +18,7 @@ namespace AlchemyStars.Cards;
 /// <summary>
 /// 起源·月：检视抽牌堆底 5 张，选 1 张入手并可将最多 2 张置于牌堆顶。
 /// </summary>
-[RegisterCard(typeof(AlchemyStarsCardPool))]
+[RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedOriginMoon : ModCardTemplate
 {
     private const int BaseEnergyCost = 1;
@@ -28,6 +28,8 @@ public sealed class AlchemyStarsGeneratedOriginMoon : ModCardTemplate
     private const bool ShowInCardLibrary = false;
     private const int ScryCount = 5;
     private const int TopCount = 2;
+
+    public override bool CanBeGeneratedInCombat => false;
 
     public override CardPoolModel VisualCardPool => ModelDb.CardPool<ColorlessCardPool>();
 

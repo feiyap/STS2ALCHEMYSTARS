@@ -27,7 +27,7 @@ public sealed class AlchemyStarsThunderRare5 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.AllEnemies;
     private const bool ShowInCardLibrary = true;
-    private const decimal HitDamage = 9m;
+    private const decimal HitDamage = 7m;
     private const int BaseHitCount = 2;
     private const int ImperialThunderApplyAmount = 99;
 
@@ -101,28 +101,28 @@ public sealed class AlchemyStarsThunderRare5 : ModCardTemplate
                 DynamicVars.Damage.BaseValue,
                 LightElement.Thunder,
                 cardPlay);
-        }
 
-        if (enemy.GetPowerAmount<AlchemyStarsImperialThunderPower>() > 0)
-        {
+            if (enemy.IsDead)
+                break;
+
             var imperialThunder = enemy.GetPower<AlchemyStarsImperialThunderPower>();
-            if (imperialThunder != null)
-            {
-                await PowerCmd.Decrement(imperialThunder);
+            if (imperialThunder == null || imperialThunder.Amount <= 0)
+                continue;
 
-                if (IsUpgraded && !enemy.IsDead)
+            await PowerCmd.Decrement(imperialThunder);
+
+            if (IsUpgraded && !enemy.IsDead)
+            {
+                var bonus = enemy.MaxHp * 0.07m;
+                if (bonus > 0m)
                 {
-                    var bonus = enemy.MaxHp * 0.05m;
-                    if (bonus > 0m)
-                    {
-                        await CreatureCmd.Damage(
-                            choiceContext,
-                            enemy,
-                            bonus,
-                            ValueProp.Unblockable | ValueProp.Unpowered,
-                            this,
-                            cardPlay);
-                    }
+                    await CreatureCmd.Damage(
+                        choiceContext,
+                        enemy,
+                        bonus,
+                        ValueProp.Unblockable | ValueProp.Unpowered,
+                        this,
+                        cardPlay);
                 }
             }
         }

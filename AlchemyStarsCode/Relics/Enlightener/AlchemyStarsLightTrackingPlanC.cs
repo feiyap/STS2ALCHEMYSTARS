@@ -133,7 +133,17 @@ public sealed class AlchemyStarsLightTrackingPlanC : AlchemyStarsEnlightenerReli
 
         var rng = player.PlayerRng.Shops;
         foreach (var entry in cards)
-            RerollCard(entry, pool, player, rng, matchType: true);
+        {
+            // 购物后会对整页货架再跑一遍本 Hook；已处理过则跳过，避免整页卡牌被重抽刷新。
+            if (entry.ModifyingRelics.Contains(this))
+                continue;
+
+            if (!RerollCard(entry, pool, player, rng, matchType: true))
+            {
+                // 权重仍抽中原卡时也打标，防止后续 UpdateEntry 再次重抽。
+                entry.ModifyCard(entry.Card, this);
+            }
+        }
     }
 
     private bool HasWeightBonus =>

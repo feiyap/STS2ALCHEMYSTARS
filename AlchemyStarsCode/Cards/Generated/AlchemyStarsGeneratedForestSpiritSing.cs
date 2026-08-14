@@ -19,7 +19,7 @@ namespace AlchemyStars.Cards;
 /// <summary>
 /// ??�?????????????????????
 /// </summary>
-[RegisterCard(typeof(AlchemyStarsCardPool))]
+[RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedForestSpiritSing : ModCardTemplate
 {
     private const int BaseEnergyCost = 0;
@@ -29,6 +29,8 @@ public sealed class AlchemyStarsGeneratedForestSpiritSing : ModCardTemplate
     private const bool ShowInCardLibrary = false;
     private const decimal BaseDamage = 7m;
     private const int EmeraldMarkAmount = 2;
+
+    public override bool CanBeGeneratedInCombat => false;
 
     public override CardPoolModel VisualCardPool => ModelDb.CardPool<ColorlessCardPool>();
 

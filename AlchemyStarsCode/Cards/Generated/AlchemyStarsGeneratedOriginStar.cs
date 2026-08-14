@@ -15,7 +15,7 @@ namespace AlchemyStars.Cards;
 
 /// <summary>
 /// 起源·星：预知抽牌堆顶 5 张，�?2 张牌并保留其�?2 张。消耗�?/// </summary>
-[RegisterCard(typeof(AlchemyStarsCardPool))]
+[RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedOriginStar : ModCardTemplate
 {
     private const int BaseEnergyCost = 1;
@@ -26,6 +26,8 @@ public sealed class AlchemyStarsGeneratedOriginStar : ModCardTemplate
     private const int ForesightCount = 5;
     private const int DrawCount = 2;
     private const int RetainCount = 2;
+
+    public override bool CanBeGeneratedInCombat => false;
 
     public override CardPoolModel VisualCardPool => ModelDb.CardPool<ColorlessCardPool>();
 

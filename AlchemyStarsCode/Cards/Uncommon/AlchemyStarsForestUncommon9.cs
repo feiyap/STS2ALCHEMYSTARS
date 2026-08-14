@@ -2,6 +2,7 @@ using System.Linq;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
@@ -16,7 +17,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 铁棘冠冕·列奥：荆印在身；消耗森光能，随机多段森伤并叠加保留效果计数加成�?/// </summary>
+/// 铁棘冠冕·列奥：荆印在身；消耗森光能，随机多段森伤；伤害随本场保留效果次数成长。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestUncommon9 : ModCardTemplate
 {
@@ -26,6 +28,7 @@ public sealed class AlchemyStarsForestUncommon9 : ModCardTemplate
     private const TargetType CardTarget = TargetType.RandomEnemy;
     private const bool ShowInCardLibrary = true;
     private const int HitCount = 3;
+    private const decimal BaseHitDamage = 3m;
 
     protected override bool IsPlayable => LightMechanic.HasForestLightEnergy(Owner);
 
@@ -36,7 +39,7 @@ public sealed class AlchemyStarsForestUncommon9 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(3m, ValueProp.Move),
+        new DamageVar(BaseHitDamage, ValueProp.Move),
         new RepeatVar(HitCount),
         AlchemyStarsKeywordText.InlineTitleVar("ThornSealOnBody", AlchemyStarsKeywordIds.ThornSealOnBody),
         AlchemyStarsKeywordText.InlineTitleVar("ForestTitle", AlchemyStarsKeywordIds.Forest)
@@ -51,7 +54,6 @@ public sealed class AlchemyStarsForestUncommon9 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest)),
-        
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.ThornSealOnBody))
     ];
 
@@ -64,8 +66,8 @@ public sealed class AlchemyStarsForestUncommon9 : ModCardTemplate
     {
         LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Forest]);
 
-        var retainBonus = AlchemyStarsForestState.GetRetainEffectCount(Owner);
-        var damage = DynamicVars.Damage.BaseValue + retainBonus;
+        SyncDamageDisplay();
+        var damage = DynamicVars.Damage.BaseValue;
 
         for (var i = 0; i < HitCount; i++)
         {
@@ -95,6 +97,36 @@ public sealed class AlchemyStarsForestUncommon9 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Damage.UpgradeValueBy(1m);
+        SyncDamageDisplay();
+    }
+
+    private decimal GetCombatDamage()
+    {
+        var baseDamage = IsUpgraded ? BaseHitDamage + 1m : BaseHitDamage;
+        if (Owner == null)
+            return baseDamage;
+
+        return baseDamage + AlchemyStarsForestState.GetRetainEffectCount(Owner);
+    }
+
+    private void SyncDamageDisplay()
+    {
+        DynamicVars.Damage.BaseValue = GetCombatDamage();
+    }
+
+    /// <summary>
+    /// 保留效果计数变化后，同步所有列奥牌面伤害数字。
+    /// </summary>
+    public static void SyncAllThornSealDamageDisplays(Player player)
+    {
+        var combat = player.PlayerCombatState;
+        if (combat == null)
+            return;
+
+        foreach (var card in combat.AllCards)
+        {
+            if (card is AlchemyStarsForestUncommon9 leo)
+                leo.SyncDamageDisplay();
+        }
     }
 }

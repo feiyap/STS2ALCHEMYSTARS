@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System.Linq;
+using AlchemyStars.Cards;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
@@ -11,7 +11,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 梦魇荆棘：敌人身上每�?1 层减益，克娜莉对其最终伤害增�?2%�?/// </summary>
+/// 梦魇荆棘：敌人身上每有 1 层减益，克娜莉对其最终伤害增加 2%。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsNightmareThornPower : ModPowerTemplate
 {
@@ -27,7 +28,7 @@ public sealed class AlchemyStarsNightmareThornPower : ModPowerTemplate
         CardModel? cardSource,
         CardPlay? cardPlay)
     {
-        if (dealer != Owner || target == null || !props.IsPoweredAttack())
+        if (dealer != Owner || target == null || cardSource is not AlchemyStarsWaterRare4 || !props.IsPoweredAttack())
             return 1m;
 
         var debuffStacks = target.Powers

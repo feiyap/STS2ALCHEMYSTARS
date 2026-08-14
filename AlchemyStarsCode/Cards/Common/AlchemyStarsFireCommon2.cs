@@ -15,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 涤暇福音·马太：获得格挡并随机转化非火属性格，成功转化 2 格时获得力量与火光能。
+/// 涤暇福音·马太：获得格挡，将非火光能（含万色）转化为火格，成功 2 格时获力量并获得火光能。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireCommon2 : ModCardTemplate
@@ -25,7 +25,7 @@ public sealed class AlchemyStarsFireCommon2 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int ConvertCellCount = 2;
+    private const int ConvertLightEnergyCount = 2;
 
     public override bool GainsBlock => true;
 
@@ -61,8 +61,10 @@ public sealed class AlchemyStarsFireCommon2 : ModCardTemplate
     {
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
 
-        var converted = LightMechanic.TryConvertRandomNonFireCells(Owner, ConvertCellCount);
-        if (converted >= ConvertCellCount)
+        var converted = LightMechanic.TryConvertRandomNonFireLightEnergyToFireCells(
+            Owner,
+            ConvertLightEnergyCount);
+        if (converted >= ConvertLightEnergyCount)
         {
             await PowerCmd.Apply<StrengthPower>(
                 choiceContext,

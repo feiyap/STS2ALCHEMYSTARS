@@ -15,7 +15,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 终末之龙·希罗娜：X 费；需水光能打出，消�?1 点水光能后按 X 多段水伤并叠加龙牙印记�?/// </summary>
+/// 终末之龙·希罗娜：X 费；需水光能打出，造成 X 次水伤并施加 X×倍率层龙牙印记。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterRare5 : ModCardTemplate
 {
@@ -24,7 +25,9 @@ public sealed class AlchemyStarsWaterRare5 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
-    private const decimal HitDamage = 1m;
+    private const decimal HitDamage = 4m;
+    private const int BaseFangMultiplier = 2;
+    private const int UpgradedFangMultiplier = 3;
 
     protected override bool HasEnergyCostX => true;
 
@@ -38,22 +41,21 @@ public sealed class AlchemyStarsWaterRare5 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new DamageVar(HitDamage, ValueProp.Move),
+        new IntVar("FangMult", BaseFangMultiplier),
         AlchemyStarsKeywordText.InlineTitleVar("DragonFangMark", AlchemyStarsKeywordIds.DragonFangMark),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
+        CardKeyword.Exhaust,
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water),
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DragonFangMark)
     ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DragonFangMark)),
-        
-        HoverTipFactory.FromPower<AlchemyStarsDragonFangMarkPower>()
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water))
     ];
 
     public AlchemyStarsWaterRare5()
@@ -84,11 +86,18 @@ public sealed class AlchemyStarsWaterRare5 : ModCardTemplate
                 DynamicVars.Damage.BaseValue,
                 LightElement.Water,
                 cardPlay);
+        }
 
+        if (cardPlay.Target.IsDead)
+            return;
+
+        var fangAmount = x * DynamicVars["FangMult"].IntValue;
+        if (fangAmount > 0)
+        {
             await PowerCmd.Apply<AlchemyStarsDragonFangMarkPower>(
                 choiceContext,
                 cardPlay.Target,
-                1m,
+                fangAmount,
                 Owner.Creature,
                 this);
         }
@@ -96,6 +105,7 @@ public sealed class AlchemyStarsWaterRare5 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        AddKeyword(CardKeyword.Exhaust);
+        RemoveKeyword(CardKeyword.Exhaust);
+        DynamicVars["FangMult"].UpgradeValueBy(UpgradedFangMultiplier - BaseFangMultiplier);
     }
 }

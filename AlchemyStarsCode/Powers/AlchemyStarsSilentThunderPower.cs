@@ -1,8 +1,5 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AlchemyStars.Mechanics;
-using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
@@ -15,32 +12,35 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// ?????????????1 ??????????????1% ?????/// </summary>
+/// 静声之雷：受到伤害时，额外受到最大生命值 0.5% × 层数的伤害（不消耗层数）。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsSilentThunderPower : ModPowerTemplate
 {
-    public override PowerType Type => PowerType.Buff;
+    private const decimal MaxHpBonusPercentPerStack = 0.005m;
+
+    public override PowerType Type => PowerType.Debuff;
 
     public override PowerStackType StackType => PowerStackType.Counter;
 
-    public override async Task AfterDamageGiven(
+    public override async Task AfterDamageReceived(
         PlayerChoiceContext choiceContext,
-        Creature? dealer,
+        Creature target,
         DamageResult result,
         ValueProp props,
-        Creature target,
+        Creature? dealer,
         CardModel? cardSource)
     {
-        if (dealer != Owner || Amount <= 0 || result.TotalDamage <= 0)
+        if (target != Owner || Amount <= 0 || result.UnblockedDamage <= 0m)
             return;
 
-        if (!props.IsPoweredAttack())
+        // 避免自身额外伤害递归触发。
+        if (props.HasFlag(ValueProp.Unpowered))
             return;
 
         Flash();
-        await PowerCmd.Decrement(this);
 
-        var bonus = target.MaxHp * 0.01m;
+        var bonus = Owner.MaxHp * MaxHpBonusPercentPerStack * Amount;
         if (bonus <= 0m)
             return;
 
@@ -48,7 +48,7 @@ public sealed class AlchemyStarsSilentThunderPower : ModPowerTemplate
         {
             await CreatureCmd.Damage(
                 choiceContext,
-                target,
+                Owner,
                 bonus,
                 ValueProp.Unblockable | ValueProp.Unpowered,
                 cardSource,

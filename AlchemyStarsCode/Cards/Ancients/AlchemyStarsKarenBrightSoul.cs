@@ -17,7 +17,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 卡莲·煜魂：先古技能。高庭卫队；按火/水属性格造成火伤并获得等额格挡。
+/// 卡莲·煜魂：先古技能。高庭卫队；按火/水光能造成火伤并获得等额格挡。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsKarenBrightSoul : ModCardTemplate
@@ -39,7 +39,7 @@ public sealed class AlchemyStarsKarenBrightSoul : ModCardTemplate
         new DamageVar(HitDamage, ValueProp.Move),
         new CalculationBaseVar(0m),
         new CalculationExtraVar(1m),
-        new CalculatedVar(CalculatedHitsKey).WithMultiplier(CountFireAndWaterHits),
+        new CalculatedVar(CalculatedHitsKey).WithMultiplier(CountFireAndWaterLightHits),
         AlchemyStarsKeywordText.InlineTitleVar("HighCourtGuard", AlchemyStarsKeywordIds.HighCourtGuard),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
@@ -57,8 +57,6 @@ public sealed class AlchemyStarsKarenBrightSoul : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
-        
-        
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.HighCourtGuard))
     ];
 
@@ -85,9 +83,6 @@ public sealed class AlchemyStarsKarenBrightSoul : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        if (IsUpgraded)
-            LightMechanic.TryAddAttributeCell(Owner, LightElement.Fire);
-
         if (AlchemyStarsCardHelpers.HasOtherTagInHand(this, Owner, AlchemyStarsCardTags.HighCourtGuard))
             await PlayerCmd.GainEnergy(1, Owner);
 
@@ -98,8 +93,7 @@ public sealed class AlchemyStarsKarenBrightSoul : ModCardTemplate
         if (target == null || target.IsDead)
             return;
 
-        // 升级火格已在上方加入转色栏；此处按当前格数结算，避免与预览中的 +1 重复。
-        var hitCount = LightMechanic.CountFireAndWaterAttributeCells(Owner);
+        var hitCount = LightMechanic.CountFireAndWaterLightEnergy(Owner);
         var hitDamage = DynamicVars.Damage.BaseValue;
 
         for (var i = 0; i < hitCount; i++)
@@ -131,18 +125,20 @@ public sealed class AlchemyStarsKarenBrightSoul : ModCardTemplate
         }
     }
 
+    protected override void OnUpgrade()
+    {
+        EnergyCost.UpgradeBy(-1);
+    }
+
     /// <summary>
-    /// 当前火/水属性格加权数量；升级时打出前会先生成 1 个火格，预览一并计入。
+    /// 当前火/水光能数量（含万色）；预览包含打出时将获得的 1 火 + 1 水。
     /// </summary>
-    private static decimal CountFireAndWaterHits(CardModel card, Creature? _)
+    private static decimal CountFireAndWaterLightHits(CardModel card, Creature? _)
     {
         if (card.Owner == null)
             return 0m;
 
-        var hits = LightMechanic.CountFireAndWaterAttributeCells(card.Owner);
-        if (card.IsUpgraded)
-            hits += 1;
-
-        return hits;
+        // 打出时会先获得 1 火 + 1 水光能，预览一并计入。
+        return LightMechanic.CountFireAndWaterLightEnergy(card.Owner) + 2;
     }
 }

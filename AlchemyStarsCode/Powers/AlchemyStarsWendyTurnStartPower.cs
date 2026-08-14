@@ -13,11 +13,13 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 飓风灵鸮：下个回合开始时额外获得 2 点能量与 1 点森属性光能�?/// </summary>
+/// 飓风灵鸮：下个回合开始时额外获得 2 点能量与 2 点森属性光能。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsWendyTurnStartPower : ModPowerTemplate
 {
     private const int BonusEnergy = 2;
+    private const int BonusForestLightEnergy = 2;
 
     public override PowerType Type => PowerType.Buff;
 
@@ -34,7 +36,7 @@ public sealed class AlchemyStarsWendyTurnStartPower : ModPowerTemplate
             return;
 
         await PlayerCmd.GainEnergy(BonusEnergy, player);
-        LightMechanic.TryGrantLightEnergy(player, LightElement.Forest);
+        LightMechanic.TryGrantLightEnergyMany(player, LightElement.Forest, BonusForestLightEnergy);
         await PowerCmd.Remove(this);
     }
 }

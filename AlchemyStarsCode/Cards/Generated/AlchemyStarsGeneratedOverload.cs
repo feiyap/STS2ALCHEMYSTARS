@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.CardPools;
 using AlchemyStars.Characters;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Keywords;
@@ -16,8 +17,9 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 超载：抽到时失去 1 点能量�?/// </summary>
-[RegisterCard(typeof(AlchemyStarsCardPool))]
+/// 超载：抽到时失去 1 点能量。
+/// </summary>
+[RegisterCard(typeof(StatusCardPool))]
 public sealed class AlchemyStarsGeneratedOverload : ModCardTemplate
 {
     private const int BaseEnergyCost = -1;
@@ -26,7 +28,11 @@ public sealed class AlchemyStarsGeneratedOverload : ModCardTemplate
     private const TargetType CardTarget = TargetType.None;
     private const bool ShowInCardLibrary = false;
 
-    /// <summary>升级巡航阵列生成时：抽到时令手牌�?1 张雷属性攻击可重放 1 次�?/summary>
+    public override bool CanBeGeneratedInCombat => false;
+
+    public override CardPoolModel VisualCardPool => ModelDb.CardPool<ColorlessCardPool>();
+
+    /// <summary>升级巡航阵列生成时：抽到时令手牌中 1 张雷属性攻击可重放 1 次。</summary>
     internal bool GrantsThunderAttackReplay { get; set; }
 
     public override CardAssetProfile AssetProfile => new(

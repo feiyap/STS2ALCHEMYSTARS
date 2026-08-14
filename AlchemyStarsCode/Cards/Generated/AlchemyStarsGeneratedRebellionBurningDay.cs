@@ -17,8 +17,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 反叛灼燃之日：由启明之光生成；唤醒反叛者并制造莱因哈特衍生牌�?/// </summary>
-[RegisterCard(typeof(AlchemyStarsCardPool))]
+/// ????????????????????????????????/// </summary>
+[RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedRebellionBurningDay : ModCardTemplate
 {
     private const int BaseEnergyCost = 0;
@@ -26,6 +26,8 @@ public sealed class AlchemyStarsGeneratedRebellionBurningDay : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Token;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = false;
+
+    public override bool CanBeGeneratedInCombat => false;
 
     public override CardPoolModel VisualCardPool => ModelDb.CardPool<ColorlessCardPool>();
 

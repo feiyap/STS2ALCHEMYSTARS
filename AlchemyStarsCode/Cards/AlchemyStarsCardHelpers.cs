@@ -13,6 +13,8 @@ using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.ValueProps;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Encounters;
+using MegaCrit.Sts2.Core.Models.Monsters;
 using MegaCrit.Sts2.Core.Models.Powers;
 using STS2RitsuLib.Keywords;
 
@@ -81,12 +83,12 @@ internal static class AlchemyStarsCardHelpers
     public static async Task TryTriggerTeaPartyOnPlay(
         PlayerChoiceContext choiceContext,
         CardModel card,
-        Player owner,
-        int cooldownTurns)
+        Player owner)
     {
         if (!IsTeaPartyMember(card))
             return;
 
+        // 冷却中，或场上仍有未消耗的折扣时，不再叠加。
         if (AlchemyStarsForestState.GetTeaPartyCooldown(owner) > 0)
             return;
 
@@ -100,7 +102,7 @@ internal static class AlchemyStarsCardHelpers
             owner.Creature,
             card);
 
-        AlchemyStarsForestState.SetTeaPartyCooldown(owner, cooldownTurns);
+        // 冷却在折扣被消耗时启动（见 TeaPartyDiscountPower.BeforeCardPlayed）。
     }
 
     public static async Task TryDrawLegionCommanderFromDrawPile(
@@ -219,6 +221,38 @@ internal static class AlchemyStarsCardHelpers
             .Where(enemy => !enemy.IsDead && enemy.MaxHp > 0)
             .OrderBy(enemy => enemy.CurrentHp / enemy.MaxHp)
             .FirstOrDefault();
+    }
+
+    /// <summary>
+    /// 是否与你同距离：一般以 HittableEnemies[0] 为最近；
+    /// 帝王蟹左右钳等部位视为全体同距离。
+    /// </summary>
+    public static bool AreEnemiesAtSameDistance(IReadOnlyList<Creature> enemies)
+    {
+        if (enemies.Count <= 1)
+            return true;
+
+        var encounter = enemies[0].CombatState?.Encounter;
+        if (encounter is KaiserCrabBoss)
+            return true;
+
+        // 帝王蟹式部位：全部为左右钳（Crusher / Rocket）
+        return enemies.All(enemy =>
+            enemy.Monster is Crusher or Rocket);
+    }
+
+    /// <summary>
+    /// 目标是否为最近敌人（同距离时所有目标均视为最近）。
+    /// </summary>
+    public static bool IsNearestEnemy(Creature target, IReadOnlyList<Creature> enemies)
+    {
+        if (enemies.Count == 0)
+            return false;
+
+        if (AreEnemiesAtSameDistance(enemies))
+            return enemies.Any(enemy => ReferenceEquals(enemy, target));
+
+        return ReferenceEquals(target, enemies[0]);
     }
 
     public static async Task DoubleStackableDebuffs(

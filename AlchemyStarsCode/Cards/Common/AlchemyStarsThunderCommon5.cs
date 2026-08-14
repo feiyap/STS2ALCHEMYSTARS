@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ��Ц��ࡤ��͡������׹��ܡ�������񵲡�
+/// 奚笑歌班·基汀：抽牌并获得格挡；每个雷属性格额外提供 4% 格挡。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderCommon5 : ModCardTemplate
@@ -24,6 +24,7 @@ public sealed class AlchemyStarsThunderCommon5 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
+    private const decimal BlockBonusPerThunderCell = 0.04m;
 
     public override bool GainsBlock => true;
 
@@ -32,7 +33,7 @@ public sealed class AlchemyStarsThunderCommon5 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new BlockVar(12m, ValueProp.Move),
+        new BlockVar(11m, ValueProp.Move),
         new CardsVar(1),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
     ];
@@ -44,8 +45,8 @@ public sealed class AlchemyStarsThunderCommon5 : ModCardTemplate
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        ];
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder))
+    ];
 
     public AlchemyStarsThunderCommon5() : base(BaseEnergyCost, CardKind, CardRarityValue, CardTarget, ShowInCardLibrary)
     {
@@ -53,13 +54,20 @@ public sealed class AlchemyStarsThunderCommon5 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        LightMechanic.TryGrantLightEnergy(Owner, LightElement.Thunder);
         await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.BaseValue, Owner);
-        await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
+
+        var block = DynamicVars.Block.BaseValue;
+        var thunderCells = LightMechanic.CountThunderAttributeCells(Owner);
+        block *= 1m + BlockBonusPerThunderCell * thunderCells;
+
+        await CreatureCmd.GainBlock(
+            Owner.Creature,
+            new BlockVar(block, ValueProp.Move),
+            cardPlay);
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Block.UpgradeValueBy(4m);
+        DynamicVars.Block.UpgradeValueBy(3m);
     }
 }

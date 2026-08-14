@@ -21,7 +21,7 @@ namespace AlchemyStars.Cards;
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireRare2 : ModCardTemplate
 {
-    private const int BaseEnergyCost = 3;
+    private const int BaseEnergyCost = 2;
     private const CardType CardKind = CardType.Attack;
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.AnyEnemy;
@@ -49,7 +49,6 @@ public sealed class AlchemyStarsFireRare2 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.RedOilWrench)),
-        
         HoverTipFactory.FromPower<AlchemyStarsIgnitionPower>()
     ];
 
@@ -79,11 +78,14 @@ public sealed class AlchemyStarsFireRare2 : ModCardTemplate
 
         var baseDamage = DynamicVars.Damage.BaseValue;
         var target = cardPlay.Target;
+        var allSameDistance = AlchemyStarsCardHelpers.AreEnemiesAtSameDistance(enemies);
+        var targetIsNearest = AlchemyStarsCardHelpers.IsNearestEnemy(target, enemies);
+
         var targetDamage = baseDamage;
-        if (consumed && (enemies.Count == 1 || ReferenceEquals(target, enemies[0])))
+        if (consumed && targetIsNearest)
             targetDamage *= 2m;
 
-        var othersDealFullDamage = consumed && enemies.Count > 1;
+        var othersDealFullDamage = consumed && allSameDistance;
 
         foreach (var enemy in enemies)
         {

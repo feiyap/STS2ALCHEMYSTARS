@@ -5,7 +5,6 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
-using AlchemyStars.Mechanics;
 using AlchemyStars.Powers;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Keywords;
@@ -32,9 +31,8 @@ public sealed class AlchemyStarsFireRare1 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new PowerVar<AlchemyStarsBloomingBegoniaPower>(BaseBegoniaAmount),
-        AlchemyStarsKeywordText.InlineTitleVar("BloomingBegonia", AlchemyStarsKeywordIds.BloomingBegonia),
-        AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
+        new EnergyVar(1),
+        new PowerVar<AlchemyStarsBloomingBegoniaPower>(BaseBegoniaAmount)
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
@@ -46,10 +44,7 @@ public sealed class AlchemyStarsFireRare1 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.BloomingBegonia)),
-        
-        
-        HoverTipFactory.FromPower<AlchemyStarsBloomingBegoniaPower>(),
+        // 「灼灼海棠」词条由 CanonicalKeywords 自动附带；不重复挂能力提示。
         HoverTipFactory.FromPower<AlchemyStarsIgnitionPower>()
     ];
 

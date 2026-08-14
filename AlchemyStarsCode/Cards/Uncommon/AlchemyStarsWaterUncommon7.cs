@@ -13,7 +13,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 破雪绮光·查莉娅：每回合将雷森格转为水深色格，否则获能与抽牌。虚无，升级后移除�?/// </summary>
+/// 破雪绮光·查莉娅：每回合将 1 个属性格转为水深色格，否则获能与抽牌。虚无，升级后移除。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterUncommon7 : ModCardTemplate
 {
@@ -28,6 +29,7 @@ public sealed class AlchemyStarsWaterUncommon7 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
+        new EnergyVar(1),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
     ];
 

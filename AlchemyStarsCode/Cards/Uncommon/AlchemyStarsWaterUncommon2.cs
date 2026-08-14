@@ -14,7 +14,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 浑冥之水·沙利叶：获得水光能与格挡，并将所有属性格转为水属性格�?/// </summary>
+/// 浑冥之水·沙利叶：获得水光能与格挡，并生成 2 个水属性格（中概率深色）。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterUncommon2 : ModCardTemplate
 {
@@ -24,6 +25,7 @@ public sealed class AlchemyStarsWaterUncommon2 : ModCardTemplate
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
     private const int WaterEnergyGain = 2;
+    private const int WaterCellGain = 2;
     private const int DarkCellChancePercent = 30;
 
     public override bool GainsBlock => true;
@@ -45,8 +47,6 @@ public sealed class AlchemyStarsWaterUncommon2 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
-        
-        
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DarkCell))
     ];
 
@@ -59,7 +59,7 @@ public sealed class AlchemyStarsWaterUncommon2 : ModCardTemplate
     {
         LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Water, WaterEnergyGain);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
-        LightMechanic.TryConvertAllCellsToElement(Owner, LightElement.Water, DarkCellChancePercent);
+        LightMechanic.TryAddWaterCellsWithDarkChance(Owner, WaterCellGain, DarkCellChancePercent);
     }
 
     protected override void OnUpgrade()

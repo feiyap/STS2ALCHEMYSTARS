@@ -33,7 +33,8 @@ public sealed class AlchemyStarsFireRare5 : ModCardTemplate
     private const bool ShowInCardLibrary = true;
     private const int RequiredFireCells = 4;
     private const decimal BaseBulletDamage = 2m;
-    private const decimal IgnitionBonusRate = 0.1m;
+    private const int BulletsPerExhaustCard = 2;
+    private const decimal IgnitionBonusRate = 0.15m;
 
     protected override bool IsPlayable =>
         LightMechanic.CountFireAttributeCells(Owner) >= RequiredFireCells;
@@ -81,7 +82,7 @@ public sealed class AlchemyStarsFireRare5 : ModCardTemplate
         if (!ReferenceEquals(card, this))
             return;
 
-        Bullets[this] += PileType.Exhaust.GetPile(Owner).Cards.Count;
+        Bullets[this] += PileType.Exhaust.GetPile(Owner).Cards.Count * BulletsPerExhaustCard;
         DynamicVars["Bullets"].BaseValue = Bullets[this];
         await Task.CompletedTask;
     }

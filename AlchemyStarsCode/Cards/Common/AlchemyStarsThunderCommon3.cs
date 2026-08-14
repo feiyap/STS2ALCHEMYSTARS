@@ -15,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ��ǹ�������ܽ������ø񵲲����ת���������Ը񣬳ɹ�ת�� 2 ��ʱ���������
+/// 雷枪公爵·贝芙丽：格挡，并消耗非雷光能生成雷格；成功转化 2 点时获得力量。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderCommon3 : ModCardTemplate
@@ -25,7 +25,7 @@ public sealed class AlchemyStarsThunderCommon3 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int ConvertCellCount = 2;
+    private const int ConvertLightEnergyCount = 2;
 
     public override bool GainsBlock => true;
 
@@ -47,8 +47,6 @@ public sealed class AlchemyStarsThunderCommon3 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        
-        
         HoverTipFactory.FromPower<StrengthPower>()
     ];
 
@@ -60,8 +58,10 @@ public sealed class AlchemyStarsThunderCommon3 : ModCardTemplate
     {
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
 
-        var converted = LightMechanic.TryConvertRandomNonThunderCells(Owner, ConvertCellCount);
-        if (converted >= ConvertCellCount)
+        var converted = LightMechanic.TryConvertRandomNonThunderLightEnergyToThunderCells(
+            Owner,
+            ConvertLightEnergyCount);
+        if (converted >= ConvertLightEnergyCount)
         {
             await PowerCmd.Apply<StrengthPower>(
                 choiceContext,

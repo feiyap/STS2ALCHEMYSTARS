@@ -18,7 +18,7 @@ namespace AlchemyStars.Cards;
 /// <summary>
 /// ??�???????? 5 ??? 1 ???????? 2 ???????
 /// </summary>
-[RegisterCard(typeof(AlchemyStarsCardPool))]
+[RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedOriginSun : ModCardTemplate
 {
     private const int BaseEnergyCost = 1;
@@ -28,6 +28,8 @@ public sealed class AlchemyStarsGeneratedOriginSun : ModCardTemplate
     private const bool ShowInCardLibrary = false;
     private const int ScryCount = 5;
     private const int BottomCount = 2;
+
+    public override bool CanBeGeneratedInCombat => false;
 
     public override CardPoolModel VisualCardPool => ModelDb.CardPool<ColorlessCardPool>();
 

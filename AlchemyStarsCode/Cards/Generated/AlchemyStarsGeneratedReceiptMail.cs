@@ -16,7 +16,7 @@ namespace AlchemyStars.Cards;
 /// <summary>
 /// ??????????????????
 /// </summary>
-[RegisterCard(typeof(AlchemyStarsCardPool))]
+[RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedReceiptMail : ModCardTemplate
 {
     private const int BaseEnergyCost = 1;
@@ -26,6 +26,8 @@ public sealed class AlchemyStarsGeneratedReceiptMail : ModCardTemplate
     private const bool ShowInCardLibrary = false;
     private const int BaseBonusDraw = 0;
     private const int BonusDrawUpgradeBy = 1;
+
+    public override bool CanBeGeneratedInCombat => false;
 
     public override CardPoolModel VisualCardPool => ModelDb.CardPool<ColorlessCardPool>();
 
