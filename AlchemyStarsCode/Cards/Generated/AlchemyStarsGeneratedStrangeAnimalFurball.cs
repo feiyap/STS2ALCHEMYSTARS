@@ -15,11 +15,12 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 小毛球：获得能量；被消耗或丢弃时获得格挡。消耗�?/// </summary>
+/// 小毛球：获得能量；被消耗或丢弃时获得格挡。消耗。
+/// </summary>
 [RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedStrangeAnimalFurball : ModCardTemplate
 {
-    private const int BaseEnergyCost = 1;
+    private const int BaseEnergyCost = 0;
     private const CardType CardKind = CardType.Skill;
     private const CardRarity CardRarityValue = CardRarity.Token;
     private const TargetType CardTarget = TargetType.Self;
@@ -52,6 +53,7 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalFurball : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(CardKeyword.Exhaust),
+        HoverTipFactory.FromKeyword(CardKeyword.Retain),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.StrangeAnimal)),
         HoverTipFactory.Static(StaticHoverTip.Block)
     ];
@@ -71,22 +73,16 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalFurball : ModCardTemplate
         CardModel card,
         bool causedByEthereal)
     {
-        if (card != this || CombatState == null)
-            return;
-
-        await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, null);
+        await AlchemyStarsCardHelpers.TryGainStrangeAnimalBlock(this, card);
     }
 
     public override async Task AfterCardDiscarded(PlayerChoiceContext choiceContext, CardModel card)
     {
-        if (card != this || CombatState == null)
-            return;
-
-        await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, null);
+        await AlchemyStarsCardHelpers.TryGainStrangeAnimalBlock(this, card);
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Energy.UpgradeValueBy(1m);
+        AddKeyword(CardKeyword.Retain);
     }
 }

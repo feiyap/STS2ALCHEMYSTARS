@@ -23,7 +23,7 @@ namespace AlchemyStars.Cards;
 public sealed class AlchemyStarsThunderRare7 : ModCardTemplate
 {
     private const string CalculatedHitsKey = "CalculatedHits";
-    private const int BaseEnergyCost = 2;
+    private const int BaseEnergyCost = 1;
     private const CardType CardKind = CardType.Attack;
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.AllEnemies;
@@ -97,7 +97,7 @@ public sealed class AlchemyStarsThunderRare7 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        EnergyCost.UpgradeBy(-1);
+        DynamicVars.Repeat.UpgradeValueBy(1m);
     }
 
     private static decimal CountTotalHits(CardModel card, Creature? _)

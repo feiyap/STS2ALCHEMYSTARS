@@ -17,7 +17,7 @@ namespace AlchemyStars.Cards;
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterRare1 : ModCardTemplate
 {
-    private const int BaseEnergyCost = 3;
+    private const int BaseEnergyCost = 2;
     private const CardType CardKind = CardType.Power;
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.Self;
@@ -39,7 +39,7 @@ public sealed class AlchemyStarsWaterRare1 : ModCardTemplate
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        // 「北境」词条由 CanonicalKeywords 自动附带提示；不再重复挂能力提示。
+        // 「北境之力」词条由 CanonicalKeywords 自动附带提示；不再重复挂能力提示。
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water))
     ];
 
@@ -60,6 +60,6 @@ public sealed class AlchemyStarsWaterRare1 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        EnergyCost.UpgradeBy(-1);
+        AddKeyword(CardKeyword.Innate);
     }
 }

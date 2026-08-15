@@ -8,22 +8,22 @@ using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
-using AlchemyStars.Keywords;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
 
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 审判：受到雷属性伤害时叠加 1 层颤栗；回合结束时失�?1 层�?/// </summary>
+/// 审判：受到雷属性伤害时自身 +1 层；到达 25 层时眩晕并移除所有审判；回合结束时 -1 层。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsJudgmentPower : ModPowerTemplate
 {
+    private const int StunThreshold = 25;
+
     public override PowerType Type => PowerType.Debuff;
 
     public override PowerStackType StackType => PowerStackType.Counter;
-
-    protected override IEnumerable<string> RegisteredKeywordIds => [AlchemyStarsKeywordIds.Tremor];
 
     public override async Task AfterDamageReceived(
         PlayerChoiceContext choiceContext,
@@ -40,14 +40,8 @@ public sealed class AlchemyStarsJudgmentPower : ModPowerTemplate
             LightMechanicDamageContext.CurrentElement != LightElement.Prismatic)
             return;
 
-        await PowerCmd.Apply<AlchemyStarsTremorPower>(
-            choiceContext,
-            Owner,
-            1m,
-            dealer,
-            cardSource);
-
-        await AlchemyStarsTremorPower.TryTriggerStunThreshold(choiceContext, Owner);
+        await PowerCmd.ModifyAmount(choiceContext, this, 1m, dealer, cardSource);
+        await TryTriggerStunThreshold(choiceContext, Owner);
     }
 
     public override async Task AfterSideTurnEnd(
@@ -64,5 +58,18 @@ public sealed class AlchemyStarsJudgmentPower : ModPowerTemplate
 
         Flash();
         await PowerCmd.Decrement(this);
+    }
+
+    public static async Task TryTriggerStunThreshold(
+        PlayerChoiceContext choiceContext,
+        Creature target,
+        int threshold = StunThreshold)
+    {
+        var judgment = target.GetPower<AlchemyStarsJudgmentPower>();
+        if (judgment == null || judgment.Amount < threshold || target.IsDead)
+            return;
+
+        await CreatureCmd.Stun(target);
+        await PowerCmd.Remove(judgment);
     }
 }

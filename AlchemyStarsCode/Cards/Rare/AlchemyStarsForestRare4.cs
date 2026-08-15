@@ -21,9 +21,9 @@ namespace AlchemyStars.Cards;
 public sealed class AlchemyStarsForestRare4 : ModCardTemplate
 {
     private const int BaseEnergyCost = 3;
-    private const CardType CardKind = CardType.Attack;
+    private const CardType CardKind = CardType.Skill;
     private const CardRarity CardRarityValue = CardRarity.Rare;
-    private const TargetType CardTarget = TargetType.AnyEnemy;
+    private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
 
     public override CardAssetProfile AssetProfile => new(

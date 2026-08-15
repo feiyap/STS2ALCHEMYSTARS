@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -38,6 +39,7 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalBica : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new CardsVar(DrawCount),
+        new BlockVar(3m, ValueProp.Unpowered),
         AlchemyStarsKeywordText.InlineTitleVar("StrangeAnimal", AlchemyStarsKeywordIds.StrangeAnimal)
     ];
 
@@ -53,7 +55,8 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalBica : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(CardKeyword.Exhaust),
         HoverTipFactory.FromKeyword(CardKeyword.Ethereal),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.StrangeAnimal))
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.StrangeAnimal)),
+        HoverTipFactory.Static(StaticHoverTip.Block)
     ];
 
     public AlchemyStarsGeneratedStrangeAnimalBica()
@@ -74,6 +77,19 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalBica : ModCardTemplate
             CardCmd.ApplyKeyword(card, CardKeyword.Ethereal);
 
         await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
+    }
+
+    public override async Task AfterCardExhausted(
+        PlayerChoiceContext choiceContext,
+        CardModel card,
+        bool causedByEthereal)
+    {
+        await AlchemyStarsCardHelpers.TryGainStrangeAnimalBlock(this, card);
+    }
+
+    public override async Task AfterCardDiscarded(PlayerChoiceContext choiceContext, CardModel card)
+    {
+        await AlchemyStarsCardHelpers.TryGainStrangeAnimalBlock(this, card);
     }
 
     protected override void OnUpgrade()

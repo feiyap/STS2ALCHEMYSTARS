@@ -17,7 +17,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ????????????????????????????????/// </summary>
+/// 反叛灼燃之日：将反叛灼燃·莱因哈特放入手牌，并为贡露、雷霆、莱因哈特追加反叛灼燃词条。
+/// </summary>
 [RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedRebellionBurningDay : ModCardTemplate
 {

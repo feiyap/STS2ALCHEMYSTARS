@@ -1,11 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AlchemyStars.Cards;
-using AlchemyStars.Mechanics;
-using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
@@ -17,12 +14,14 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// ????????????????????????????????????/// </summary>
+/// 反叛灼燃之日升级：从下一回合开始，反叛灼燃牌在能量不足时可用同等生命支付。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsRebellionHpPayPower : ModPowerTemplate
 {
     private int _activeFromTurn;
     private CardModel? _pendingHpPayCard;
+    private decimal _pendingHpPayCost;
 
     public override PowerType Type => PowerType.Buff;
 
@@ -65,6 +64,7 @@ public sealed class AlchemyStarsRebellionHpPayPower : ModPowerTemplate
             return false;
 
         _pendingHpPayCard = card;
+        _pendingHpPayCost = originalCost;
         modifiedCost = 0m;
         return true;
     }
@@ -74,8 +74,9 @@ public sealed class AlchemyStarsRebellionHpPayPower : ModPowerTemplate
         if (_pendingHpPayCard == null || !ReferenceEquals(cardPlay.Card, _pendingHpPayCard))
             return;
 
+        var cost = _pendingHpPayCost;
         _pendingHpPayCard = null;
-        var cost = System.Math.Max(0, cardPlay.Card.EnergyCost.GetWithModifiers(CostModifiers.All));
+        _pendingHpPayCost = 0m;
         if (cost <= 0m)
             return;
 

@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 浑冥之水·沙利叶：获得水光能与格挡，并生成 2 个水属性格（中概率深色）。
+/// 浑冥之水·沙利叶：获得水光能与格挡，并生成 1 个水属性格（中概率深色）。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterUncommon2 : ModCardTemplate
@@ -25,7 +25,7 @@ public sealed class AlchemyStarsWaterUncommon2 : ModCardTemplate
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
     private const int WaterEnergyGain = 2;
-    private const int WaterCellGain = 2;
+    private const int WaterCellGain = 1;
     private const int DarkCellChancePercent = 30;
 
     public override bool GainsBlock => true;

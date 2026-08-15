@@ -21,10 +21,21 @@ using STS2RitsuLib.Keywords;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ????????????
+/// 卡牌共用辅助：军团长、茶话会、奇异动物等跨卡结算。
 /// </summary>
 internal static class AlchemyStarsCardHelpers
 {
+    /// <summary>
+    /// 奇异动物被消耗或丢弃时获得格挡。
+    /// </summary>
+    public static async Task TryGainStrangeAnimalBlock(CardModel self, CardModel card)
+    {
+        if (card != self || self.CombatState == null || self.Owner == null)
+            return;
+
+        await CreatureCmd.GainBlock(self.Owner.Creature, self.DynamicVars.Block, null);
+    }
+
     public static bool HasOtherTagInHand(CardModel self, Player owner, CardTag tag)
     {
         var hand = owner.PlayerCombatState?.Hand.Cards;
@@ -58,8 +69,28 @@ internal static class AlchemyStarsCardHelpers
         if (overload == null)
             return false;
 
+        var wasUpgraded = overload.IsUpgraded;
         await CardCmd.Exhaust(choiceContext, overload);
+        if (wasUpgraded)
+            TryGrantThunderCardReplay(owner);
+
         return true;
+    }
+
+    /// <summary>
+    /// 强化超载被消耗时：随机令手牌中 1 张雷属性牌重放 1 次。
+    /// </summary>
+    public static void TryGrantThunderCardReplay(Player owner)
+    {
+        var thunderCards = owner.PlayerCombatState?.Hand.Cards
+            .Where(HasThunderKeyword)
+            .ToList();
+        if (thunderCards == null || thunderCards.Count == 0)
+            return;
+
+        var picked = owner.RunState.Rng.CombatTargets.NextItem(thunderCards);
+        if (picked != null)
+            picked.BaseReplayCount += 1;
     }
 
     public static bool HasThunderKeyword(CardModel card) =>
@@ -105,22 +136,42 @@ internal static class AlchemyStarsCardHelpers
         // 冷却在折扣被消耗时启动（见 TeaPartyDiscountPower.BeforeCardPlayed）。
     }
 
-    public static async Task TryDrawLegionCommanderFromDrawPile(
+    /// <summary>
+    /// 战斗中手牌 / 抽牌堆 / 弃牌堆 / 消耗堆是否存在其他军团长牌。
+    /// </summary>
+    public static bool HasOtherLegionCommanderInCombat(Player owner, CardModel source)
+    {
+        foreach (var pileType in new[] { PileType.Hand, PileType.Draw, PileType.Discard, PileType.Exhaust })
+        {
+            var pile = pileType.GetPile(owner);
+            if (pile?.Cards == null)
+                continue;
+
+            if (pile.Cards.Any(card =>
+                    !ReferenceEquals(card, source) &&
+                    card.Tags.Contains(AlchemyStarsCardTags.LegionCommander)))
+                return true;
+        }
+
+        return false;
+    }
+
+    public static async Task TryApplyLegionCommanderStat<TPower>(
         PlayerChoiceContext choiceContext,
         Player owner,
-        CardModel source)
+        CardModel source,
+        decimal amount = 1m)
+        where TPower : PowerModel
     {
-        var drawPile = PileType.Draw.GetPile(owner);
-        var legionCards = drawPile.Cards
-            .Where(card => card.Tags.Contains(AlchemyStarsCardTags.LegionCommander))
-            .ToList();
-
-        if (legionCards.Count == 0)
+        if (!HasOtherLegionCommanderInCombat(owner, source))
             return;
 
-        var picked = owner.RunState.Rng.CombatTargets.NextItem(legionCards);
-        if (picked != null)
-            await CardPileCmd.Add(picked, PileType.Hand);
+        await PowerCmd.Apply<TPower>(
+            choiceContext,
+            owner.Creature,
+            amount,
+            owner.Creature,
+            source);
     }
 
     public static async Task TryExecuteBelowHpThreshold(

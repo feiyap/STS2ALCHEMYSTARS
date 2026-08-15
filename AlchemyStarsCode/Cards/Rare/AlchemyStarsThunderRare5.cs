@@ -28,7 +28,7 @@ public sealed class AlchemyStarsThunderRare5 : ModCardTemplate
     private const TargetType CardTarget = TargetType.AllEnemies;
     private const bool ShowInCardLibrary = true;
     private const decimal HitDamage = 7m;
-    private const int BaseHitCount = 2;
+    private const int BaseHitCount = 1;
     private const int ImperialThunderApplyAmount = 99;
 
     public override CardAssetProfile AssetProfile => new(
@@ -77,6 +77,9 @@ public sealed class AlchemyStarsThunderRare5 : ModCardTemplate
             DynamicVars["AlchemyStarsImperialThunderPower"].BaseValue,
             Owner.Creature,
             this);
+
+        foreach (var enemy in CombatState.HittableEnemies)
+            AlchemyStarsImperialThunderPower.ClampOwner(enemy);
     }
 
     private async Task AttackEnemyWithRighteousMajesty(

@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Entities.RestSite;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
@@ -68,8 +69,8 @@ public sealed class AlchemyStarsForestUncommon3 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        if (AlchemyStarsCardHelpers.IsFirstCardPlayedThisTurn(this, Owner, CombatState))
-            await AlchemyStarsCardHelpers.TryDrawLegionCommanderFromDrawPile(choiceContext, Owner, this);
+        await AlchemyStarsCardHelpers.TryApplyLegionCommanderStat<DexterityPower>(
+            choiceContext, Owner, this);
 
         LightMechanic.TryConsumeLightEnergy(
             Owner,

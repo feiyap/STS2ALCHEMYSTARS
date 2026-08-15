@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Entities.RestSite;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
@@ -19,7 +20,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ????�?????????????????????????????? 1 ??????/// </summary>
+/// 豪荣铁颚·巴顿：军团长；全体失去生命，获得水光能与覆甲。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterCommon4 : ModCardTemplate
 {
@@ -29,6 +31,9 @@ public sealed class AlchemyStarsWaterCommon4 : ModCardTemplate
     private const TargetType CardTarget = TargetType.AllEnemies;
     private const bool ShowInCardLibrary = true;
     private const decimal HpLoss = 4m;
+    private const int WaterEnergyGain = 2;
+    private const decimal BasePlating = 2m;
+    private const decimal PlatingUpgradeBy = 2m;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -36,6 +41,7 @@ public sealed class AlchemyStarsWaterCommon4 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new HpLossVar(HpLoss),
+        new PowerVar<PlatingPower>(BasePlating),
         AlchemyStarsKeywordText.InlineTitleVar("LegionCommander", AlchemyStarsKeywordIds.LegionCommander),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
     ];
@@ -52,8 +58,7 @@ public sealed class AlchemyStarsWaterCommon4 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LegionCommander)),
-        
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DarkCell))
+        HoverTipFactory.FromPower<PlatingPower>()
     ];
 
     public AlchemyStarsWaterCommon4()
@@ -63,16 +68,14 @@ public sealed class AlchemyStarsWaterCommon4 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        if (AlchemyStarsCardHelpers.IsFirstCardPlayedThisTurn(this, Owner, CombatState))
-            await AlchemyStarsCardHelpers.TryDrawLegionCommanderFromDrawPile(choiceContext, Owner, this);
+        await AlchemyStarsCardHelpers.TryApplyLegionCommanderStat<DexterityPower>(
+            choiceContext, Owner, this);
 
-        var energyGain = 0;
         foreach (var enemy in CombatState!.HittableEnemies.ToList())
         {
             if (enemy.IsDead)
                 continue;
 
-            var hpBefore = enemy.CurrentHp;
             await CreatureCmd.Damage(
                 choiceContext,
                 enemy,
@@ -80,16 +83,21 @@ public sealed class AlchemyStarsWaterCommon4 : ModCardTemplate
                 ValueProp.Unblockable | ValueProp.Unpowered | ValueProp.Move,
                 this,
                 cardPlay);
-
-            if (hpBefore > enemy.CurrentHp)
-                energyGain++;
         }
 
-        if (energyGain > 0)
-            LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Water, energyGain);
+        LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Water, WaterEnergyGain);
 
-        if (IsUpgraded)
-            LightMechanic.TryConvertRandomWaterCellToDark(Owner);
+        await PowerCmd.Apply<PlatingPower>(
+            choiceContext,
+            Owner.Creature,
+            DynamicVars["PlatingPower"].BaseValue,
+            Owner.Creature,
+            this);
+    }
+
+    protected override void OnUpgrade()
+    {
+        DynamicVars["PlatingPower"].UpgradeValueBy(PlatingUpgradeBy);
     }
 
     public override bool TryModifyRestSiteOptions(Player player, ICollection<RestSiteOption> options)

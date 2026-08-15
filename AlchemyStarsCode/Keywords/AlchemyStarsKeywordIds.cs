@@ -41,6 +41,7 @@ public static class AlchemyStarsKeywordIds
     public const string AuroraMoment = "ALCHEMY_STARS_KEYWORD_AURORA_MOMENT";
     public const string HighCourtGuard = "ALCHEMY_STARS_KEYWORD_HIGH_COURT_GUARD";
     public const string LegionCommander = "ALCHEMY_STARS_KEYWORD_LEGION_COMMANDER";
+    public const string LegionCommanderStrength = "ALCHEMY_STARS_KEYWORD_LEGION_COMMANDER_STRENGTH";
     public const string Scout = "ALCHEMY_STARS_KEYWORD_SCOUT";
     public const string Overload = "ALCHEMY_STARS_KEYWORD_OVERLOAD";
     public const string OverheatBattleSkill = "ALCHEMY_STARS_KEYWORD_OVERHEAT_BATTLE_SKILL";

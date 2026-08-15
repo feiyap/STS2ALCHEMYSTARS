@@ -74,6 +74,12 @@ namespace AlchemyStars.Keywords;
 
 [RegisterOwnedCardKeyword(
 
+    "legion_commander_strength",
+
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword(
+
     "scout",
 
     CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]

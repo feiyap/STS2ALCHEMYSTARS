@@ -179,6 +179,49 @@ public static class LightMechanic
     }
 
     /// <summary>
+    /// 生成若干雷属性格，按概率出现棱镜格；返回成功生成数量。
+    /// </summary>
+    public static int TryAddThunderCellsWithPrismChance(
+        Player player,
+        int count,
+        int prismChancePercent = 50)
+    {
+        if (count <= 0)
+            return 0;
+
+        var rng = player.RunState.Rng.Niche;
+        var created = 0;
+        for (var i = 0; i < count; i++)
+        {
+            var kind = rng.NextInt(100) < prismChancePercent
+                ? AttributeCellKind.Prism
+                : AttributeCellKind.Normal;
+            if (TryAddAttributeCell(player, LightElement.Thunder, kind))
+                created++;
+        }
+
+        return created;
+    }
+
+    /// <summary>
+    /// 生成若干雷属性深色格；返回成功生成数量。
+    /// </summary>
+    public static int TryAddDarkThunderCells(Player player, int count)
+    {
+        if (count <= 0)
+            return 0;
+
+        var created = 0;
+        for (var i = 0; i < count; i++)
+        {
+            if (TryAddAttributeCell(player, LightElement.Thunder, AttributeCellKind.Dark))
+                created++;
+        }
+
+        return created;
+    }
+
+    /// <summary>
     /// 统计转色栏中的雷属性格数量（含万色格）。
     /// </summary>
     public static int CountThunderAttributeCells(Player player)
@@ -1420,7 +1463,43 @@ public static class LightMechanic
     }
 
     /// <summary>
-    /// 贯穿之星：无视格挡、滑溜、缓冲、覆甲与难以杀灭后造成雷属性伤害�?
+    /// 造成同时视为火与雷的攻击伤害。
+    /// </summary>
+    public static async Task DealFireAndThunderAttackDamage(
+        PlayerChoiceContext choiceContext,
+        Player player,
+        CardModel? card,
+        Creature target,
+        decimal baseDamage,
+        CardPlay? cardPlay = null)
+    {
+        using (LightMechanicDamageContext.UseFireAndThunder())
+        {
+            if (card != null)
+            {
+                await DamageCmd.Attack(baseDamage)
+                    .FromCard(card, cardPlay)
+                    .Targeting(target)
+                    .Execute(choiceContext);
+            }
+            else
+            {
+                await CreatureCmd.Damage(
+                    choiceContext,
+                    target,
+                    baseDamage,
+                    ValueProp.Unblockable | ValueProp.Unpowered,
+                    null,
+                    null);
+            }
+        }
+
+        RecordThunderDamageDealt(player);
+        await ApplyElementalHitEffects(choiceContext, player, target, LightElement.Prismatic, card);
+    }
+
+    /// <summary>
+    /// 贯穿之星：无视格挡、滑溜、缓冲、覆甲与难以杀灭后造成雷属性伤害。
     /// </summary>
     public static async Task DealPenetratingElementalAttackDamage(
         PlayerChoiceContext choiceContext,
@@ -1515,12 +1594,15 @@ public static class LightMechanic
         state.UpdateRainbowState();
 
         var multiplier = 1m;
+        var isFireAndThunder = LightMechanicDamageContext.IsFireAndThunder;
 
-        if (element != null)
+        if (isFireAndThunder || element != null)
         {
-            var elements = element == LightElement.Prismatic
-                ? LightElementExtensions.BaseElements
-                : new[] { element.Value };
+            var elements = isFireAndThunder
+                ? new[] { LightElement.Fire, LightElement.Thunder }
+                : element == LightElement.Prismatic
+                    ? LightElementExtensions.BaseElements
+                    : new[] { element!.Value };
 
             foreach (var current in elements)
             {
@@ -1539,7 +1621,7 @@ public static class LightMechanic
             multiplier *= 1m + bonus;
         }
 
-        if (element is LightElement.Fire or LightElement.Prismatic)
+        if (isFireAndThunder || element is LightElement.Fire or LightElement.Prismatic)
         {
             var ignition = player.Creature.GetPower<AlchemyStarsIgnitionPower>();
             if (ignition is { Amount: > 0 })

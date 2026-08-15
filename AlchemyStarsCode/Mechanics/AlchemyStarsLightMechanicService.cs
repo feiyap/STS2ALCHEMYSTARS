@@ -34,6 +34,8 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
 
         foreach (var player in runState.Players)
         {
+            AlchemyStarsRebellionBurningHelper.ResetTurnTracking(player);
+
             if (!LightMechanic.HasMechanicRelic(player))
                 continue;
 
@@ -107,12 +109,19 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {
+        AlchemyStarsRebellionBurningHelper.ResetTurnTracking(player);
+
         if (!LightMechanic.IsMechanicActive(player))
             return;
 
         LightMechanic.ResetTurnCounters(player);
         AlchemyStarsForestState.TickTeaPartyCooldown(player);
         await Task.CompletedTask;
+    }
+
+    public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    {
+        await AlchemyStarsRebellionBurningHelper.TryEchoAfterPlay(choiceContext, cardPlay);
     }
 
     public override Task AfterDeath(

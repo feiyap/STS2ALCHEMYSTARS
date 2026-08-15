@@ -15,14 +15,16 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 壮志凌云·巴顿：篝火合成产物；全体 2×6 万色伤，获得万色光能并转化 1 格为万色。
+/// 壮志凌云·巴顿：篝火合成产物；全体 2×6 万色伤，获得 2 点万色光能并转化 2 格为万色。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterRareBarton : ModCardTemplate
 {
     private const int BaseEnergyCost = 2;
     private const CardType CardKind = CardType.Skill;
-    private const CardRarity CardRarityValue = CardRarity.Rare;
+    private const CardRarity CardRarityValue = CardRarity.Ancient;
+    private const int PrismaticEnergyGain = 2;
+    private const int PrismaticCellConvert = 2;
     private const TargetType CardTarget = TargetType.AllEnemies;
     private const bool ShowInCardLibrary = true;
     private const int HitCount = 2;
@@ -77,8 +79,8 @@ public sealed class AlchemyStarsWaterRareBarton : ModCardTemplate
             }
         }
 
-        LightMechanic.TryGrantLightEnergy(Owner, LightElement.Prismatic);
-        LightMechanic.TryConvertRandomNonElementCells(Owner, LightElement.Prismatic, 1);
+        LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Prismatic, PrismaticEnergyGain);
+        LightMechanic.TryConvertRandomNonElementCells(Owner, LightElement.Prismatic, PrismaticCellConvert);
     }
 
     protected override void OnUpgrade()

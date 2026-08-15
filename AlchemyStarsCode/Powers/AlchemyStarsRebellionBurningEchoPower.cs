@@ -14,10 +14,13 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 反叛灼燃·莱因哈特：回合末对全体敌人造成已损失生�?25% 伤害�?/// </summary>
+/// 反叛灼燃·莱因哈特：回合末对全体敌人造成已损失生命 70% 的火/雷伤害。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsRebellionBurningEchoPower : ModPowerTemplate
 {
+    public const decimal MissingHpDamageRatio = 0.70m;
+
     public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Single;
@@ -44,8 +47,8 @@ public sealed class AlchemyStarsRebellionBurningEchoPower : ModPowerTemplate
             if (missingHp <= 0m)
                 continue;
 
-            var damage = missingHp * 0.25m;
-            using (LightMechanicDamageContext.Use(LightElement.Prismatic))
+            var damage = missingHp * MissingHpDamageRatio;
+            using (LightMechanicDamageContext.UseFireAndThunder())
             {
                 await CreatureCmd.Damage(
                     choiceContext,

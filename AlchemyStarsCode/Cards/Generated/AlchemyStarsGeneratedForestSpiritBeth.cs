@@ -19,7 +19,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 神鹿·贝瑟：按抽牌堆规模强化格子，全强化时改为获得飞行。消耗�?/// </summary>
+/// 神鹿·贝瑟：按消耗牌堆规模强化格子，全强化时改为获得飞行。消耗。
+/// </summary>
 [RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedForestSpiritBeth : ModCardTemplate
 {
@@ -70,7 +71,7 @@ public sealed class AlchemyStarsGeneratedForestSpiritBeth : ModCardTemplate
         await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
         LightMechanic.TryGrantLightEnergy(Owner, LightElement.Forest);
 
-        var drawPileSize = PileType.Draw.GetPile(Owner).Cards.Count;
+        var exhaustPileSize = PileType.Exhaust.GetPile(Owner).Cards.Count;
         if (AllCellsEnhanced(Owner))
         {
             await PowerCmd.Apply<AlchemyStarsFlyingPower>(
@@ -82,7 +83,7 @@ public sealed class AlchemyStarsGeneratedForestSpiritBeth : ModCardTemplate
         }
         else
         {
-            for (var i = 0; i < drawPileSize; i++)
+            for (var i = 0; i < exhaustPileSize; i++)
             {
                 if (AllCellsEnhanced(Owner))
                 {

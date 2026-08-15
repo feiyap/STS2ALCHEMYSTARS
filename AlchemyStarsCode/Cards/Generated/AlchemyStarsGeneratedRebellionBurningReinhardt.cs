@@ -17,21 +17,23 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ????�??????????????????????????????/// </summary>
+/// 反叛灼燃·莱因哈特：先古火/雷攻击。只能支付等同于耗能的生命打出；清空属性格后，若仅有火与雷则在回合结束时造成已损失生命 70% 伤害。
+/// </summary>
 [RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedRebellionBurningReinhardt : ModCardTemplate
 {
-    private const int BaseEnergyCost = 0;
+    private const int BaseEnergyCost = 10;
     private const CardType CardKind = CardType.Attack;
-    private const CardRarity CardRarityValue = CardRarity.Token;
+    private const CardRarity CardRarityValue = CardRarity.Ancient;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = false;
-    private const decimal BaseHpCost = 10m;
     private const decimal BaseDamage = 10m;
+
+    private decimal _hpPayCost;
 
     public override bool CanBeGeneratedInCombat => false;
 
-    public override CardPoolModel VisualCardPool => ModelDb.CardPool<ColorlessCardPool>();
+    public override CardPoolModel VisualCardPool => ModelDb.CardPool<AlchemyStarsCardPool>();
 
     protected override bool IsPlayable => Owner.Creature.CurrentHp > HpPlayCost;
 
@@ -42,14 +44,16 @@ public sealed class AlchemyStarsGeneratedRebellionBurningReinhardt : ModCardTemp
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new HpLossVar(BaseHpCost),
         new DamageVar(BaseDamage, ValueProp.Move),
-        AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
+        AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder),
+        AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
         CardKeyword.Ethereal,
+        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder),
+        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire),
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.RebellionBurning)
     ];
 
@@ -58,28 +62,52 @@ public sealed class AlchemyStarsGeneratedRebellionBurningReinhardt : ModCardTemp
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(CardKeyword.Ethereal),
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.RebellionBurning)),
         HoverTipFactory.FromPower<AlchemyStarsRebellionBurningEchoPower>()
     ];
 
-    private decimal HpPlayCost => DynamicVars.HpLoss.BaseValue;
+    private decimal HpPlayCost => EnergyCost.GetWithModifiers(CostModifiers.None);
 
     public AlchemyStarsGeneratedRebellionBurningReinhardt()
         : base(BaseEnergyCost, CardKind, CardRarityValue, CardTarget, ShowInCardLibrary)
     {
     }
 
+    public override bool TryModifyEnergyCostInCombatLate(
+        CardModel card,
+        decimal originalCost,
+        out decimal modifiedCost)
+    {
+        modifiedCost = originalCost;
+        if (!ReferenceEquals(card, this) || originalCost <= 0m)
+            return false;
+
+        if (Owner.Creature.CurrentHp <= originalCost)
+            return false;
+
+        _hpPayCost = originalCost;
+        modifiedCost = 0m;
+        return true;
+    }
+
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
-        await CreatureCmd.Damage(
-            choiceContext,
-            Owner.Creature,
-            HpPlayCost,
-            ValueProp.Unblockable | ValueProp.Unpowered | ValueProp.Move,
-            this,
-            cardPlay);
+        var hpCost = _hpPayCost > 0m ? _hpPayCost : HpPlayCost;
+        _hpPayCost = 0m;
+        if (hpCost > 0m)
+        {
+            await CreatureCmd.Damage(
+                choiceContext,
+                Owner.Creature,
+                hpCost,
+                ValueProp.Unblockable | ValueProp.Unpowered | ValueProp.Move,
+                this,
+                cardPlay);
+        }
 
         if (LightMechanic.TryExhaustAllAttributeCellsOnlyThunderAndFire(Owner))
         {
@@ -91,19 +119,18 @@ public sealed class AlchemyStarsGeneratedRebellionBurningReinhardt : ModCardTemp
                 this);
         }
 
-        await LightMechanic.DealElementalAttackDamage(
+        await LightMechanic.DealFireAndThunderAttackDamage(
             choiceContext,
             Owner,
             this,
             cardPlay.Target,
             DynamicVars.Damage.BaseValue,
-            LightElement.Prismatic,
             cardPlay);
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars.HpLoss.UpgradeValueBy(-2m);
+        EnergyCost.UpgradeBy(-2);
         DynamicVars.Damage.UpgradeValueBy(-2m);
     }
 }

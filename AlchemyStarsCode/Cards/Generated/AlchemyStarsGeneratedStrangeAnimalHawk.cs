@@ -39,6 +39,7 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalHawk : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new DamageVar(BaseDamage, ValueProp.Move),
+        new BlockVar(3m, ValueProp.Unpowered),
         new CalculationBaseVar(0m),
         new CalculationExtraVar(1m),
         new CalculatedVar("Hits").WithMultiplier(CountStrangeAnimalsInExhaust),
@@ -56,7 +57,8 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalHawk : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(CardKeyword.Exhaust),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.StrangeAnimal))
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.StrangeAnimal)),
+        HoverTipFactory.Static(StaticHoverTip.Block)
     ];
 
     public AlchemyStarsGeneratedStrangeAnimalHawk()
@@ -82,6 +84,19 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalHawk : ModCardTemplate
         }
     }
 
+    public override async Task AfterCardExhausted(
+        PlayerChoiceContext choiceContext,
+        CardModel card,
+        bool causedByEthereal)
+    {
+        await AlchemyStarsCardHelpers.TryGainStrangeAnimalBlock(this, card);
+    }
+
+    public override async Task AfterCardDiscarded(PlayerChoiceContext choiceContext, CardModel card)
+    {
+        await AlchemyStarsCardHelpers.TryGainStrangeAnimalBlock(this, card);
+    }
+
     protected override void OnUpgrade()
     {
         DynamicVars.Damage.UpgradeValueBy(1m);
@@ -90,9 +105,9 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalHawk : ModCardTemplate
     private static decimal CountStrangeAnimalsInExhaust(CardModel card, Creature? _)
     {
         if (card.Owner == null)
-            return 0m;
+            return 1m;
 
         return PileType.Exhaust.GetPile(card.Owner).Cards
-            .Count(exhausted => exhausted.Tags.Contains(AlchemyStarsCardTags.StrangeAnimal));
+            .Count(exhausted => exhausted.Tags.Contains(AlchemyStarsCardTags.StrangeAnimal)) + 1m;
     }
 }

@@ -1,8 +1,6 @@
 using System.Linq;
-using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
@@ -18,7 +16,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 正义执行·奈弥西斯：正义不灭；获得雷光能并对全体施加易伤，可消耗超载回收弃牌�?/// </summary>
+/// 正义执行·奈弥西斯：正义不灭；获得雷光能并对全体施加易伤，升级额外施加审判。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon10 : ModCardTemplate
 {
@@ -28,14 +27,12 @@ public sealed class AlchemyStarsThunderUncommon10 : ModCardTemplate
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
     private const int ThunderEnergyGain = 2;
-    private const int UpgradedJudgmentAmount = 3;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new EnergyVar(1),
         new PowerVar<VulnerablePower>(2m),
         new PowerVar<AlchemyStarsJudgmentPower>(3m),
         AlchemyStarsKeywordText.InlineTitleVar("JusticeImmortal", AlchemyStarsKeywordIds.JusticeImmortal),
@@ -53,12 +50,10 @@ public sealed class AlchemyStarsThunderUncommon10 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Overload)),
         HoverTipFactory.FromCard<AlchemyStarsGeneratedOverload>(),
         HoverTipFactory.FromPower<VulnerablePower>(),
-        HoverTipFactory.FromPower<AlchemyStarsJudgmentPower>(),
-        HoverTipFactory.FromPower<AlchemyStarsTremorPower>()
+        HoverTipFactory.FromPower<AlchemyStarsJudgmentPower>()
     ];
 
     public AlchemyStarsThunderUncommon10()
@@ -69,22 +64,7 @@ public sealed class AlchemyStarsThunderUncommon10 : ModCardTemplate
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         if (await AlchemyStarsCardHelpers.TryConsumeOverloadFromHand(choiceContext, Owner))
-        {
-            await PlayerCmd.GainEnergy(1, Owner);
-
-            var discardPile = PileType.Discard.GetPile(Owner);
-            if (discardPile.Cards.Count > 0)
-            {
-                var selected = (await CardSelectCmd.FromCombatPile(
-                    choiceContext,
-                    discardPile,
-                    Owner,
-                    new CardSelectorPrefs(SelectionScreenPrompt, 1))).FirstOrDefault();
-
-                if (selected != null)
-                    await CardPileCmd.Add(selected, PileType.Hand);
-            }
-        }
+            await CardPileCmd.Draw(choiceContext, 1, Owner);
 
         LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Thunder, ThunderEnergyGain);
 
@@ -103,6 +83,9 @@ public sealed class AlchemyStarsThunderUncommon10 : ModCardTemplate
                 DynamicVars["AlchemyStarsJudgmentPower"].BaseValue,
                 Owner.Creature,
                 this);
+
+            foreach (var enemy in CombatState.HittableEnemies.ToList())
+                await AlchemyStarsJudgmentPower.TryTriggerStunThreshold(choiceContext, enemy);
         }
     }
 }

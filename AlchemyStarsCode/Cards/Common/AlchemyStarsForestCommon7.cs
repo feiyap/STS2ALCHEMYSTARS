@@ -16,7 +16,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 绿晶巨角·奥斐娜：弃牌获得能量并强化格子，可消耗森光能下回合抽牌�?/// </summary>
+/// 绿晶巨角·奥斐娜：弃牌获能并下回合抽牌；可消耗森光能添加随机属性强化格。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestCommon7 : ModCardTemplate
 {
@@ -25,8 +26,11 @@ public sealed class AlchemyStarsForestCommon7 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int MaxDiscardCount = 2;
+    private const int BaseMaxDiscardCount = 1;
+    private const int MaxDiscardCountUpgradeBy = 1;
     private const int EnergyGain = 1;
+    private const int BaseDrawCount = 1;
+    private const int DrawCountUpgradeBy = 1;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -34,19 +38,21 @@ public sealed class AlchemyStarsForestCommon7 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new EnergyVar(EnergyGain),
-        AlchemyStarsKeywordText.InlineTitleVar("ForestTitle", AlchemyStarsKeywordIds.Forest)
+        new IntVar("Discard", BaseMaxDiscardCount),
+        new CardsVar(BaseDrawCount)
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
+        CardKeyword.Retain,
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest)
     ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest)),
-        
-        ];
+        HoverTipFactory.FromKeyword(CardKeyword.Retain),
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest))
+    ];
 
     public AlchemyStarsForestCommon7()
         : base(BaseEnergyCost, CardKind, CardRarityValue, CardTarget, ShowInCardLibrary)
@@ -55,10 +61,11 @@ public sealed class AlchemyStarsForestCommon7 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        var maxDiscard = DynamicVars["Discard"].IntValue;
         var discarded = (await CardSelectCmd.FromHandForDiscard(
             choiceContext,
             Owner,
-            new CardSelectorPrefs(SelectionScreenPrompt, 0, MaxDiscardCount),
+            new CardSelectorPrefs(SelectionScreenPrompt, 0, maxDiscard),
             card => !ReferenceEquals(card, this),
             this)).ToList();
 
@@ -66,16 +73,27 @@ public sealed class AlchemyStarsForestCommon7 : ModCardTemplate
             await CardCmd.Discard(choiceContext, discarded);
 
         await PlayerCmd.GainEnergy(EnergyGain, Owner);
-        LightMechanic.TryEnhanceRandomCell(Owner, LightElement.Forest, GetType().Name);
+
+        var drawCount = DynamicVars.Cards.IntValue;
+        var drawPower = await PowerCmd.Apply<AlchemyStarsOfinaDrawPower>(
+            choiceContext,
+            Owner.Creature,
+            1m,
+            Owner.Creature,
+            this);
+        drawPower?.Configure(drawCount);
 
         if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Forest]))
         {
-            await PowerCmd.Apply<AlchemyStarsOfinaDrawPower>(
-                choiceContext,
-                Owner.Creature,
-                1m,
-                Owner.Creature,
-                this);
+            var elements = LightElementExtensions.BaseElements;
+            var element = elements[Owner.RunState.Rng.Niche.NextInt(elements.Length)];
+            LightMechanic.TryAddAttributeCell(Owner, element, AttributeCellKind.Enhanced);
         }
+    }
+
+    protected override void OnUpgrade()
+    {
+        DynamicVars["Discard"].UpgradeValueBy(MaxDiscardCountUpgradeBy);
+        DynamicVars.Cards.UpgradeValueBy(DrawCountUpgradeBy);
     }
 }

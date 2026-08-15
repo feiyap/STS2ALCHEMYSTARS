@@ -27,7 +27,7 @@ public sealed class AlchemyStarsGeneratedForestSpiritPoit : ModCardTemplate
     private const bool ShowInCardLibrary = false;
     private const int DrawCount = 1;
     private const int EnergyGain = 2;
-    private const int EmeraldMarkAmount = 2;
+    private const int EmeraldMarkAmount = 1;
 
     public override bool CanBeGeneratedInCombat => false;
 

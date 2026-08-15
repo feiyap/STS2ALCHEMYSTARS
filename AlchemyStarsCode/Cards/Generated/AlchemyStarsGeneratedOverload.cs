@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AlchemyStars.Keywords;
-using AlchemyStars.Mechanics;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -17,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 超载：抽到时失去 1 点能量。
+/// 超载：抽到时失去 1 点能量。强化超载被侦察者/正义不灭消耗时仍会重放雷属性牌。
 /// </summary>
 [RegisterCard(typeof(StatusCardPool))]
 public sealed class AlchemyStarsGeneratedOverload : ModCardTemplate
@@ -31,9 +30,6 @@ public sealed class AlchemyStarsGeneratedOverload : ModCardTemplate
     public override bool CanBeGeneratedInCombat => false;
 
     public override CardPoolModel VisualCardPool => ModelDb.CardPool<ColorlessCardPool>();
-
-    /// <summary>升级巡航阵列生成时：抽到时令手牌中 1 张雷属性攻击可重放 1 次。</summary>
-    internal bool GrantsThunderAttackReplay { get; set; }
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -69,14 +65,5 @@ public sealed class AlchemyStarsGeneratedOverload : ModCardTemplate
 
         await Cmd.Wait(0.25f);
         await PlayerCmd.LoseEnergy(DynamicVars.Energy.IntValue, Owner);
-
-        if (!GrantsThunderAttackReplay)
-            return;
-
-        var thunderAttack = Owner.PlayerCombatState?.Hand.Cards.FirstOrDefault(candidate =>
-            candidate.Type == CardType.Attack && AlchemyStarsCardHelpers.HasThunderKeyword(candidate));
-
-        if (thunderAttack != null)
-            thunderAttack.BaseReplayCount += 1;
     }
 }

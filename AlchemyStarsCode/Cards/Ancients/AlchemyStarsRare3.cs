@@ -15,14 +15,14 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 总攻击？：尽可能打出手牌中所有攻击牌并结束回合；若击杀目标则偷取属性格×4 金币。
+/// 总攻击？：先古万色攻击。尽可能打出手牌中所有攻击牌并结束回合；若击杀目标则偷取属性格×4 金币。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsRare3 : ModCardTemplate
 {
     private const int BaseEnergyCost = 3;
     private const CardType CardKind = CardType.Attack;
-    private const CardRarity CardRarityValue = CardRarity.Rare;
+    private const CardRarity CardRarityValue = CardRarity.Ancient;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
     private const int GoldPerAttributeCell = 4;
@@ -30,11 +30,14 @@ public sealed class AlchemyStarsRare3 : ModCardTemplate
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [];
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+    [
+        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Prismatic)
+    ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Prismatic)),
         HoverTipFactory.Static(StaticHoverTip.Fatal)
     ];
 

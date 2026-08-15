@@ -1,10 +1,12 @@
 using System.Linq;
+using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
@@ -16,7 +18,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 凌野之鹰·蕾切尔：侦察者；添加雷格（满栏转深色/全深色获格挡），并可回收弃牌堆雷牌。
+/// 凌野之鹰·蕾切尔：侦察者；添加深色雷格并获得同量覆甲，可自选弃牌堆雷牌回手。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
@@ -27,7 +29,6 @@ public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
     private const int OverloadEnergyGain = 2;
-    private const decimal FullDarkThunderBlock = 8m;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -36,7 +37,6 @@ public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
     [
         new EnergyVar(OverloadEnergyGain),
         new RepeatVar(1),
-        new CardsVar(1),
         AlchemyStarsKeywordText.InlineTitleVar("Scout", AlchemyStarsKeywordIds.Scout),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
     ];
@@ -54,7 +54,8 @@ public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DarkCell)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Overload)),
-        HoverTipFactory.FromCard<AlchemyStarsGeneratedOverload>()
+        HoverTipFactory.FromCard<AlchemyStarsGeneratedOverload>(),
+        HoverTipFactory.FromPower<PlatingPower>()
     ];
 
     public AlchemyStarsThunderUncommon5()
@@ -67,39 +68,42 @@ public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
         if (await AlchemyStarsCardHelpers.TryConsumeOverloadFromHand(choiceContext, Owner))
             await PlayerCmd.GainEnergy(OverloadEnergyGain, Owner);
 
-        var (allDarkThunder, _) = LightMechanic.TryAddThunderCellsOrDarkWhenFull(
-            Owner,
-            DynamicVars.Repeat.IntValue);
-        if (allDarkThunder)
+        LightMechanic.TryAddDarkThunderCells(Owner, DynamicVars.Repeat.IntValue);
+
+        var plating = LightMechanic.CountThunderAttributeCells(Owner);
+        if (plating > 0)
         {
-            await CreatureCmd.GainBlock(
+            await PowerCmd.Apply<PlatingPower>(
+                choiceContext,
                 Owner.Creature,
-                new BlockVar(FullDarkThunderBlock, ValueProp.Move),
-                cardPlay);
+                plating,
+                Owner.Creature,
+                this);
         }
 
-        if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
-        {
-            var retrieveCount = DynamicVars.Cards.IntValue;
-            for (var i = 0; i < retrieveCount; i++)
-            {
-                var thunderCards = PileType.Discard.GetPile(Owner).Cards
-                    .Where(AlchemyStarsCardHelpers.HasThunderKeyword)
-                    .ToList();
+        if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
+            return;
 
-                if (thunderCards.Count == 0)
-                    break;
+        var discardPile = PileType.Discard.GetPile(Owner);
+        if (!discardPile.Cards.Any(AlchemyStarsCardHelpers.HasThunderKeyword))
+            return;
 
-                var picked = Owner.RunState.Rng.CombatTargets.NextItem(thunderCards);
-                if (picked != null)
-                    await CardPileCmd.Add(picked, PileType.Hand);
-            }
-        }
+        var selected = (await CardSelectCmd.FromCombatPile(
+            choiceContext,
+            discardPile,
+            Owner,
+            new CardSelectorPrefs(SelectionScreenPrompt, 1),
+            AlchemyStarsCardHelpers.HasThunderKeyword)).FirstOrDefault();
+
+        if (selected == null)
+            return;
+
+        selected.EnergyCost.SetThisTurn(0);
+        await CardPileCmd.Add(selected, PileType.Hand);
     }
 
     protected override void OnUpgrade()
     {
         DynamicVars.Repeat.UpgradeValueBy(1m);
-        DynamicVars.Cards.UpgradeValueBy(1m);
     }
 }

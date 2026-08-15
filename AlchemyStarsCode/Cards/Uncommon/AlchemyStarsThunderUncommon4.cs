@@ -38,7 +38,7 @@ public sealed class AlchemyStarsThunderUncommon4 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new DamageVar(BaseDamage, ValueProp.Move),
-        AlchemyStarsKeywordText.InlineTitleVar("LegionCommander", AlchemyStarsKeywordIds.LegionCommander),
+        AlchemyStarsKeywordText.InlineTitleVar("LegionCommanderStrength", AlchemyStarsKeywordIds.LegionCommanderStrength),
         AlchemyStarsKeywordText.InlineTitleVar("Overload", AlchemyStarsKeywordIds.Overload),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
     ];
@@ -48,16 +48,17 @@ public sealed class AlchemyStarsThunderUncommon4 : ModCardTemplate
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder),
-        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LegionCommander),
+        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LegionCommanderStrength),
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Overload)
     ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LegionCommanderStrength)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Overload)),
         HoverTipFactory.FromCard<AlchemyStarsGeneratedOverload>(),
+        HoverTipFactory.FromPower<StrengthPower>(),
         HoverTipFactory.FromPower<SlipperyPower>(),
         HoverTipFactory.FromPower<BufferPower>()
     ];
@@ -73,20 +74,8 @@ public sealed class AlchemyStarsThunderUncommon4 : ModCardTemplate
 
         LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]);
 
-        if (AlchemyStarsCardHelpers.IsFirstCardPlayedThisTurn(this, Owner, CombatState))
-        {
-            var drawPile = PileType.Draw.GetPile(Owner);
-            var legionCards = drawPile.Cards
-                .Where(card => card.Tags.Contains(AlchemyStarsCardTags.LegionCommander))
-                .ToList();
-
-            if (legionCards.Count > 0)
-            {
-                var picked = Owner.RunState.Rng.CombatTargets.NextItem(legionCards);
-                if (picked != null)
-                    await CardPileCmd.Add(picked, PileType.Hand);
-            }
-        }
+        await AlchemyStarsCardHelpers.TryApplyLegionCommanderStat<StrengthPower>(
+            choiceContext, Owner, this);
 
         await AlchemyStarsCardHelpers.ClearEnemyDefenses(choiceContext, cardPlay.Target);
 
@@ -99,7 +88,7 @@ public sealed class AlchemyStarsThunderUncommon4 : ModCardTemplate
             LightElement.Thunder,
             cardPlay);
 
-        // 升级后生成超载+（升级超载抽到时赋予雷属性攻击重放）。
+        // 升级后生成强化超载（被侦察者/正义不灭消耗时仍会重放雷属性牌）。
         var overload = CombatState!.CreateCard<AlchemyStarsGeneratedOverload>(Owner);
         if (IsUpgraded)
             CardCmd.Upgrade(overload);

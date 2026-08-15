@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 少女王座·贡露：获得雷光能与格挡，并生成 2 个雷属性格（小概率深色）。
+/// 少女王座·贡露：获得雷光能与格挡，并生成 1 个雷属性格（中概率棱镜格）。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon3 : ModCardTemplate
@@ -25,8 +25,8 @@ public sealed class AlchemyStarsThunderUncommon3 : ModCardTemplate
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
     private const int ThunderEnergyGain = 2;
-    private const int ThunderCellCreateCount = 2;
-    private const int DarkCellChancePercent = 15;
+    private const int ThunderCellCreateCount = 1;
+    private const int PrismCellChancePercent = 50;
 
     public override bool GainsBlock => true;
 
@@ -47,7 +47,7 @@ public sealed class AlchemyStarsThunderUncommon3 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DarkCell))
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.PrismCell))
     ];
 
     public AlchemyStarsThunderUncommon3()
@@ -59,7 +59,7 @@ public sealed class AlchemyStarsThunderUncommon3 : ModCardTemplate
     {
         LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Thunder, ThunderEnergyGain);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
-        LightMechanic.TryAddThunderCellsWithDarkChance(Owner, ThunderCellCreateCount, DarkCellChancePercent);
+        LightMechanic.TryAddThunderCellsWithPrismChance(Owner, ThunderCellCreateCount, PrismCellChancePercent);
     }
 
     protected override void OnUpgrade()

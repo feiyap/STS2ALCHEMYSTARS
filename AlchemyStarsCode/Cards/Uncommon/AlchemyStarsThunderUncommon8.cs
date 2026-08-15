@@ -88,6 +88,9 @@ public sealed class AlchemyStarsThunderUncommon8 : ModCardTemplate
                 cardPlay);
         }
 
+        if (overheated)
+            return;
+
         var overheat = await PowerCmd.Apply<AlchemyStarsOverheatPower>(
             choiceContext,
             Owner.Creature,

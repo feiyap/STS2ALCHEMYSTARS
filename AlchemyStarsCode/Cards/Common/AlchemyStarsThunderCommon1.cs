@@ -16,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 凡骨之羽·安吉尔：随机多段雷伤；命中同一敌人时伤害递减。
+/// 凡尘之羽·安洁尔：随机多段雷伤；命中同一敌人时伤害递减；最多消耗 2 点雷光能加段。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderCommon1 : ModCardTemplate
@@ -28,10 +28,12 @@ public sealed class AlchemyStarsThunderCommon1 : ModCardTemplate
     private const TargetType CardTarget = TargetType.RandomEnemy;
     private const bool ShowInCardLibrary = true;
     private const int BaseHitCount = 4;
-    private const decimal BaseHitDamage = 4m;
+    private const decimal BaseHitDamage = 2m;
+    private const decimal HitDamageUpgradeBy = 1m;
     private const decimal BaseMinHitDamage = 1m;
     private const decimal MinHitDamageUpgradeBy = 1m;
-    private const int BonusHitCount = 2;
+    private const int BonusHitCount = 1;
+    private const int MaxThunderLightConsume = 2;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -63,8 +65,13 @@ public sealed class AlchemyStarsThunderCommon1 : ModCardTemplate
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         var hitCount = DynamicVars.CalculationBase.IntValue;
-        if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
+        for (var n = 0; n < MaxThunderLightConsume; n++)
+        {
+            if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
+                break;
+
             hitCount += DynamicVars.CalculationExtra.IntValue;
+        }
 
         var nextHitDamage = new Dictionary<Creature, decimal>();
         var minHitDamage = DynamicVars["MinDamage"].BaseValue;
@@ -93,6 +100,7 @@ public sealed class AlchemyStarsThunderCommon1 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
+        DynamicVars.Damage.UpgradeValueBy(HitDamageUpgradeBy);
         DynamicVars["MinDamage"].UpgradeValueBy(MinHitDamageUpgradeBy);
     }
 
@@ -110,6 +118,6 @@ public sealed class AlchemyStarsThunderCommon1 : ModCardTemplate
         if (card.Owner == null)
             return 0m;
 
-        return LightMechanic.HasThunderLightEnergy(card.Owner) ? 1m : 0m;
+        return Math.Min(MaxThunderLightConsume, LightMechanic.CountThunderLightEnergy(card.Owner));
     }
 }

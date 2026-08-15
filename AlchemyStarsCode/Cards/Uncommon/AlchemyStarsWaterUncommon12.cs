@@ -13,11 +13,12 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 幻象双刃·菲莉诗：每回合开始时治疗全体队友。多人模式�?/// </summary>
+/// 幻象双刃·菲莉诗：每回合开始时治疗全体队友。多人模式。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterUncommon12 : ModCardTemplate
 {
-    private const int BaseEnergyCost = 3;
+    private const int BaseEnergyCost = 1;
     private const CardType CardKind = CardType.Power;
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.Self;
@@ -64,6 +65,6 @@ public sealed class AlchemyStarsWaterUncommon12 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        EnergyCost.UpgradeBy(-1);
+        // 升级后额外按最大生命百分比治疗，见 ConfigureAlsoHealMaxHpPercent。
     }
 }

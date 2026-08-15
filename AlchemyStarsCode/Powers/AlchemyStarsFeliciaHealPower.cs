@@ -12,12 +12,13 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 幻象双刃·菲莉诗：每回合开始时治疗全体队友已损失生命的 1%；升级后额外治疗最大生命的 1%�?/// </summary>
+/// 幻象双刃·菲莉诗：每回合开始时治疗全体队友已损失生命的 5%；升级后额外治疗最大生命的 5%。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsFeliciaHealPower : ModPowerTemplate
 {
-    private const decimal LostHpHealPercent = 0.01m;
-    private const decimal MaxHpHealPercent = 0.01m;
+    private const decimal LostHpHealPercent = 0.05m;
+    private const decimal MaxHpHealPercent = 0.05m;
 
     private bool _alsoHealMaxHpPercent;
 

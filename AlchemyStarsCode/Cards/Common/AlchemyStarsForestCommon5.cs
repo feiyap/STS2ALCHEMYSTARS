@@ -23,7 +23,7 @@ public sealed class AlchemyStarsForestCommon5 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
-    private const int DrawCount = 2;
+    private const int DrawCount = 1;
     private const decimal PaperWoundAmount = 2m;
 
     public override CardAssetProfile AssetProfile => new(

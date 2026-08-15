@@ -33,9 +33,9 @@ public sealed class AlchemyStarsThunderUncommon2 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new EnergyVar(1),
-        new DamageVar(9m, ValueProp.Move),
+        new DamageVar(6m, ValueProp.Move),
         new RepeatVar(2),
-        new PowerVar<AlchemyStarsSilentThunderPower>(5m),
+        new PowerVar<AlchemyStarsSilentThunderPower>(1m),
         AlchemyStarsKeywordText.InlineTitleVar("HighCourtGuard", AlchemyStarsKeywordIds.HighCourtGuard),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
     ];
@@ -97,6 +97,6 @@ public sealed class AlchemyStarsThunderUncommon2 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        DynamicVars["AlchemyStarsSilentThunderPower"].UpgradeValueBy(5m);
+        DynamicVars.Damage.UpgradeValueBy(3m);
     }
 }

@@ -25,7 +25,7 @@ public sealed class AlchemyStarsWaterCommon6 : ModCardTemplate
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
     private const decimal HpLoss = 2m;
-    private const int DrawCount = 2;
+    private const int DrawCount = 3;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");

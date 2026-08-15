@@ -3,6 +3,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
@@ -15,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 终末之龙·希罗娜：X 费；需水光能打出，造成 X 次水伤并施加 X×倍率层龙牙印记。
+/// 终末之龙·希罗娜：X 费军团长；需水光能打出，造成 X 次水伤并施加 X×倍率层龙牙印记。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterRare5 : ModCardTemplate
@@ -42,20 +43,25 @@ public sealed class AlchemyStarsWaterRare5 : ModCardTemplate
     [
         new DamageVar(HitDamage, ValueProp.Move),
         new IntVar("FangMult", BaseFangMultiplier),
+        AlchemyStarsKeywordText.InlineTitleVar("LegionCommanderStrength", AlchemyStarsKeywordIds.LegionCommanderStrength),
         AlchemyStarsKeywordText.InlineTitleVar("DragonFangMark", AlchemyStarsKeywordIds.DragonFangMark),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
     ];
 
+    protected override HashSet<CardTag> CanonicalTags => [AlchemyStarsCardTags.LegionCommander];
+
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
-        CardKeyword.Exhaust,
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water),
+        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LegionCommanderStrength),
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DragonFangMark)
     ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water))
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LegionCommanderStrength)),
+        HoverTipFactory.FromPower<StrengthPower>()
     ];
 
     public AlchemyStarsWaterRare5()
@@ -68,6 +74,9 @@ public sealed class AlchemyStarsWaterRare5 : ModCardTemplate
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
         LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Water]);
+
+        await AlchemyStarsCardHelpers.TryApplyLegionCommanderStat<StrengthPower>(
+            choiceContext, Owner, this);
 
         var x = ResolveEnergyXValue();
         if (x <= 0)
@@ -105,7 +114,6 @@ public sealed class AlchemyStarsWaterRare5 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        RemoveKeyword(CardKeyword.Exhaust);
         DynamicVars["FangMult"].UpgradeValueBy(UpgradedFangMultiplier - BaseFangMultiplier);
     }
 }
