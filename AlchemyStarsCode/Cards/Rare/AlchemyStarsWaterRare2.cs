@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.HoverTips;
@@ -75,9 +76,6 @@ public sealed class AlchemyStarsWaterRare2 : ModCardTemplate
             CapitalTaxConfigured[this] = true;
         }
 
-        if (IsUpgraded && LightMechanic.CountWaterDarkCells(Owner) >= DarkCellReplayThreshold)
-            BaseReplayCount += 1;
-
         var cellCount = LightMechanic.CountEffectiveWaterCells(Owner);
         var bonusRate = AlchemyStarsCapitalTaxPower.GetDamageBonusRate(this);
         var damage = DamageMultiplier * cellCount * (1m + bonusRate);
@@ -119,8 +117,19 @@ public sealed class AlchemyStarsWaterRare2 : ModCardTemplate
         AlchemyStarsCapitalTaxPower.RecordTax(this, tax);
     }
 
+    public override int ModifyCardPlayCount(CardModel card, Creature? target, int playCount)
+    {
+        if (!ReferenceEquals(card, this) || !IsUpgraded)
+            return playCount;
+
+        if (LightMechanic.CountWaterDarkCells(Owner) < DarkCellReplayThreshold)
+            return playCount;
+
+        return playCount + 1;
+    }
+
     protected override void OnUpgrade()
     {
-        // 升级后水深色格达到 2 个时额外重放 1 次。
+        // 升级后：水深色格达到 2 个时，本次打出重放 1。
     }
 }

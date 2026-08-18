@@ -1,4 +1,5 @@
 using System.Linq;
+using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -17,7 +18,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 熔岩黑兽·贾尔斯：将抽牌堆 1 张牌变为灼伤，再造成火属性伤害并施加易伤。
+/// 熔岩黑兽·贾尔斯：从抽牌堆选择 1 张牌转化为灼伤，再造成火属性伤害并施加易伤。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireCommon4 : ModCardTemplate
@@ -60,12 +61,16 @@ public sealed class AlchemyStarsFireCommon4 : ModCardTemplate
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
-        var transformable = PileType.Draw.GetPile(Owner).Cards
-            .Where(card => card.IsTransformable)
-            .ToList();
-        if (transformable.Count > 0)
+        var drawPile = PileType.Draw.GetPile(Owner);
+        if (drawPile.Cards.Any(card => card.IsTransformable))
         {
-            var selected = Owner.RunState.Rng.CombatTargets.NextItem(transformable);
+            var selected = (await CardSelectCmd.FromCombatPile(
+                choiceContext,
+                drawPile,
+                Owner,
+                new CardSelectorPrefs(CardSelectorPrefs.TransformSelectionPrompt, 0, 1),
+                card => card.IsTransformable)).FirstOrDefault();
+
             if (selected != null)
             {
                 var burn = CombatState!.CreateCard<Burn>(Owner);

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AlchemyStars.Mechanics;
 using MegaCrit.Sts2.Core.Combat;
@@ -16,11 +17,13 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 易位王影：为队友承担伤害，并将自身森属性伤害加成转移给队友�?/// </summary>
+/// 易位王影：为队友承担未被格挡的生命伤害，并将自身森属性格伤害加成转移给对方。回合开始时移除。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsDisplacementKingShadowPower : ModPowerTemplate
 {
     private Creature? _protectedAlly;
+    private Player? _protectedAllyPlayer;
     private bool _isUpgraded;
     private bool _shareForestBonusWithAllAllies;
 
@@ -31,37 +34,44 @@ public sealed class AlchemyStarsDisplacementKingShadowPower : ModPowerTemplate
     internal void Configure(Creature protectedAlly, bool isUpgraded = false)
     {
         _protectedAlly = protectedAlly;
+        _protectedAllyPlayer = protectedAlly.Player;
         _isUpgraded = isUpgraded;
     }
 
-    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
+    public override async Task BeforeSideTurnStart(
+        PlayerChoiceContext choiceContext,
+        CombatSide side,
+        IReadOnlyList<Creature> participants,
+        ICombatState combatState)
     {
-        if (player.Creature != Owner)
+        if (side != CombatSide.Player || !participants.Contains(Owner))
             return;
 
-        _shareForestBonusWithAllAllies = _isUpgraded && Owner.Block > 0;
-        await Task.CompletedTask;
+        // 在格挡清空前判定升级；有格挡则本回合全体队友分享加成，下个回合开始再移除。
+        if (_isUpgraded && !_shareForestBonusWithAllAllies && Owner.Block > 0)
+        {
+            _shareForestBonusWithAllAllies = true;
+            return;
+        }
+
+        Flash();
+        await PowerCmd.Remove(this);
     }
 
-    public override async Task AfterDamageReceived(
-        PlayerChoiceContext choiceContext,
+    public override Creature ModifyUnblockedDamageTarget(
         Creature target,
-        DamageResult result,
+        decimal amount,
         ValueProp props,
-        Creature? dealer,
-        CardModel? cardSource)
+        Creature? dealer)
     {
-        if (_protectedAlly == null || target != _protectedAlly || result.UnblockedDamage <= 0m || Owner.IsDead)
-            return;
+        if (amount <= 0m || Owner.IsDead || target == Owner || dealer == Owner)
+            return target;
 
-        await CreatureCmd.Damage(
-            choiceContext,
-            Owner,
-            (decimal)result.UnblockedDamage,
-            props,
-            dealer);
+        if (!IsProtectedTarget(target))
+            return target;
 
-        await CreatureCmd.Heal(target, result.UnblockedDamage);
+        Flash();
+        return Owner;
     }
 
     public override decimal ModifyDamageMultiplicative(
@@ -72,31 +82,69 @@ public sealed class AlchemyStarsDisplacementKingShadowPower : ModPowerTemplate
         CardModel? cardSource,
         CardPlay? cardPlay)
     {
-        if (!props.IsPoweredAttack() || dealer?.Player == null)
+        if (dealer == null || !IsForestOutgoingDamage())
             return 1m;
 
-        var player = Owner.Player;
-        if (player == null || !LightMechanic.HasMechanicRelic(player))
+        var ownerPlayer = Owner.Player;
+        if (ownerPlayer == null || !LightMechanic.HasMechanicRelic(ownerPlayer))
             return 1m;
 
-        var forestMultiplier = LightMechanic.GetOutgoingDamageMultiplier(player, LightElement.Forest);
+        var forestMultiplier = GetOwnerForestCellMultiplier(ownerPlayer);
         if (forestMultiplier <= 1m)
             return 1m;
 
-        if (_shareForestBonusWithAllAllies &&
-            dealer != Owner &&
-            dealer.IsPlayer &&
-            dealer.CombatState?.PlayerCreatures.Contains(dealer) == true)
-        {
-            return forestMultiplier;
-        }
-
-        if (dealer == _protectedAlly)
+        if (IsBonusRecipient(dealer))
             return forestMultiplier;
 
-        if (dealer == Owner && LightMechanicDamageContext.CurrentElement == LightElement.Forest)
+        if (dealer == Owner)
             return 1m / forestMultiplier;
 
         return 1m;
+    }
+
+    private bool IsProtectedTarget(Creature target)
+    {
+        if (_protectedAlly != null && target == _protectedAlly)
+            return true;
+
+        return _protectedAllyPlayer != null &&
+               target.Player == _protectedAllyPlayer &&
+               target != Owner;
+    }
+
+    private bool IsBonusRecipient(Creature dealer)
+    {
+        if (dealer == Owner)
+            return false;
+
+        if (_shareForestBonusWithAllAllies &&
+            dealer.IsPlayer &&
+            dealer.Side == Owner.Side)
+        {
+            return true;
+        }
+
+        if (_protectedAlly != null && dealer == _protectedAlly)
+            return true;
+
+        return _protectedAllyPlayer != null && dealer.Player == _protectedAllyPlayer;
+    }
+
+    private static bool IsForestOutgoingDamage()
+    {
+        if (LightMechanicDamageContext.IsFireAndThunder)
+            return false;
+
+        var element = LightMechanicDamageContext.CurrentElement;
+        return element is LightElement.Forest or LightElement.Prismatic;
+    }
+
+    private static decimal GetOwnerForestCellMultiplier(Player ownerPlayer)
+    {
+        var count = LightMechanic.CountForestAttributeCells(ownerPlayer);
+        if (count <= 0)
+            return 1m;
+
+        return 1m + count * 0.04m;
     }
 }

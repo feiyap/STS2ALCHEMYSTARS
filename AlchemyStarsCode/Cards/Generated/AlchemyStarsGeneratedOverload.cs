@@ -16,14 +16,14 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 超载：抽到时失去 1 点能量。强化超载被侦察者/正义不灭消耗时仍会重放雷属性牌。
+/// 超载：抽到时失去 1 点能量。衍生 Token，不会进入状态牌随机池。
 /// </summary>
-[RegisterCard(typeof(StatusCardPool))]
+[RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedOverload : ModCardTemplate
 {
     private const int BaseEnergyCost = -1;
     private const CardType CardKind = CardType.Status;
-    private const CardRarity CardRarityValue = CardRarity.Status;
+    private const CardRarity CardRarityValue = CardRarity.Token;
     private const TargetType CardTarget = TargetType.None;
     private const bool ShowInCardLibrary = false;
 

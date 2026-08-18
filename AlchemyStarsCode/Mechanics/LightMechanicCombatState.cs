@@ -720,6 +720,51 @@ public sealed class LightMechanicCombatState
         return true;
     }
 
+    /// <summary>
+    /// 随机挑选一格未强化的属性格，不改动栏位。
+    /// </summary>
+    public bool TryPickRandomUnenhancedCell(Rng rng, out int cellIndex, out LightElement element)
+    {
+        cellIndex = -1;
+        element = default;
+        var cells = AttributeCells.Items.ToList();
+        var candidateIndices = cells
+            .Select((cell, index) => (cell, index))
+            .Where(entry => entry.cell.Kind != AttributeCellKind.Enhanced)
+            .Select(entry => entry.index)
+            .ToList();
+
+        if (candidateIndices.Count == 0)
+            return false;
+
+        var pickIndex = rng.NextInt(candidateIndices.Count);
+        cellIndex = candidateIndices[pickIndex];
+        element = cells[cellIndex].Element;
+        return true;
+    }
+
+    /// <summary>
+    /// 将指定格强化，保留原属性。
+    /// </summary>
+    public bool TryEnhanceCellAt(int cellIndex, string? enhancedCardTypeName = null)
+    {
+        var cells = AttributeCells.Items.ToList();
+        if (cellIndex < 0 || cellIndex >= cells.Count)
+            return false;
+
+        var original = cells[cellIndex];
+        if (original.Kind == AttributeCellKind.Enhanced)
+            return false;
+
+        cells[cellIndex] = new AttributeCell(
+            original.Element,
+            AttributeCellKind.Enhanced,
+            enhancedCardTypeName ?? original.EnhancedCardTypeName);
+        AttributeCells.ReplaceAll(cells);
+        UpdateRainbowState();
+        return true;
+    }
+
     public int ConsumeAllEnhancedCells(LightElement element, string? cardTypeName = null)
     {
         var cells = AttributeCells.Items.ToList();

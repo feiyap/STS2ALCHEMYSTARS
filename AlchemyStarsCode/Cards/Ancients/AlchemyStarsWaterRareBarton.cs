@@ -4,6 +4,8 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
@@ -15,9 +17,9 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 壮志凌云·巴顿：篝火合成产物；全体 2×6 万色伤，获得 2 点万色光能并转化 2 格为万色。
+/// 壮志凌云·巴顿：篝火合成产物（先古，不进空裔卡池）；全体 2×6 万色伤，获得 2 点万色光能并转化 2 格为万色。
 /// </summary>
-[RegisterCard(typeof(AlchemyStarsCardPool))]
+[RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsWaterRareBarton : ModCardTemplate
 {
     private const int BaseEnergyCost = 2;
@@ -29,6 +31,10 @@ public sealed class AlchemyStarsWaterRareBarton : ModCardTemplate
     private const bool ShowInCardLibrary = true;
     private const int HitCount = 2;
     private const decimal HitDamage = 6m;
+
+    public override bool CanBeGeneratedInCombat => false;
+
+    public override CardPoolModel VisualCardPool => ModelDb.CardPool<AlchemyStarsCardPool>();
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/AlchemyStarsWaterCommon4.png");

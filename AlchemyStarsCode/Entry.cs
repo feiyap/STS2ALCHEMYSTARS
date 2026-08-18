@@ -42,6 +42,7 @@ public partial class Entry
 
         var patcher = RitsuLibFramework.CreatePatcher(ModId, "core");
         patcher.RegisterPatch<ArchaicToothTransformRemainingStartersPatch>();
+        patcher.RegisterPatch<AncientCardArtStylePatch>();
         patcher.RegisterPatch<EnlightenerFollowUpDonePatch>();
         patcher.RegisterPatch<EnlightenerRefreshVisualPatch>();
         RitsuLibFramework.ApplyRequiredPatcher(patcher, DisableMod);

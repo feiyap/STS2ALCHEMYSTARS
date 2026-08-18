@@ -1,9 +1,35 @@
 [gd_scene load_steps=3 format=3 uid="uid://bxag5pq75xjo4"]
 
-[ext_resource type="Texture2D" uid="uid://cuox1quoevh38" path="res://AlchemyStars/scenes/characters/AlchemyStars_character.png" id="1_q6ifa"]
+[ext_resource type="Texture2D" uid="uid://cuox1quoevh38" path="res://AlchemyStars/scenes/characters/idle.png" id="1_q6ifa"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_uouv1"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_q6ifa")
+}, {
+"duration": 1.0,
+"texture": ExtResource("1_q6ifa")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 60.0
+}, {
+"frames": [],
+"loop": false,
+"name": &"cast",
+"speed": 60.0
+}, {
+"frames": [],
+"loop": false,
+"name": &"die",
+"speed": 60.0
+}, {
+"frames": [],
+"loop": false,
+"name": &"hurt",
+"speed": 60.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": ExtResource("1_q6ifa")
@@ -23,7 +49,7 @@ unique_name_in_owner = true
 position = Vector2(-1.9999999, -196)
 scale = Vector2(1.25, 1.25)
 sprite_frames = SubResource("SpriteFrames_uouv1")
-animation = &"idle_loop"
+animation = &"attack"
 autoplay = "idle_loop"
 
 [node name="Bounds" type="Control" parent="."]

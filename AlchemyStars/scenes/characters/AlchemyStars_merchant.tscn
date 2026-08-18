@@ -1,10 +1,10 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=2 format=3 uid="uid://c3o4v5kg3mn0t"]
 
-[ext_resource type="Texture2D" path="res://AlchemyStars/images/characters/AlchemyStars_character_select.png" id="1_character"]
+[ext_resource type="Texture2D" uid="uid://csokpobxfc2gy" path="res://AlchemyStars/scenes/characters/AlchemyStars_merchant.png" id="1_epm1u"]
 
 [node name="AlchemyStarsCharacterMerchant" type="Node2D"]
 
 [node name="Visuals" type="Sprite2D" parent="."]
-position = Vector2(0, -96)
-scale = Vector2(1.25, 1.25)
-texture = ExtResource("1_character")
+position = Vector2(-31, -243)
+scale = Vector2(-1, 1)
+texture = ExtResource("1_epm1u")

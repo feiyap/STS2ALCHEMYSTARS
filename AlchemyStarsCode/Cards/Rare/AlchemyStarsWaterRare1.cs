@@ -13,7 +13,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 北境女王·伯利恒：获得北境之力，本场战斗中每张水属性牌首次打出时重�?1 次�?/// </summary>
+/// 北境女王·伯利恒：本场战斗中，所有水属性卡牌首次打出时重放 1。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterRare1 : ModCardTemplate
 {

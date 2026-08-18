@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.RestSite;
 
 /// <summary>
-/// 篝火合成：消耗水/森巴顿各 1 张，获得壮志凌云·巴顿。
+/// 篝火合成：消耗水/森巴顿各 1 张，获得壮志凌云·巴顿；任一素材已升级时产物也升级。
 /// </summary>
 public sealed class AlchemyStarsBartonFusionRestSiteOption : ModRestSiteOptionTemplate
 {
@@ -41,10 +41,15 @@ public sealed class AlchemyStarsBartonFusionRestSiteOption : ModRestSiteOptionTe
         if (!TryFindMaterials(Owner, out var waterBarton, out var forestBarton))
             return false;
 
+        var fuseUpgraded = waterBarton.IsUpgraded || forestBarton.IsUpgraded;
+
         await CardPileCmd.RemoveFromDeck(waterBarton);
         await CardPileCmd.RemoveFromDeck(forestBarton);
 
         var fused = Owner.RunState.CreateCard<AlchemyStarsWaterRareBarton>(Owner);
+        if (fuseUpgraded)
+            fused.UpgradeInternal();
+
         var results = new List<CardPileAddResult>
         {
             await CardPileCmd.Add(fused, PileType.Deck)
@@ -61,10 +66,17 @@ public sealed class AlchemyStarsBartonFusionRestSiteOption : ModRestSiteOptionTe
         out CardModel waterBarton,
         out CardModel forestBarton)
     {
-        waterBarton = player.Deck.Cards.FirstOrDefault(card => card is AlchemyStarsWaterCommon4)!;
-        forestBarton = player.Deck.Cards.FirstOrDefault(card => card is AlchemyStarsForestUncommon3)!;
+        // 优先消耗已升级的素材，避免牌组里有升级版却合成出未升级巴顿。
+        waterBarton = FindPreferredMaterial<AlchemyStarsWaterCommon4>(player)!;
+        forestBarton = FindPreferredMaterial<AlchemyStarsForestUncommon3>(player)!;
         return waterBarton != null && forestBarton != null;
     }
+
+    private static CardModel? FindPreferredMaterial<T>(Player player) where T : CardModel =>
+        player.Deck.Cards
+            .Where(card => card is T)
+            .OrderByDescending(card => card.IsUpgraded)
+            .FirstOrDefault();
 
     /// <summary>
     /// 向篝火选项列表追加合成项（若尚未存在且材料齐全）。

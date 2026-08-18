@@ -23,7 +23,7 @@ namespace AlchemyStars.Cards;
 public sealed class AlchemyStarsThunderRare7 : ModCardTemplate
 {
     private const string CalculatedHitsKey = "CalculatedHits";
-    private const int BaseEnergyCost = 1;
+    private const int BaseEnergyCost = 0;
     private const CardType CardKind = CardType.Attack;
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.AllEnemies;

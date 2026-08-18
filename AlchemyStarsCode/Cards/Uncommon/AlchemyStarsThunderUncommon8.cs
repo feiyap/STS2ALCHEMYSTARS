@@ -39,7 +39,7 @@ public sealed class AlchemyStarsThunderUncommon8 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new DamageVar(MinDamage, ValueProp.Move),
-        new IntVar("Max", MaxDamage),
+        new DamageVar("Max", MaxDamage, ValueProp.Move),
         new RepeatVar(HitCount),
         AlchemyStarsKeywordText.InlineTitleVar("OverheatBattleSkill", AlchemyStarsKeywordIds.OverheatBattleSkill),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)

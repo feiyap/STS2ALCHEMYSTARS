@@ -89,6 +89,24 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
         return LightMechanic.GetOutgoingDamageMultiplier(dealer.Player, element);
     }
 
+    public override async Task BeforeSideTurnEnd(
+        PlayerChoiceContext choiceContext,
+        CombatSide side,
+        IEnumerable<Creature> participants)
+    {
+        if (side != CombatSide.Player)
+            return;
+
+        foreach (var creature in participants)
+        {
+            var player = creature.Player;
+            if (player == null || creature.IsDead || !LightMechanic.IsMechanicActive(player))
+                continue;
+
+            await LightMechanic.ResolveForestTurnEndBlock(player);
+        }
+    }
+
     public override async Task AfterSideTurnEnd(
         PlayerChoiceContext choiceContext,
         CombatSide side,

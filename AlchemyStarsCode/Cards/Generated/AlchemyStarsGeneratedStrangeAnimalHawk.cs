@@ -18,16 +18,19 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 泥尊鹰：按消耗堆奇兽数量，多次造成水属性伤害。消耗�?/// </summary>
+/// 泥尊鹰：按消耗堆奇兽数量，多次造成水属性伤害。
+/// </summary>
 [RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedStrangeAnimalHawk : ModCardTemplate
 {
+    private const string CalculatedHitsKey = "CalculatedHits";
     private const int BaseEnergyCost = 1;
     private const CardType CardKind = CardType.Attack;
     private const CardRarity CardRarityValue = CardRarity.Token;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = false;
     private const decimal BaseDamage = 3m;
+    private const decimal BaseHitCount = 1m;
 
     public override bool CanBeGeneratedInCombat => false;
 
@@ -40,10 +43,11 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalHawk : ModCardTemplate
     [
         new DamageVar(BaseDamage, ValueProp.Move),
         new BlockVar(3m, ValueProp.Unpowered),
-        new CalculationBaseVar(0m),
+        new CalculationBaseVar(BaseHitCount),
         new CalculationExtraVar(1m),
-        new CalculatedVar("Hits").WithMultiplier(CountStrangeAnimalsInExhaust),
-        AlchemyStarsKeywordText.InlineTitleVar("StrangeAnimal", AlchemyStarsKeywordIds.StrangeAnimal)
+        new CalculatedVar(CalculatedHitsKey).WithMultiplier(CountStrangeAnimalsInExhaust),
+        AlchemyStarsKeywordText.InlineTitleVar("StrangeAnimal", AlchemyStarsKeywordIds.StrangeAnimal),
+        AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
     ];
 
     protected override HashSet<CardTag> CanonicalTags => [AlchemyStarsCardTags.StrangeAnimal];
@@ -51,13 +55,15 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalHawk : ModCardTemplate
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
         CardKeyword.Exhaust,
-        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.StrangeAnimal)
+        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.StrangeAnimal),
+        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)
     ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(CardKeyword.Exhaust),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.StrangeAnimal)),
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
         HoverTipFactory.Static(StaticHoverTip.Block)
     ];
 
@@ -70,7 +76,7 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalHawk : ModCardTemplate
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
-        var hitCount = (int)((CalculatedVar)DynamicVars["Hits"]).Calculate(cardPlay.Target);
+        var hitCount = (int)((CalculatedVar)DynamicVars[CalculatedHitsKey]).Calculate(cardPlay.Target);
         for (var i = 0; i < hitCount; i++)
         {
             await LightMechanic.DealElementalAttackDamage(
@@ -105,9 +111,9 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalHawk : ModCardTemplate
     private static decimal CountStrangeAnimalsInExhaust(CardModel card, Creature? _)
     {
         if (card.Owner == null)
-            return 1m;
+            return 0m;
 
         return PileType.Exhaust.GetPile(card.Owner).Cards
-            .Count(exhausted => exhausted.Tags.Contains(AlchemyStarsCardTags.StrangeAnimal)) + 1m;
+            .Count(exhausted => exhausted.Tags.Contains(AlchemyStarsCardTags.StrangeAnimal));
     }
 }

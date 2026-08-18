@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
@@ -6,7 +6,6 @@ using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.CardPools;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
 using AlchemyStars.Powers;
@@ -17,20 +16,19 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 灿星天秤·伊伦汀：多人模式；与队友平分生命，胜利后获得金币与棱镜格�?/// </summary>
+/// 灿星天秤·伊伦汀：多人模式稀有牌；与队友平分生命，胜利后获得金币与棱镜格。卡图按先古样式展示。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
-public sealed class AlchemyStarsThunderUncommon11 : ModCardTemplate
+public sealed class AlchemyStarsThunderUncommon11 : ModCardTemplate, IAncientCardArtStyle
 {
     private const int BaseEnergyCost = 0;
     private const CardType CardKind = CardType.Power;
-    private const CardRarity CardRarityValue = CardRarity.Ancient;
+    private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.AnyAlly;
     private const bool ShowInCardLibrary = true;
 
     public override CardMultiplayerConstraint MultiplayerConstraint =>
         CardMultiplayerConstraint.MultiplayerOnly;
-
-    public override CardPoolModel VisualCardPool => ModelDb.CardPool<ColorlessCardPool>();
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");

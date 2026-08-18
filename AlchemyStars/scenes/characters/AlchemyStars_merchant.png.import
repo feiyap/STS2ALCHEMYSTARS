@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cuox1quoevh38"
-path="res://.godot/imported/AlchemyStars_character.png-44464f369b4d4f419be77e79a13c1b0a.ctex"
+uid="uid://csokpobxfc2gy"
+path="res://.godot/imported/AlchemyStars_merchant.png-e768955ee927849a05157143ea6a7434.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://AlchemyStars/scenes/characters/AlchemyStars_character.png"
-dest_files=["res://.godot/imported/AlchemyStars_character.png-44464f369b4d4f419be77e79a13c1b0a.ctex"]
+source_file="res://AlchemyStars/scenes/characters/AlchemyStars_merchant.png"
+dest_files=["res://.godot/imported/AlchemyStars_merchant.png-e768955ee927849a05157143ea6a7434.ctex"]
 
 [params]
 

@@ -15,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ????�??????????????????????????
+/// 伊斯塔万·沓痕：选定队友，为其承担伤害并转移森属性格伤害加成。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestRare6 : ModCardTemplate
@@ -70,11 +70,12 @@ public sealed class AlchemyStarsForestRare6 : ModCardTemplate
             Owner.Creature,
             this);
 
+        power ??= Owner.Creature.GetPower<AlchemyStarsDisplacementKingShadowPower>();
         power?.Configure(cardPlay.Target, IsUpgraded);
     }
 
     protected override void OnUpgrade()
     {
-        // ???????????????????????????
+        // 升级：下回合开始时若仍有格挡，全体队友该回合分享森格加成后再移除。
     }
 }

@@ -65,19 +65,19 @@ public sealed class AlchemyStarsViceEmptyPupil : ModCardTemplate
         if (enemies == null || enemies.Count == 0)
             return;
 
-        var hitDamage = DynamicVars.Damage.BaseValue;
+        var sealStacks = DynamicVars["AlchemyStarsTimelessSealPower"].BaseValue;
+        await PowerCmd.Apply<AlchemyStarsTimelessSealPower>(
+            choiceContext,
+            enemies,
+            sealStacks,
+            Owner.Creature,
+            this);
 
+        // 先给全体上锁定，避免伤害循环中途中断导致后续敌人吃不到减益。
         foreach (var enemy in enemies)
         {
             if (enemy.IsDead)
                 continue;
-
-            await PowerCmd.Apply<AlchemyStarsTimelessSealPower>(
-                choiceContext,
-                enemy,
-                DynamicVars["AlchemyStarsTimelessSealPower"].BaseValue,
-                Owner.Creature,
-                this);
 
             var sealAmount = enemy.GetPowerAmount<AlchemyStarsTimelessSealPower>();
             if (sealAmount <= 0)
@@ -89,8 +89,17 @@ public sealed class AlchemyStarsViceEmptyPupil : ModCardTemplate
                 sealAmount,
                 Owner.Creature,
                 this);
+        }
 
-            for (var i = 0; i < sealAmount; i++)
+        var hitDamage = DynamicVars.Damage.BaseValue;
+        var playAnim = true;
+        foreach (var enemy in enemies)
+        {
+            if (enemy.IsDead)
+                continue;
+
+            var hits = enemy.GetPowerAmount<AlchemyStarsTimelessSealPower>();
+            for (var i = 0; i < hits; i++)
             {
                 if (enemy.IsDead)
                     break;
@@ -102,7 +111,9 @@ public sealed class AlchemyStarsViceEmptyPupil : ModCardTemplate
                     enemy,
                     hitDamage,
                     LightElement.Water,
-                    cardPlay);
+                    cardPlay,
+                    playAttackerAnim: playAnim);
+                playAnim = false;
             }
         }
     }

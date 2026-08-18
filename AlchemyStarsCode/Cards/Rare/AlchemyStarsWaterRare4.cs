@@ -16,7 +16,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 水形之音·克娜莉：影镇茶话会；获得梦魇荆棘，群体水伤并施加颤栗，可触发低阈值眩晕�?/// </summary>
+/// 水形之音·克娜莉：影镇茶话会；获得梦魇荆棘，群体水伤并施加颤栗。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterRare4 : ModCardTemplate
 {
@@ -28,7 +29,6 @@ public sealed class AlchemyStarsWaterRare4 : ModCardTemplate
     private const decimal BaseDamage = 6m;
     private const decimal BaseTremorAmount = 1m;
     private const decimal TremorAmountUpgradeBy = 1m;
-    private const int StunThreshold = 4;
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
@@ -91,8 +91,6 @@ public sealed class AlchemyStarsWaterRare4 : ModCardTemplate
                 DynamicVars.Damage.BaseValue,
                 LightElement.Water,
                 cardPlay);
-
-            await AlchemyStarsTremorPower.TryTriggerStunThreshold(choiceContext, enemy, StunThreshold);
         }
     }
 

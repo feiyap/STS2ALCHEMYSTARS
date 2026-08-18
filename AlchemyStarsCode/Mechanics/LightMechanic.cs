@@ -838,7 +838,41 @@ public static class LightMechanic
     }
 
     /// <summary>
-    /// 通知场上能力：玩家获得了森属性强化格（用于言绝等效果）�?
+    /// 随机强化属性栏中一格，保留该格原有属性。
+    /// </summary>
+    public static bool TryEnhanceRandomUnenhancedCell(
+        Player player,
+        string? enhancedCardTypeName = null,
+        bool allowWordAbsoluteAbsorb = true)
+    {
+        var state = GetActiveState(player);
+        if (state == null)
+            return false;
+
+        if (!state.TryPickRandomUnenhancedCell(
+                player.RunState.Rng.Niche,
+                out var cellIndex,
+                out var enhancedElement))
+            return false;
+
+        var isForestEnhanced = enhancedElement is LightElement.Forest or LightElement.Prismatic;
+        if (isForestEnhanced &&
+            allowWordAbsoluteAbsorb &&
+            AlchemyStarsForestState.TryAbsorbEnhancedCellsForWordAbsolute(player, 1) > 0)
+            return true;
+
+        if (!state.TryEnhanceCellAt(cellIndex, enhancedCardTypeName))
+            return false;
+
+        LightMechanicUiBootstrap.RefreshForPlayer(player);
+        if (isForestEnhanced)
+            NotifyForestEnhancedCellGained(player, 1);
+
+        return true;
+    }
+
+    /// <summary>
+    /// 通知场上能力：玩家获得了森属性强化格（用于言绝等效果）。
     /// </summary>
     public static void NotifyForestEnhancedCellGained(Player player, int count)
     {
@@ -1433,14 +1467,18 @@ public static class LightMechanic
         Creature target,
         decimal baseDamage,
         LightElement element,
-        CardPlay? cardPlay = null)
+        CardPlay? cardPlay = null,
+        bool playAttackerAnim = true)
     {
         using (LightMechanicDamageContext.Use(element))
         {
             if (card != null)
             {
-                await DamageCmd.Attack(baseDamage)
-                    .FromCard(card, cardPlay)
+                var attack = DamageCmd.Attack(baseDamage)
+                    .FromCard(card, playAttackerAnim ? cardPlay : null);
+                if (!playAttackerAnim)
+                    attack = attack.WithNoAttackerAnim();
+                await attack
                     .Targeting(target)
                     .Execute(choiceContext);
             }
@@ -1676,6 +1714,25 @@ public static class LightMechanic
         return onlyThunderAndFire;
     }
 
+    /// <summary>
+    /// 森属性 4 格特效：在弃牌前按当前手牌数获得格挡。
+    /// </summary>
+    public static async Task ResolveForestTurnEndBlock(Player player)
+    {
+        var state = GetActiveState(player);
+        if (state == null)
+            return;
+
+        var forestProcs = state.GetEffectiveCount(LightElement.Forest) / 4;
+        if (forestProcs <= 0)
+            return;
+
+        var handSize = PileType.Hand.GetPile(player).Cards.Count;
+        var block = handSize * forestProcs;
+        if (block > 0)
+            await CreatureCmd.GainBlock(player.Creature, new BlockVar(block, ValueProp.Move), null);
+    }
+
     public static async Task ResolvePlayerTurnEnd(
         PlayerChoiceContext choiceContext,
         Player player)
@@ -1687,15 +1744,6 @@ public static class LightMechanic
         var waterProcs = state.GetEffectiveCount(LightElement.Water) / 4;
         for (var i = 0; i < waterProcs; i++)
             await CreatureCmd.Heal(player.Creature, 1m);
-
-        var forestProcs = state.GetEffectiveCount(LightElement.Forest) / 4;
-        if (forestProcs > 0)
-        {
-            var handSize = player.PlayerCombatState?.Hand?.Cards.Count ?? 0;
-            var block = handSize * forestProcs;
-            if (block > 0)
-                await CreatureCmd.GainBlock(player.Creature, new BlockVar(block, ValueProp.Move), null);
-        }
 
         // 结算前按当前格子重算，避免缓存状态与「万色补缺口」规则不一致。
         state.UpdateRainbowState();

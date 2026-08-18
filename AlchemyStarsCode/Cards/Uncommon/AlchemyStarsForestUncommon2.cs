@@ -13,7 +13,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 潜庭之脊·弥加德：攻击附加森伤并随机强化一格；升级后低血目标可被斩杀�?/// </summary>
+/// 潜庭之脊·弥加德：攻击附加森伤并随机强化一格；升级后低血目标可被斩杀。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestUncommon2 : ModCardTemplate
 {

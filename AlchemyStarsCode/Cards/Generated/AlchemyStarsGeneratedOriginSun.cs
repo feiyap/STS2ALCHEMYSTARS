@@ -2,9 +2,9 @@ using System.Linq;
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
+using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
@@ -16,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ??�???????? 5 ??? 1 ???????? 2 ???????
+/// 起源·日：检视抽牌堆顶 5 张，选 1 张入手并可将最多 2 张置于牌堆底。
 /// </summary>
 [RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedOriginSun : ModCardTemplate
@@ -58,7 +58,35 @@ public sealed class AlchemyStarsGeneratedOriginSun : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        await PerformTopScry(choiceContext, ScryCount, BottomCount);
+        var drawPile = PileType.Draw.GetPile(Owner);
+        var options = drawPile.Cards.Take(ScryCount).ToList();
+        if (options.Count > 0)
+        {
+            var picked = (await CardSelectCmd.FromCombatPile(
+                choiceContext,
+                drawPile,
+                Owner,
+                new CardSelectorPrefs(SelectionScreenPrompt, 0, 1),
+                card => options.Contains(card))).FirstOrDefault();
+
+            if (picked != null)
+                await CardPileCmd.Add(picked, PileType.Hand);
+
+            var remaining = options.Where(card => !ReferenceEquals(card, picked)).ToList();
+            if (remaining.Count > 0)
+            {
+                var toBottom = (await CardSelectCmd.FromCombatPile(
+                    choiceContext,
+                    drawPile,
+                    Owner,
+                    new CardSelectorPrefs(GetSecondaryPrompt(), 0, Math.Min(BottomCount, remaining.Count)),
+                    card => remaining.Contains(card))).ToList();
+
+                if (toBottom.Count > 0)
+                    await CardPileCmd.Add(toBottom, PileType.Draw, CardPilePosition.Bottom, this);
+            }
+        }
+
         await PowerCmd.Apply<RetainHandPower>(
             choiceContext,
             Owner.Creature,
@@ -72,41 +100,7 @@ public sealed class AlchemyStarsGeneratedOriginSun : ModCardTemplate
         AddKeyword(CardKeyword.Retain);
     }
 
-    internal static async Task PerformTopScry(
-        PlayerChoiceContext choiceContext,
-        int scryCount,
-        int bottomCount,
-        CardModel? source = null,
-        Player? owner = null)
-    {
-        owner ??= source?.Owner ?? throw new InvalidOperationException("?????????");
-        var drawPile = PileType.Draw.GetPile(owner);
-        var options = drawPile.Cards.Take(scryCount).ToList();
-        if (options.Count == 0)
-            return;
-
-        var picked = (await CardSelectCmd.FromCombatPile(
-            choiceContext,
-            drawPile,
-            owner,
-            new CardSelectorPrefs(source?.SelectionScreenPrompt ?? CardSelectorPrefs.TransformSelectionPrompt, 1),
-            card => options.Contains(card))).FirstOrDefault();
-
-        if (picked != null)
-            await CardPileCmd.Add(picked, PileType.Hand);
-
-        var remaining = options.Where(card => !ReferenceEquals(card, picked)).ToList();
-        if (remaining.Count == 0 || bottomCount <= 0)
-            return;
-
-        var toBottom = (await CardSelectCmd.FromCombatPile(
-            choiceContext,
-            drawPile,
-            owner,
-            new CardSelectorPrefs(CardSelectorPrefs.TransformSelectionPrompt, 0, bottomCount),
-            card => remaining.Contains(card))).ToList();
-
-        if (toBottom.Count > 0)
-            await CardPileCmd.Add(toBottom, PileType.Draw, CardPilePosition.Bottom, source);
-    }
+    private LocString GetSecondaryPrompt() =>
+        LocString.GetIfExists("cards", Id.Entry + ".putOnBottomPrompt")
+        ?? CardSelectorPrefs.DiscardSelectionPrompt;
 }

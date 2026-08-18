@@ -1,0 +1,4 @@
+res://AlchemyStars/scenes/characters/AlchemyStars_character.tscn
+res://AlchemyStars/scenes/characters/AlchemyStars_rest_site.tscn
+res://AlchemyStars/scenes/characters/AlchemyStars_merchant.tscn
+res://AlchemyStarsCode/UI/LightMechanicUiBar.cs

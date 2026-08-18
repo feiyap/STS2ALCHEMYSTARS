@@ -14,7 +14,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 起源·星：预知抽牌堆顶 5 张，�?2 张牌并保留其�?2 张。消耗�?/// </summary>
+/// 起源·星：预知抽牌堆顶 5 张并自选丢弃或留下，再抽 2 张并保留其中 2 张。消耗。
+/// </summary>
 [RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedOriginStar : ModCardTemplate
 {
@@ -60,12 +61,15 @@ public sealed class AlchemyStarsGeneratedOriginStar : ModCardTemplate
         var preview = drawPile.Cards.Take(ForesightCount).ToList();
         if (preview.Count > 0)
         {
-            await CardSelectCmd.FromCombatPile(
+            var toDiscard = (await CardSelectCmd.FromCombatPile(
                 choiceContext,
                 drawPile,
                 Owner,
-                new CardSelectorPrefs(SelectionScreenPrompt, 0),
-                card => preview.Contains(card));
+                new CardSelectorPrefs(CardSelectorPrefs.DiscardSelectionPrompt, 0, preview.Count),
+                card => preview.Contains(card))).ToList();
+
+            if (toDiscard.Count > 0)
+                await CardCmd.Discard(choiceContext, toDiscard);
         }
 
         await CardPileCmd.Draw(choiceContext, DrawCount, Owner);

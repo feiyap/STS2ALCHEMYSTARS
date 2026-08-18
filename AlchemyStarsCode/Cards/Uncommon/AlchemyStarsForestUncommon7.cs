@@ -70,31 +70,34 @@ public sealed class AlchemyStarsForestUncommon7 : ModCardTemplate
     }
 
     /// <summary>
-    /// 手牌中时：未被格挡的森属性攻击为目标施加结晶。
+    /// 手牌中时：未被格挡的森属性攻击命中，为目标施加 1 层结晶。
     /// </summary>
-    public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    public override async Task AfterDamageReceived(
+        PlayerChoiceContext choiceContext,
+        Creature target,
+        DamageResult result,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource)
     {
         if (Pile?.Type != PileType.Hand)
             return;
 
-        if (cardPlay.Card.Owner != Owner)
+        if (dealer != Owner.Creature || target.IsDead || target.Side == Owner.Creature.Side)
             return;
 
-        if (cardPlay.Card.Type != CardType.Attack || !AlchemyStarsCardHelpers.HasForestKeyword(cardPlay.Card))
+        if (!props.IsPoweredAttack() || result.UnblockedDamage <= 0)
             return;
 
-        if (cardPlay.Target == null || cardPlay.Target.IsDead)
-            return;
-
-        if (cardPlay.Target.Block > 0)
+        if (LightMechanicDamageContext.CurrentElement != LightElement.Forest)
             return;
 
         await PowerCmd.Apply<AlchemyStarsCrystallizationPower>(
             choiceContext,
-            cardPlay.Target,
+            target,
             1m,
             Owner.Creature,
-            cardPlay.Card);
+            this);
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)

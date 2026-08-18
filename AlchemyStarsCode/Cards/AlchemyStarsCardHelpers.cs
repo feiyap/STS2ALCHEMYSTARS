@@ -182,16 +182,11 @@ internal static class AlchemyStarsCardHelpers
         if (target.IsDead || target.MaxHp <= 0)
             return;
 
-        if (target.CurrentHp / target.MaxHp > thresholdPercent)
+        // CurrentHp / MaxHp 都是 int，必须先转小数，否则未满血时整除恒为 0，会误触发斩杀。
+        if (target.GetHpPercentRemaining() > (double)thresholdPercent)
             return;
 
-        await CreatureCmd.Damage(
-            choiceContext,
-            target,
-            target.CurrentHp,
-            ValueProp.Unblockable | ValueProp.Unpowered,
-            null,
-            null);
+        await CreatureCmd.Kill(target);
     }
 
     public static async Task ClearEnemyDefenses(

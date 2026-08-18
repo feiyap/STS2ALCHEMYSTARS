@@ -1,9 +1,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
-using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Powers;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Rooms;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
@@ -20,18 +19,24 @@ public sealed class AlchemyStarsSupremeCodexPower : ModPowerTemplate
 
     public override PowerStackType StackType => PowerStackType.Single;
 
-    public override async Task AfterCombatVictory(CombatRoom room)
+    /// <summary>
+    /// 必须用 AfterCombatEnd：引擎会在 AfterCombatVictory 前清掉能力。
+    /// </summary>
+    public override Task AfterCombatEnd(CombatRoom room)
     {
         var player = Owner.Player;
         if (player == null)
-            return;
+            return Task.CompletedTask;
 
-        var upgradable = player.Deck.Cards.Where(card => card.IsUpgradable).ToList();
+        var upgradable = PileType.Deck.GetPile(player).Cards
+            .Where(card => card.IsUpgradable)
+            .ToList();
         if (upgradable.Count == 0)
-            return;
+            return Task.CompletedTask;
 
         Flash();
-        var pick = upgradable[player.RunState.Rng.Niche.NextInt(upgradable.Count)];
+        var pick = player.RunState.Rng.CombatCardSelection.NextItem(upgradable);
         CardCmd.Upgrade(pick);
+        return Task.CompletedTask;
     }
 }

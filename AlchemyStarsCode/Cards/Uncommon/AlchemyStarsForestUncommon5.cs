@@ -17,7 +17,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 樱华刹那·绯：X 费军团长；按森格数量与 X 造成多段森属性伤害。
+/// 樱华刹那·绯：X 费军团长；按森格数量 × 3/4 造成 X 次森属性伤害。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestUncommon5 : ModCardTemplate
@@ -27,8 +27,8 @@ public sealed class AlchemyStarsForestUncommon5 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
-    private const int DamageMultiplier = 1;
-    private const int DamageMultiplierUpgradeBy = 1;
+    private const decimal DamagePerCell = 3m;
+    private const decimal DamagePerCellUpgradeBy = 1m;
 
     protected override bool HasEnergyCostX => true;
 
@@ -37,8 +37,7 @@ public sealed class AlchemyStarsForestUncommon5 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(1m, ValueProp.Move),
-        new IntVar("Multiplier", DamageMultiplier),
+        new DamageVar(DamagePerCell, ValueProp.Move),
         AlchemyStarsKeywordText.InlineTitleVar("LegionCommander", AlchemyStarsKeywordIds.LegionCommander),
         AlchemyStarsKeywordText.InlineTitleVar("ForestTitle", AlchemyStarsKeywordIds.Forest)
     ];
@@ -77,8 +76,7 @@ public sealed class AlchemyStarsForestUncommon5 : ModCardTemplate
             return;
 
         var cellCount = LightMechanic.CountEffectiveForestCellsForDamage(Owner);
-        var multiplier = DynamicVars["Multiplier"].BaseValue;
-        var damage = cellCount * x * multiplier;
+        var damage = cellCount * DynamicVars.Damage.BaseValue;
         var target = cardPlay.Target;
 
         for (var i = 0; i < x; i++)
@@ -112,6 +110,6 @@ public sealed class AlchemyStarsForestUncommon5 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        DynamicVars["Multiplier"].UpgradeValueBy(DamageMultiplierUpgradeBy);
+        DynamicVars.Damage.UpgradeValueBy(DamagePerCellUpgradeBy);
     }
 }
