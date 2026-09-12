@@ -14,7 +14,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 飓风灵鸮·温蒂：获得飞行并生成回执邮件；已飞行时下回合额外获得能量与森光能�?/// </summary>
+/// 飓风灵鸮·温蒂：获得飞行并生成回执邮件；已飞行时下回合额外获得能量与森光能。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestCommon9 : ModCardTemplate
 {
@@ -23,7 +24,7 @@ public sealed class AlchemyStarsForestCommon9 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int BonusEnergy = 2;
+    private const int BonusEnergy = 1;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");

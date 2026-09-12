@@ -16,12 +16,14 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 灿星天秤·伊伦汀：多人模式稀有牌；与队友平分生命，胜利后获得金币与棱镜格。卡图按先古样式展示。
+/// 金泽之星·伊伦汀：多人模式稀有牌；与队友平分生命，胜利后各得金币并按已损失生命治疗。卡图按先古样式展示。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon11 : ModCardTemplate, IAncientCardArtStyle
 {
-    private const int BaseEnergyCost = 0;
+    private const int BaseEnergyCost = 1;
+    private const decimal BaseLostHpHealPercent = 0.35m;
+    private const decimal UpgradedLostHpHealPercent = 0.50m;
     private const CardType CardKind = CardType.Power;
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.AnyAlly;
@@ -37,6 +39,7 @@ public sealed class AlchemyStarsThunderUncommon11 : ModCardTemplate, IAncientCar
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
+        CardKeyword.Innate,
         CardKeyword.Retain,
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder),
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.GoldenScaleStar)
@@ -44,6 +47,7 @@ public sealed class AlchemyStarsThunderUncommon11 : ModCardTemplate, IAncientCar
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
+        HoverTipFactory.FromKeyword(CardKeyword.Innate),
         HoverTipFactory.FromKeyword(CardKeyword.Retain),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.GoldenScaleStar)),
         HoverTipFactory.FromPower<AlchemyStarsGoldenScaleStarPower>()
@@ -74,17 +78,18 @@ public sealed class AlchemyStarsThunderUncommon11 : ModCardTemplate, IAncientCar
         await CreatureCmd.SetCurrentHp(self, average);
         await CreatureCmd.SetCurrentHp(ally, average);
 
-        await PowerCmd.Apply<AlchemyStarsGoldenScaleStarPower>(
+        var power = await PowerCmd.Apply<AlchemyStarsGoldenScaleStarPower>(
             choiceContext,
             self,
             1m,
             self,
             this);
+        power?.ConfigureLostHpHealPercent(IsUpgraded ? UpgradedLostHpHealPercent : BaseLostHpHealPercent);
     }
 
     protected override void OnUpgrade()
     {
-        AddKeyword(CardKeyword.Innate);
+        // 升级只提高胜利时已损失生命治疗比例，由 ConfigureLostHpHealPercent 传入。
     }
 
     private bool HasEligibleAllyTarget()

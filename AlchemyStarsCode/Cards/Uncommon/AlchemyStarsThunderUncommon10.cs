@@ -7,7 +7,6 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models.Powers;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
-using AlchemyStars.Mechanics;
 using AlchemyStars.Powers;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Keywords;
@@ -16,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 正义执行·奈弥西斯：正义不灭；获得雷光能并对全体施加易伤，升级额外施加审判。
+/// 正义执行·奈弥西斯：正义不灭；抽牌并对全体施加易伤与审判。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon10 : ModCardTemplate
@@ -26,15 +25,16 @@ public sealed class AlchemyStarsThunderUncommon10 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int ThunderEnergyGain = 2;
+    private const int DrawCount = 1;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new PowerVar<VulnerablePower>(2m),
-        new PowerVar<AlchemyStarsJudgmentPower>(3m),
+        new CardsVar(DrawCount),
+        new PowerVar<VulnerablePower>(1m),
+        new PowerVar<AlchemyStarsJudgmentPower>(2m),
         AlchemyStarsKeywordText.InlineTitleVar("JusticeImmortal", AlchemyStarsKeywordIds.JusticeImmortal),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
     ];
@@ -63,10 +63,10 @@ public sealed class AlchemyStarsThunderUncommon10 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        if (await AlchemyStarsCardHelpers.TryConsumeOverloadFromHand(choiceContext, Owner))
-            await CardPileCmd.Draw(choiceContext, 1, Owner);
+        await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
 
-        LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Thunder, ThunderEnergyGain);
+        if (await AlchemyStarsCardHelpers.TryConsumeOverloadFromHand(choiceContext, Owner))
+            await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
 
         await PowerCmd.Apply<VulnerablePower>(
             choiceContext,
@@ -75,17 +75,20 @@ public sealed class AlchemyStarsThunderUncommon10 : ModCardTemplate
             Owner.Creature,
             this);
 
-        if (IsUpgraded)
-        {
-            await PowerCmd.Apply<AlchemyStarsJudgmentPower>(
-                choiceContext,
-                CombatState.HittableEnemies,
-                DynamicVars["AlchemyStarsJudgmentPower"].BaseValue,
-                Owner.Creature,
-                this);
+        await PowerCmd.Apply<AlchemyStarsJudgmentPower>(
+            choiceContext,
+            CombatState.HittableEnemies,
+            DynamicVars["AlchemyStarsJudgmentPower"].BaseValue,
+            Owner.Creature,
+            this);
 
-            foreach (var enemy in CombatState.HittableEnemies.ToList())
-                await AlchemyStarsJudgmentPower.TryTriggerStunThreshold(choiceContext, enemy);
-        }
+        foreach (var enemy in CombatState.HittableEnemies.ToList())
+            await AlchemyStarsJudgmentPower.TryTriggerStunThreshold(choiceContext, enemy);
+    }
+
+    protected override void OnUpgrade()
+    {
+        DynamicVars.Vulnerable.UpgradeValueBy(1m);
+        DynamicVars["AlchemyStarsJudgmentPower"].UpgradeValueBy(1m);
     }
 }

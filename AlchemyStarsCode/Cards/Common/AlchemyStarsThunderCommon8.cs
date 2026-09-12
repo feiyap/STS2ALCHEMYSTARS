@@ -15,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ѩ����Ӱ�����ţ���÷��в�����������˺������ǰ�ѷ������˺���ø񵲡�
+/// 雪色之影·凯雅：先造成雷伤并按造成伤害获得格挡；仅打出前已飞行时再获得飞行。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderCommon8 : ModCardTemplate
@@ -31,7 +31,7 @@ public sealed class AlchemyStarsThunderCommon8 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(7m, ValueProp.Move),
+        new DamageVar(5m, ValueProp.Move),
         new PowerVar<AlchemyStarsFlyingPower>(1m),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
     ];
@@ -57,13 +57,6 @@ public sealed class AlchemyStarsThunderCommon8 : ModCardTemplate
 
         var hadFlying = Owner.Creature.GetPowerAmount<AlchemyStarsFlyingPower>() > 0;
 
-        await PowerCmd.Apply<AlchemyStarsFlyingPower>(
-            choiceContext,
-            Owner.Creature,
-            DynamicVars["AlchemyStarsFlyingPower"].BaseValue,
-            Owner.Creature,
-            this);
-
         decimal totalDamage;
         using (LightMechanicDamageContext.Use(LightElement.Thunder))
         {
@@ -83,8 +76,18 @@ public sealed class AlchemyStarsThunderCommon8 : ModCardTemplate
             LightElement.Thunder,
             this);
 
-        if (hadFlying && totalDamage > 0m)
+        if (totalDamage > 0m)
             await CreatureCmd.GainBlock(Owner.Creature, new BlockVar(totalDamage, ValueProp.Move), cardPlay);
+
+        if (!hadFlying)
+            return;
+
+        await PowerCmd.Apply<AlchemyStarsFlyingPower>(
+            choiceContext,
+            Owner.Creature,
+            DynamicVars["AlchemyStarsFlyingPower"].BaseValue,
+            Owner.Creature,
+            this);
     }
 
     protected override void OnUpgrade()

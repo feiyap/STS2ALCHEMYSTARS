@@ -28,7 +28,7 @@ public sealed class AlchemyStarsFireUncommon3 : ModCardTemplate
     private const bool ShowInCardLibrary = true;
     private const int FireEnergyGain = 2;
     private const int ScorchAmount = 3;
-    private const decimal BaseBlockPerEnemy = 4m;
+    private const decimal BaseBlockPerEnemy = 3m;
     private const decimal BlockPerEnemyUpgradeBy = 1m;
 
     public override bool GainsBlock => true;

@@ -13,7 +13,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 怪奇猎人·康斯坦丁：对敌人造成水属性伤害，可消耗水光能按当前生命百分比提升伤害�?/// </summary>
+/// 怪奇猎人·康斯坦丁：对敌人造成水属性伤害，可消耗水光能按已损失生命百分比提升伤害。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterCommon9 : ModCardTemplate
 {
@@ -56,8 +57,8 @@ public sealed class AlchemyStarsWaterCommon9 : ModCardTemplate
         if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Water]))
         {
             var maxHp = Owner.Creature.MaxHp;
-            var hpRatio = maxHp > 0 ? Owner.Creature.CurrentHp / maxHp : 0m;
-            damage *= 1m + hpRatio;
+            var lostHpRatio = maxHp > 0m ? (maxHp - Owner.Creature.CurrentHp) / maxHp : 0m;
+            damage *= 1m + lostHpRatio;
         }
 
         await LightMechanic.DealElementalAttackDamage(

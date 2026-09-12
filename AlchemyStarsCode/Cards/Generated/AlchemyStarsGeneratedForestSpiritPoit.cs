@@ -15,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ??�???????????????????
+/// 灵鹃·波伊特：抽牌并获得能量与碧翠印记。升级后获得保留。
 /// </summary>
 [RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedForestSpiritPoit : ModCardTemplate
@@ -26,7 +26,7 @@ public sealed class AlchemyStarsGeneratedForestSpiritPoit : ModCardTemplate
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = false;
     private const int DrawCount = 1;
-    private const int EnergyGain = 2;
+    private const int EnergyGain = 1;
     private const int EmeraldMarkAmount = 1;
 
     public override bool CanBeGeneratedInCombat => false;
@@ -49,8 +49,7 @@ public sealed class AlchemyStarsGeneratedForestSpiritPoit : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(CardKeyword.Exhaust),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.EmeraldMark)),
-        HoverTipFactory.FromPower<AlchemyStarsEmeraldMarkPower>(),
-        HoverTipFactory.FromPower<AlchemyStarsFlyingPower>()
+        HoverTipFactory.FromPower<AlchemyStarsEmeraldMarkPower>()
     ];
 
     public AlchemyStarsGeneratedForestSpiritPoit()
@@ -68,20 +67,10 @@ public sealed class AlchemyStarsGeneratedForestSpiritPoit : ModCardTemplate
             DynamicVars["AlchemyStarsEmeraldMarkPower"].BaseValue,
             Owner.Creature,
             this);
-
-        if (IsUpgraded)
-        {
-            await PowerCmd.Apply<AlchemyStarsFlyingPower>(
-                choiceContext,
-                Owner.Creature,
-                1m,
-                Owner.Creature,
-                this);
-        }
     }
 
     protected override void OnUpgrade()
     {
-        // ??????? 1 ????
+        AddKeyword(CardKeyword.Retain);
     }
 }

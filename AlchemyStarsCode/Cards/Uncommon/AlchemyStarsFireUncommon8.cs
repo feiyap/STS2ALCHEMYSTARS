@@ -18,7 +18,7 @@ namespace AlchemyStars.Cards;
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireUncommon8 : ModCardTemplate
 {
-    private const int BaseEnergyCost = 2;
+    private const int BaseEnergyCost = 1;
     private const CardType CardKind = CardType.Power;
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.Self;

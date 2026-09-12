@@ -13,7 +13,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 幻象双刃·菲莉诗：每回合开始时治疗全体队友。多人模式。
+/// 幻象双刃·菲莉诗：每回合开始时按份数治疗全体队友已损失生命；升级份同时治疗最大生命。多人模式。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterUncommon12 : ModCardTemplate

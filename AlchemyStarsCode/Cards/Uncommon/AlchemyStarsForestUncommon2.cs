@@ -13,7 +13,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 潜庭之脊·弥加德：攻击附加森伤并随机强化一格；升级后低血目标可被斩杀。
+/// 潜庭之脊·弥加德：攻击附加森伤并随机强化一格；低血目标可被斩杀。升级降低费用。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestUncommon2 : ModCardTemplate
@@ -51,13 +51,16 @@ public sealed class AlchemyStarsForestUncommon2 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        var power = await PowerCmd.Apply<AlchemyStarsMigardSpinePower>(
+        await PowerCmd.Apply<AlchemyStarsMigardSpinePower>(
             choiceContext,
             Owner.Creature,
             1m,
             Owner.Creature,
             this);
+    }
 
-        power?.ConfigureExecuteOnLowHp(IsUpgraded);
+    protected override void OnUpgrade()
+    {
+        EnergyCost.UpgradeBy(-1);
     }
 }

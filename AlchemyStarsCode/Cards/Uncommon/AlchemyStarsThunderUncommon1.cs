@@ -1,10 +1,10 @@
+using System.Linq;
+using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
-using MegaCrit.Sts2.Core.Models.Powers;
-using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
 using AlchemyStars.Mechanics;
@@ -16,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 乌鸦信使·阿褐：获得飞行；按雷格数量获得格挡（上限 4）；已飞行则改为覆甲。
+/// 乌鸦信使·阿褐：获得飞行；若打出前已飞行，可耗 1 点雷光能自动打出并消耗 1 张手牌。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon1 : ModCardTemplate
@@ -26,9 +26,6 @@ public sealed class AlchemyStarsThunderUncommon1 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int MaxBlockFromThunderCells = 4;
-
-    public override bool GainsBlock => true;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -47,8 +44,7 @@ public sealed class AlchemyStarsThunderUncommon1 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        HoverTipFactory.FromPower<AlchemyStarsFlyingPower>(),
-        HoverTipFactory.FromPower<PlatingPower>()
+        HoverTipFactory.FromPower<AlchemyStarsFlyingPower>()
     ];
 
     public AlchemyStarsThunderUncommon1()
@@ -67,25 +63,28 @@ public sealed class AlchemyStarsThunderUncommon1 : ModCardTemplate
             Owner.Creature,
             this);
 
-        var amount = Math.Min(MaxBlockFromThunderCells, LightMechanic.CountThunderAttributeCells(Owner));
-        if (amount <= 0)
+        if (!hadFlying || !LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
             return;
 
-        if (hadFlying)
-        {
-            await PowerCmd.Apply<PlatingPower>(
-                choiceContext,
-                Owner.Creature,
-                amount,
-                Owner.Creature,
-                this);
+        var hand = PileType.Hand.GetPile(Owner);
+        if (hand.Cards.Count == 0)
             return;
-        }
 
-        await CreatureCmd.GainBlock(
-            Owner.Creature,
-            new BlockVar(amount, ValueProp.Move),
-            cardPlay);
+        var selected = (await CardSelectCmd.FromHand(
+            choiceContext,
+            Owner,
+            new CardSelectorPrefs(SelectionScreenPrompt, 1, 1)
+            {
+                PretendCardsCanBePlayed = true
+            },
+            card => !ReferenceEquals(card, this),
+            this)).FirstOrDefault();
+
+        if (selected == null)
+            return;
+
+        await CardCmd.AutoPlay(choiceContext, selected, null);
+        await CardCmd.Exhaust(choiceContext, selected);
     }
 
     protected override void OnUpgrade()

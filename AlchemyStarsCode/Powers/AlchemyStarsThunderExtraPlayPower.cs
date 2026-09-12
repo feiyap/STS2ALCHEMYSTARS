@@ -11,7 +11,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 下一张雷属性牌额外打出若干次。
+/// 接下来若干张雷属性牌各额外打出 1 次。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsThunderExtraPlayPower : ModPowerTemplate
@@ -28,12 +28,18 @@ public sealed class AlchemyStarsThunderExtraPlayPower : ModPowerTemplate
         if (!AlchemyStarsCardHelpers.HasThunderKeyword(card))
             return playCount;
 
-        return playCount + (int)Amount;
+        return playCount + 1;
     }
 
     public override async Task AfterModifyingCardPlayCount(CardModel card)
     {
+        if (card.Owner.Creature != Owner || !AlchemyStarsCardHelpers.HasThunderKeyword(card))
+            return;
+
         Flash();
-        await PowerCmd.Remove(this);
+        if (Amount <= 1m)
+            await PowerCmd.Remove(this);
+        else
+            await PowerCmd.Decrement(this);
     }
 }

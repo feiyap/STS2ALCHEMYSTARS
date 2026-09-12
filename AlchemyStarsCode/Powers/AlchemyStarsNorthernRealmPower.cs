@@ -11,7 +11,8 @@ using STS2RitsuLib.Utils;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 北境之力：本场战斗中，每张水属性牌首次打出时重放 1。
+/// 北境之力：本场战斗中，每张水属性牌首次打出时额外重放 Amount 次。
+/// Amount = 重放次数（每份 +1）。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsNorthernRealmPower : ModPowerTemplate
@@ -20,7 +21,7 @@ public sealed class AlchemyStarsNorthernRealmPower : ModPowerTemplate
 
     public override PowerType Type => PowerType.Buff;
 
-    public override PowerStackType StackType => PowerStackType.Single;
+    public override PowerStackType StackType => PowerStackType.Counter;
 
     public override int ModifyCardPlayCount(CardModel card, Creature? target, int playCount)
     {
@@ -33,8 +34,12 @@ public sealed class AlchemyStarsNorthernRealmPower : ModPowerTemplate
         if (HasReplayedOnFirstPlay[card])
             return playCount;
 
+        var extraPlays = (int)Amount;
+        if (extraPlays <= 0)
+            return playCount;
+
         HasReplayedOnFirstPlay[card] = true;
-        return playCount + 1;
+        return playCount + extraPlays;
     }
 
     public override Task AfterModifyingCardPlayCount(CardModel card)

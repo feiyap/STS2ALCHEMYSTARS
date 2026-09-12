@@ -16,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 终末之龙·希罗娜：X 费军团长；需水光能打出，造成 X 次水伤并施加 X×倍率层龙牙印记。
+/// 终末之龙·希罗娜：X 费军团长；造成 X / X+1 次水伤，并施加攻击次数 ×3 层龙牙印记。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterRare5 : ModCardTemplate
@@ -26,15 +26,11 @@ public sealed class AlchemyStarsWaterRare5 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
-    private const decimal HitDamage = 4m;
-    private const int BaseFangMultiplier = 2;
-    private const int UpgradedFangMultiplier = 3;
+    private const decimal HitDamage = 6m;
+    private const int FangMultiplier = 3;
+    private const int ExtraHitUpgradeBy = 1;
 
     protected override bool HasEnergyCostX => true;
-
-    protected override bool IsPlayable => LightMechanic.HasWaterLightEnergy(Owner);
-
-    protected override bool ShouldGlowGoldInternal => IsPlayable;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -42,7 +38,8 @@ public sealed class AlchemyStarsWaterRare5 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new DamageVar(HitDamage, ValueProp.Move),
-        new IntVar("FangMult", BaseFangMultiplier),
+        new RepeatVar(0),
+        new IntVar("FangMult", FangMultiplier),
         AlchemyStarsKeywordText.InlineTitleVar("LegionCommanderStrength", AlchemyStarsKeywordIds.LegionCommanderStrength),
         AlchemyStarsKeywordText.InlineTitleVar("DragonFangMark", AlchemyStarsKeywordIds.DragonFangMark),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
@@ -73,16 +70,14 @@ public sealed class AlchemyStarsWaterRare5 : ModCardTemplate
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
-        LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Water]);
-
         await AlchemyStarsCardHelpers.TryApplyLegionCommanderStat<StrengthPower>(
             choiceContext, Owner, this);
 
-        var x = ResolveEnergyXValue();
-        if (x <= 0)
+        var hits = ResolveEnergyXValue() + DynamicVars.Repeat.IntValue;
+        if (hits <= 0)
             return;
 
-        for (var i = 0; i < x; i++)
+        for (var i = 0; i < hits; i++)
         {
             if (cardPlay.Target.IsDead)
                 break;
@@ -100,7 +95,7 @@ public sealed class AlchemyStarsWaterRare5 : ModCardTemplate
         if (cardPlay.Target.IsDead)
             return;
 
-        var fangAmount = x * DynamicVars["FangMult"].IntValue;
+        var fangAmount = hits * DynamicVars["FangMult"].IntValue;
         if (fangAmount > 0)
         {
             await PowerCmd.Apply<AlchemyStarsDragonFangMarkPower>(
@@ -114,6 +109,6 @@ public sealed class AlchemyStarsWaterRare5 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        DynamicVars["FangMult"].UpgradeValueBy(UpgradedFangMultiplier - BaseFangMultiplier);
+        DynamicVars.Repeat.UpgradeValueBy(ExtraHitUpgradeBy);
     }
 }

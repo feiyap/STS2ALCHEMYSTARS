@@ -15,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 蜜雅·涤魂：芭芭雅嘎茧生；损血转火伤加成覆甲、获能并火攻，斩杀时覆甲转生命。
+/// 蜜雅·涤魂：芭芭雅嘎茧生；损血转火伤加成覆甲并火攻，斩杀时覆甲转生命。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireUncommon5 : ModCardTemplate
@@ -32,7 +32,6 @@ public sealed class AlchemyStarsFireUncommon5 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new EnergyVar(1),
         new DamageVar(15m, ValueProp.Move),
         AlchemyStarsKeywordText.InlineTitleVar("BabaYagaCocoon", AlchemyStarsKeywordIds.BabaYagaCocoon),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
@@ -85,8 +84,6 @@ public sealed class AlchemyStarsFireUncommon5 : ModCardTemplate
                     this);
             }
         }
-
-        await PlayerCmd.GainEnergy(1, Owner);
 
         await LightMechanic.DealElementalAttackDamage(
             choiceContext,

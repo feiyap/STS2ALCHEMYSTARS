@@ -26,7 +26,7 @@ public sealed class AlchemyStarsThunderUncommon8 : ModCardTemplate
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
     private const int HitCount = 4;
-    private const int MinDamage = 3;
+    private const int MinDamage = 2;
     private const int MaxDamage = 4;
     private const int MaxDamageUpgradeBy = 1;
 
@@ -91,15 +91,12 @@ public sealed class AlchemyStarsThunderUncommon8 : ModCardTemplate
         if (overheated)
             return;
 
-        var overheat = await PowerCmd.Apply<AlchemyStarsOverheatPower>(
+        await PowerCmd.Apply<AlchemyStarsOverheatPower>(
             choiceContext,
             Owner.Creature,
             1m,
             Owner.Creature,
             this);
-
-        if (overheat != null)
-            overheat.ScheduleRemovalAfterNextTurnEnd(Owner);
     }
 
     protected override void OnUpgrade()

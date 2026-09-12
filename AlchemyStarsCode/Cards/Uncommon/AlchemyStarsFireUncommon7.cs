@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
 using AlchemyStars.Mechanics;
+using AlchemyStars.Powers;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Keywords;
 using STS2RitsuLib.Scaffolding.Content;
@@ -15,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 游目嘶鸣·莱蕾：投资风险；消耗抽牌堆底并抽牌，群体火伤，按敌人数获火光能。
+/// 游目嘶鸣·莱蕾：投资风险；消耗抽牌堆底并抽牌，群体火伤，按敌人数获得灼燃。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireUncommon7 : ModCardTemplate
@@ -25,16 +26,15 @@ public sealed class AlchemyStarsFireUncommon7 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.AllEnemies;
     private const bool ShowInCardLibrary = true;
-    private const int FireLightGainPerEnemy = 1;
-    private const int FireLightGainPerEnemyUpgradeBy = 1;
+    private const int IgnitionPerEnemy = 1;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(6m, ValueProp.Move),
-        new IntVar("FireLightGain", FireLightGainPerEnemy),
+        new DamageVar(7m, ValueProp.Move),
+        new PowerVar<AlchemyStarsIgnitionPower>(IgnitionPerEnemy),
         AlchemyStarsKeywordText.InlineTitleVar("InvestmentRisk", AlchemyStarsKeywordIds.InvestmentRisk),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
     ];
@@ -49,7 +49,8 @@ public sealed class AlchemyStarsFireUncommon7 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.InvestmentRisk)),
-        ];
+        HoverTipFactory.FromPower<AlchemyStarsIgnitionPower>()
+    ];
 
     public AlchemyStarsFireUncommon7()
         : base(BaseEnergyCost, CardKind, CardRarityValue, CardTarget, ShowInCardLibrary)
@@ -65,7 +66,8 @@ public sealed class AlchemyStarsFireUncommon7 : ModCardTemplate
 
         await CardPileCmd.Draw(choiceContext, 1, Owner);
 
-        foreach (var enemy in CombatState!.HittableEnemies.ToList())
+        var enemies = CombatState!.HittableEnemies.ToList();
+        foreach (var enemy in enemies)
         {
             await LightMechanic.DealElementalAttackDamage(
                 choiceContext,
@@ -77,14 +79,20 @@ public sealed class AlchemyStarsFireUncommon7 : ModCardTemplate
                 cardPlay);
         }
 
-        var enemyCount = CombatState.HittableEnemies.Count();
-        var fireGain = enemyCount * DynamicVars["FireLightGain"].IntValue;
-        if (fireGain > 0)
-            LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Fire, fireGain);
+        var ignition = enemies.Count * (int)DynamicVars["AlchemyStarsIgnitionPower"].BaseValue;
+        if (ignition > 0)
+        {
+            await PowerCmd.Apply<AlchemyStarsIgnitionPower>(
+                choiceContext,
+                Owner.Creature,
+                ignition,
+                Owner.Creature,
+                this);
+        }
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars["FireLightGain"].UpgradeValueBy(FireLightGainPerEnemyUpgradeBy);
+        DynamicVars.Damage.UpgradeValueBy(2m);
     }
 }

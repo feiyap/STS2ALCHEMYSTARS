@@ -1,5 +1,4 @@
 using System.Linq;
-using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Extensions;
@@ -18,7 +17,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 凌野之鹰·蕾切尔：侦察者；添加深色雷格并获得同量覆甲，可自选弃牌堆雷牌回手。
+/// 凌野之鹰·蕾切尔：侦察者；添加深色雷格并获得同量覆甲，可消耗雷光能随机取回弃牌堆雷牌。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
@@ -84,17 +83,13 @@ public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
         if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
             return;
 
-        var discardPile = PileType.Discard.GetPile(Owner);
-        if (!discardPile.Cards.Any(AlchemyStarsCardHelpers.HasThunderKeyword))
+        var thunderCards = PileType.Discard.GetPile(Owner).Cards
+            .Where(AlchemyStarsCardHelpers.HasThunderKeyword)
+            .ToList();
+        if (thunderCards.Count == 0)
             return;
 
-        var selected = (await CardSelectCmd.FromCombatPile(
-            choiceContext,
-            discardPile,
-            Owner,
-            new CardSelectorPrefs(SelectionScreenPrompt, 1),
-            AlchemyStarsCardHelpers.HasThunderKeyword)).FirstOrDefault();
-
+        var selected = Owner.RunState.Rng.CombatTargets.NextItem(thunderCards);
         if (selected == null)
             return;
 

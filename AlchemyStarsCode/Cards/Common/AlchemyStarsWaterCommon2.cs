@@ -3,11 +3,10 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
-using AlchemyStars.Mechanics;
-using AlchemyStars.Powers;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Keywords;
 using STS2RitsuLib.Scaffolding.Content;
@@ -15,14 +14,15 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ????�???????????????????????/// </summary>
+/// 白矮星：失去生命，对目标施加虚弱并获得格挡。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterCommon2 : ModCardTemplate
 {
     private const int BaseEnergyCost = 2;
     private const CardType CardKind = CardType.Skill;
     private const CardRarity CardRarityValue = CardRarity.Common;
-    private const TargetType CardTarget = TargetType.Self;
+    private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
     private const decimal HpLoss = 2m;
 
@@ -35,7 +35,7 @@ public sealed class AlchemyStarsWaterCommon2 : ModCardTemplate
     [
         new HpLossVar(HpLoss),
         new BlockVar(11m, ValueProp.Move),
-        new PowerVar<AlchemyStarsWhiteDwarfGuardPower>(1m),
+        new PowerVar<WeakPower>(1m),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
     ];
 
@@ -47,7 +47,7 @@ public sealed class AlchemyStarsWaterCommon2 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
-        HoverTipFactory.FromPower<AlchemyStarsWhiteDwarfGuardPower>()
+        HoverTipFactory.FromPower<WeakPower>()
     ];
 
     public AlchemyStarsWaterCommon2()
@@ -57,6 +57,8 @@ public sealed class AlchemyStarsWaterCommon2 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        ArgumentNullException.ThrowIfNull(cardPlay.Target);
+
         await CreatureCmd.Damage(
             choiceContext,
             Owner.Creature,
@@ -65,18 +67,19 @@ public sealed class AlchemyStarsWaterCommon2 : ModCardTemplate
             this,
             cardPlay);
 
-        await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
-
-        await PowerCmd.Apply<AlchemyStarsWhiteDwarfGuardPower>(
+        await PowerCmd.Apply<WeakPower>(
             choiceContext,
-            Owner.Creature,
-            DynamicVars["AlchemyStarsWhiteDwarfGuardPower"].BaseValue,
+            cardPlay.Target,
+            DynamicVars.Weak.BaseValue,
             Owner.Creature,
             this);
+
+        await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
     }
 
     protected override void OnUpgrade()
     {
         DynamicVars.Block.UpgradeValueBy(2m);
+        DynamicVars.Weak.UpgradeValueBy(1m);
     }
 }

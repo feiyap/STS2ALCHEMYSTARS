@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// �׹����������򷨣�����׹��ܡ��񵲣������÷������Ը�
+/// 白夜城执法人·艾莉法：获得格挡；可消耗雷光能抽牌。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderCommon6 : ModCardTemplate
@@ -25,15 +25,6 @@ public sealed class AlchemyStarsThunderCommon6 : ModCardTemplate
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
 
-    /// <summary>�и��ʣ�������ͨ�����Ը�</summary>
-    private const int MediumChancePercent = 50;
-
-    /// <summary>С���ʣ������������⾵��</summary>
-    private const int SmallChancePercent = 25;
-
-    /// <summary>����ʣ����������¸��ӵ��ܸ��ʣ��� + С����</summary>
-    private const int LargeChancePercent = MediumChancePercent + SmallChancePercent;
-
     public override bool GainsBlock => true;
 
     public override CardAssetProfile AssetProfile => new(
@@ -41,7 +32,8 @@ public sealed class AlchemyStarsThunderCommon6 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new BlockVar(8m, ValueProp.Move),
+        new BlockVar(6m, ValueProp.Move),
+        new CardsVar(1),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
     ];
 
@@ -52,10 +44,7 @@ public sealed class AlchemyStarsThunderCommon6 : ModCardTemplate
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        
-        
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.PrismCell))
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder))
     ];
 
     public AlchemyStarsThunderCommon6() : base(BaseEnergyCost, CardKind, CardRarityValue, CardTarget, ShowInCardLibrary)
@@ -64,13 +53,15 @@ public sealed class AlchemyStarsThunderCommon6 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        LightMechanic.TryGrantLightEnergy(Owner, LightElement.Thunder);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
-        LightMechanic.ResetNonThunderCells(Owner, MediumChancePercent, SmallChancePercent);
+
+        if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
+            await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
     }
 
     protected override void OnUpgrade()
     {
         DynamicVars.Block.UpgradeValueBy(2m);
+        DynamicVars.Cards.UpgradeValueBy(1m);
     }
 }

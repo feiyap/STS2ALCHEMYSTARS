@@ -17,7 +17,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 黑棘魔月·艾蕾雅：影镇茶话会；弃牌造成 2 次费用总和森伤，诅�?状态牌改为消耗并额外造成伤害�?/// </summary>
+/// 黑棘魔月·艾蕾雅：影镇茶话会；按丢弃次数造成森伤，诅咒与状态牌改为消耗并造成伤害。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestCommon8 : ModCardTemplate
 {
@@ -27,14 +28,15 @@ public sealed class AlchemyStarsForestCommon8 : ModCardTemplate
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
     private const int MaxDiscardCount = 2;
-    private const int HitCount = 2;
-    private const decimal CurseStatusDamage = 5m;
+    private const decimal DiscardDamage = 7m;
+    private const decimal CurseStatusDamage = 9m;
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(CurseStatusDamage, ValueProp.Move),
+        new DamageVar(DiscardDamage, ValueProp.Move),
+        new DamageVar("CurseStatus", CurseStatusDamage, ValueProp.Move),
         AlchemyStarsKeywordText.InlineTitleVar("ShadowTownTeaParty", AlchemyStarsKeywordIds.ShadowTownTeaParty),
         AlchemyStarsKeywordText.InlineTitleVar("ForestTitle", AlchemyStarsKeywordIds.Forest)
     ];
@@ -71,7 +73,7 @@ public sealed class AlchemyStarsForestCommon8 : ModCardTemplate
             card => !ReferenceEquals(card, this),
             this)).ToList();
 
-        decimal costSum = 0m;
+        var discardedCount = 0;
         foreach (var card in discarded)
         {
             if (card.Type is CardType.Curse or CardType.Status)
@@ -82,30 +84,35 @@ public sealed class AlchemyStarsForestCommon8 : ModCardTemplate
                     Owner,
                     this,
                     cardPlay.Target,
-                    DynamicVars.Damage.BaseValue,
+                    DynamicVars["CurseStatus"].BaseValue,
                     LightElement.Forest,
                     cardPlay);
             }
             else
             {
                 await CardCmd.Discard(choiceContext, card);
-                costSum += card.EnergyCost.GetWithModifiers(CostModifiers.All);
+                discardedCount++;
             }
         }
 
-        for (var i = 0; i < HitCount; i++)
+        if (discardedCount > 0)
         {
             await LightMechanic.DealElementalAttackDamage(
                 choiceContext,
                 Owner,
                 this,
                 cardPlay.Target,
-                costSum,
+                discardedCount * DynamicVars.Damage.BaseValue,
                 LightElement.Forest,
                 cardPlay);
         }
 
         if (IsUpgraded)
             await CardPileCmd.Draw(choiceContext, 1, Owner);
+    }
+
+    protected override void OnUpgrade()
+    {
+        DynamicVars.Damage.UpgradeValueBy(1m);
     }
 }

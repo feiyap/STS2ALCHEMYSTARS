@@ -15,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// �����칤��������櫣�����׹��ܡ��񵲣�����Ŀ��ʩ�����ˡ�
+/// 雷驰工匠·阿克西娅：获得雷光能与格挡，并对目标施加易伤。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderCommon4 : ModCardTemplate
@@ -25,7 +25,7 @@ public sealed class AlchemyStarsThunderCommon4 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
-    private const int ThunderEnergyGain = 2;
+    private const int ThunderEnergyGain = 1;
 
     public override bool GainsBlock => true;
 

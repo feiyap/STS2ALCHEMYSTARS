@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 奚笑歌班·基汀：抽牌并获得格挡；每个雷属性格额外提供 4% 格挡。
+/// 奚笑歌班·基汀：抽牌并获得格挡；每个雷属性格额外提供 8% 格挡。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderCommon5 : ModCardTemplate
@@ -24,7 +24,7 @@ public sealed class AlchemyStarsThunderCommon5 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const decimal BlockBonusPerThunderCell = 0.04m;
+    private const decimal BlockBonusPerThunderCell = 0.08m;
 
     public override bool GainsBlock => true;
 
@@ -33,7 +33,7 @@ public sealed class AlchemyStarsThunderCommon5 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new BlockVar(11m, ValueProp.Move),
+        new BlockVar(10m, ValueProp.Move),
         new CardsVar(1),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
     ];
@@ -68,6 +68,6 @@ public sealed class AlchemyStarsThunderCommon5 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Block.UpgradeValueBy(3m);
+        DynamicVars.Block.UpgradeValueBy(2m);
     }
 }

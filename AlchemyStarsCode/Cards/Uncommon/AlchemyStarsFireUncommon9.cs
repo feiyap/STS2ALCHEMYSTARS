@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 掌玩蝠屋·巴缇牙：全部消除；消耗全部光能、以深色格填满转色栏，获格挡并转化非火格。
+/// 掌玩蝠屋·巴缇牙：全部消除；耗火光能将非深色格转为火深色格，然后获得格挡。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireUncommon9 : ModCardTemplate
@@ -24,8 +24,6 @@ public sealed class AlchemyStarsFireUncommon9 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int BaseConvertCount = 1;
-    private const int ConvertCountUpgradeBy = 1;
 
     public override bool GainsBlock => true;
 
@@ -35,7 +33,6 @@ public sealed class AlchemyStarsFireUncommon9 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new BlockVar(7m, ValueProp.Move),
-        new IntVar("Convert", BaseConvertCount),
         AlchemyStarsKeywordText.InlineTitleVar("ClearAll", AlchemyStarsKeywordIds.ClearAll),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
     ];
@@ -50,8 +47,6 @@ public sealed class AlchemyStarsFireUncommon9 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.ClearAll)),
-        
-        
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DarkCell))
     ];
 
@@ -62,17 +57,12 @@ public sealed class AlchemyStarsFireUncommon9 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        LightMechanic.ConsumeAllLightEnergy(Owner);
-        LightMechanic.FillAttributeBarWithRandomElements(Owner, darkOnly: true);
+        LightMechanic.TryConvertNonDarkCellsToFireDark(Owner);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
-
-        var convertCount = DynamicVars["Convert"].IntValue;
-        LightMechanic.TryConvertRandomNonFireCells(Owner, convertCount);
     }
 
     protected override void OnUpgrade()
     {
         DynamicVars.Block.UpgradeValueBy(2m);
-        DynamicVars["Convert"].UpgradeValueBy(ConvertCountUpgradeBy);
     }
 }

@@ -24,7 +24,7 @@ public sealed class AlchemyStarsFireUncommon2 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int EnergyGain = 2;
+    private const int EnergyGain = 1;
     private const int FireEnergyGain = 2;
     private const int UpgradedIgnitionGain = 2;
 
@@ -65,7 +65,7 @@ public sealed class AlchemyStarsFireUncommon2 : ModCardTemplate
         if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Fire]))
             return;
 
-        await PlayerCmd.GainEnergy(EnergyGain, Owner);
+        await PlayerCmd.GainEnergy(DynamicVars.Energy.IntValue, Owner);
         LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Fire, FireEnergyGain);
 
         if (IsUpgraded)
@@ -77,5 +77,10 @@ public sealed class AlchemyStarsFireUncommon2 : ModCardTemplate
                 Owner.Creature,
                 this);
         }
+    }
+
+    protected override void OnUpgrade()
+    {
+        DynamicVars.Energy.UpgradeValueBy(1m);
     }
 }

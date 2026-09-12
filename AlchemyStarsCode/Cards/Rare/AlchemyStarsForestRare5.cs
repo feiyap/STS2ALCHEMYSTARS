@@ -27,7 +27,7 @@ public sealed class AlchemyStarsForestRare5 : ModCardTemplate
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
     private const int BaseValue = 1;
-    private const int UpgradeEnergyGain = 2;
+    private const int UpgradeEnergyGain = 1;
 
     private int _radiantBloomBonus;
 
@@ -107,7 +107,7 @@ public sealed class AlchemyStarsForestRare5 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        // 升级效果在打出时触发：全格转森强化格并获得 2 点能量。
+        // 升级效果在打出时触发：全格转森强化格并获得 1 点能量。
     }
 
     /// <summary>

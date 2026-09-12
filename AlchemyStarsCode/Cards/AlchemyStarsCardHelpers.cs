@@ -301,6 +301,22 @@ internal static class AlchemyStarsCardHelpers
         return ReferenceEquals(target, enemies[0]);
     }
 
+    public static async Task IncrementStackableDebuffs(
+        PlayerChoiceContext choiceContext,
+        Creature creature,
+        decimal amount,
+        Creature applier,
+        CardModel? source)
+    {
+        foreach (var power in creature.Powers.ToList())
+        {
+            if (power.Type != PowerType.Debuff || power.StackType != PowerStackType.Counter || power.Amount <= 0)
+                continue;
+
+            await PowerCmd.ModifyAmount(choiceContext, power, amount, applier, source);
+        }
+    }
+
     public static async Task DoubleStackableDebuffs(
         PlayerChoiceContext choiceContext,
         Creature creature,

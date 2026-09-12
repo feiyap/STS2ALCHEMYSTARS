@@ -22,7 +22,7 @@ namespace AlchemyStars.Powers;
 public sealed class AlchemyStarsCapitalTaxPower : ModPowerTemplate
 {
     private const int TaxGold = 20;
-    private const decimal DamageIncreaseRate = 0.2m;
+    private const decimal DamageIncreaseRate = 0.1m;
 
     private static readonly AttachedState<CardModel, int> TaxPaidGold = new(_ => 0);
     private static readonly AttachedState<CardModel, decimal> DamageBonusRate = new(_ => 0m);
@@ -47,6 +47,9 @@ public sealed class AlchemyStarsCapitalTaxPower : ModPowerTemplate
 
     public static void RecordTax(CardModel card, int goldPaid)
     {
+        if (goldPaid <= 0)
+            return;
+
         TaxPaidGold[card] += goldPaid;
         DamageBonusRate[card] += DamageIncreaseRate;
     }

@@ -14,7 +14,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 哀伤之弦·克萝伊：获得水光能并提升攻击伤害；升级后按手牌数治疗�?/// </summary>
+/// 哀伤之弦·克萝伊：获得水光能并提升攻击伤害（每份 +50%）；升级后按手牌数治疗。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterUncommon9 : ModCardTemplate
 {

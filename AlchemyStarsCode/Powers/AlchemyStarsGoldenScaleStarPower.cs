@@ -1,54 +1,46 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using AlchemyStars.Mechanics;
-using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
-using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Rooms;
-using MegaCrit.Sts2.Core.Models;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
 
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 金泽之星：胜利获得金币，下场战斗开始时获得雷属性棱镜格�?/// </summary>
+/// 金泽之星：胜利时全体玩家各得金币，并按已损失生命百分比治疗。
+/// 必须用 AfterCombatEnd：引擎会在 AfterCombatVictory 前清掉能力。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsGoldenScaleStarPower : ModPowerTemplate
 {
-    private const decimal VictoryGold = 30m;
-    private const int PrismCellCount = 2;
+    private const decimal VictoryGold = 40m;
 
-    private bool _grantPrismNextCombat;
+    private decimal _lostHpHealPercent = 0.35m;
 
     public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Single;
 
-    public override async Task AfterCombatVictory(CombatRoom room)
-    {
-        var player = Owner.Player;
-        if (player == null)
-            return;
+    /// <summary>
+    /// 由卡牌 Configure：基础 35%，升级 50%。
+    /// </summary>
+    public void ConfigureLostHpHealPercent(decimal percent) => _lostHpHealPercent = percent;
 
+    public override async Task AfterCombatEnd(CombatRoom room)
+    {
         Flash();
-        await PlayerCmd.GainGold(VictoryGold, player);
-        _grantPrismNextCombat = true;
-    }
 
-    public override async Task BeforeCombatStart()
-    {
-        if (!_grantPrismNextCombat)
-            return;
+        foreach (var player in room.CombatState.Players)
+        {
+            await PlayerCmd.GainGold(VictoryGold, player);
 
-        var player = Owner.Player;
-        if (player == null || !LightMechanic.HasMechanicRelic(player))
-            return;
+            var creature = player.Creature;
+            var heal = (creature.MaxHp - creature.CurrentHp) * _lostHpHealPercent;
+            if (heal <= 0m)
+                continue;
 
-        _grantPrismNextCombat = false;
-        for (var i = 0; i < PrismCellCount; i++)
-            LightMechanic.TryAddAttributeCell(player, LightElement.Thunder, AttributeCellKind.Prism);
+            await CreatureCmd.Heal(creature, heal);
+        }
     }
 }

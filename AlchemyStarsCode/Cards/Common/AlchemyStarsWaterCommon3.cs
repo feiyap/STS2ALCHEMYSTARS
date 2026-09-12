@@ -13,7 +13,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 零界雪姬·卓娅：消耗全部水光能并按消耗量治疗；水属性格超过 2 个时抽牌�?/// </summary>
+/// 零界雪姬·卓娅：最多消耗 4 点水光能并按消耗量治疗；水属性格超过 2 个时抽牌。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterCommon3 : ModCardTemplate
 {
@@ -23,6 +24,7 @@ public sealed class AlchemyStarsWaterCommon3 : ModCardTemplate
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
     private const int HealPerConsumedEnergy = 1;
+    private const int MaxWaterLightConsume = 4;
     private const int WaterCellDrawThreshold = 2;
     private const int DrawCount = 1;
 
@@ -54,7 +56,15 @@ public sealed class AlchemyStarsWaterCommon3 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        var consumed = LightMechanic.ConsumeAllWaterLightEnergy(Owner);
+        var consumed = 0;
+        for (var n = 0; n < MaxWaterLightConsume; n++)
+        {
+            if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Water]))
+                break;
+
+            consumed++;
+        }
+
         if (consumed > 0)
             await CreatureCmd.Heal(Owner.Creature, consumed * DynamicVars.Heal.IntValue);
 

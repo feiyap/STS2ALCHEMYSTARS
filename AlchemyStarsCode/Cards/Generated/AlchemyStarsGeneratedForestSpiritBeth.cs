@@ -19,7 +19,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 神鹿·贝瑟：按消耗牌堆规模强化格子，全强化时改为获得飞行。消耗。
+/// 神鹿·贝瑟：按消耗牌堆规模强化格子，全强化时获得 2 层飞行。消耗。升级后保留。
 /// </summary>
 [RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedForestSpiritBeth : ModCardTemplate
@@ -31,6 +31,7 @@ public sealed class AlchemyStarsGeneratedForestSpiritBeth : ModCardTemplate
     private const bool ShowInCardLibrary = false;
     private const int DrawCount = 1;
     private const int EmeraldMarkAmount = 2;
+    private const int AllEnhancedFlying = 2;
 
     public override bool CanBeGeneratedInCombat => false;
 
@@ -69,7 +70,6 @@ public sealed class AlchemyStarsGeneratedForestSpiritBeth : ModCardTemplate
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
-        LightMechanic.TryGrantLightEnergy(Owner, LightElement.Forest);
 
         var exhaustPileSize = PileType.Exhaust.GetPile(Owner).Cards.Count;
         if (AllCellsEnhanced(Owner))
@@ -77,7 +77,7 @@ public sealed class AlchemyStarsGeneratedForestSpiritBeth : ModCardTemplate
             await PowerCmd.Apply<AlchemyStarsFlyingPower>(
                 choiceContext,
                 Owner.Creature,
-                1m,
+                AllEnhancedFlying,
                 Owner.Creature,
                 this);
         }
@@ -90,7 +90,7 @@ public sealed class AlchemyStarsGeneratedForestSpiritBeth : ModCardTemplate
                     await PowerCmd.Apply<AlchemyStarsFlyingPower>(
                         choiceContext,
                         Owner.Creature,
-                        1m,
+                        AllEnhancedFlying,
                         Owner.Creature,
                         this);
                     break;

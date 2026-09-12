@@ -16,7 +16,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 咕咕咕咕·多孚：造成森属性伤害；飞行时附加虚弱；升级可先消耗森光能获得飞行�?/// </summary>
+/// 咕咕咕咕·多孚：造成森属性伤害并施加虚弱；升级时若打出前已飞行则再获得飞行。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestCommon1 : ModCardTemplate
 {
@@ -25,7 +26,7 @@ public sealed class AlchemyStarsForestCommon1 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
-    private const decimal BaseDamage = 9m;
+    private const decimal BaseDamage = 6m;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -59,16 +60,7 @@ public sealed class AlchemyStarsForestCommon1 : ModCardTemplate
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
-        if (IsUpgraded &&
-            LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Forest]))
-        {
-            await PowerCmd.Apply<AlchemyStarsFlyingPower>(
-                choiceContext,
-                Owner.Creature,
-                1m,
-                Owner.Creature,
-                this);
-        }
+        var hadFlying = Owner.Creature.GetPowerAmount<AlchemyStarsFlyingPower>() > 0;
 
         await LightMechanic.DealElementalAttackDamage(
             choiceContext,
@@ -79,12 +71,19 @@ public sealed class AlchemyStarsForestCommon1 : ModCardTemplate
             LightElement.Forest,
             cardPlay);
 
-        if (Owner.Creature.GetPowerAmount<AlchemyStarsFlyingPower>() > 0)
+        await PowerCmd.Apply<WeakPower>(
+            choiceContext,
+            cardPlay.Target,
+            DynamicVars.Weak.BaseValue,
+            Owner.Creature,
+            this);
+
+        if (IsUpgraded && hadFlying)
         {
-            await PowerCmd.Apply<WeakPower>(
+            await PowerCmd.Apply<AlchemyStarsFlyingPower>(
                 choiceContext,
-                cardPlay.Target,
-                DynamicVars.Weak.BaseValue,
+                Owner.Creature,
+                1m,
                 Owner.Creature,
                 this);
         }

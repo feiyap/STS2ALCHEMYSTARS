@@ -15,7 +15,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 弹雨慰痕·珀拉珂：可强化自身增益并翻倍敌人减益，造成伤害并获得同额格挡�?/// </summary>
+/// 弹雨慰痕·珀拉珂：可强化自身增益并为敌人减益增加层数，造成伤害并获得同额格挡。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon9 : ModCardTemplate
 {
@@ -33,6 +34,7 @@ public sealed class AlchemyStarsThunderUncommon9 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new DamageVar(8m, ValueProp.Move),
+        new IntVar("DebuffBonus", 2),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
     ];
 
@@ -64,9 +66,10 @@ public sealed class AlchemyStarsThunderUncommon9 : ModCardTemplate
                 Owner.Creature,
                 this);
 
-            await AlchemyStarsCardHelpers.DoubleStackableDebuffs(
+            await AlchemyStarsCardHelpers.IncrementStackableDebuffs(
                 choiceContext,
                 cardPlay.Target,
+                DynamicVars["DebuffBonus"].IntValue,
                 Owner.Creature,
                 this);
         }
@@ -97,5 +100,6 @@ public sealed class AlchemyStarsThunderUncommon9 : ModCardTemplate
     protected override void OnUpgrade()
     {
         DynamicVars.Damage.UpgradeValueBy(2m);
+        DynamicVars["DebuffBonus"].UpgradeValueBy(2m);
     }
 }

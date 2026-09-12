@@ -18,7 +18,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 熔岩黑兽·贾尔斯：从抽牌堆选择 1 张牌转化为灼伤，再造成火属性伤害并施加易伤。
+/// 熔岩黑兽·贾尔斯：造成火属性伤害；可选消耗 1 点火光能，将抽牌堆 1 张牌转化为灼伤并施加易伤。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireCommon4 : ModCardTemplate
@@ -34,7 +34,7 @@ public sealed class AlchemyStarsFireCommon4 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(6m, ValueProp.Move),
+        new DamageVar(7m, ValueProp.Move),
         new PowerVar<VulnerablePower>(1m),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
     ];
@@ -61,20 +61,25 @@ public sealed class AlchemyStarsFireCommon4 : ModCardTemplate
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
-        var drawPile = PileType.Draw.GetPile(Owner);
-        if (drawPile.Cards.Any(card => card.IsTransformable))
+        // 可选消耗 1 点火光能：成功后才变牌并施加易伤。
+        var consumedFire = LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Fire]);
+        if (consumedFire)
         {
-            var selected = (await CardSelectCmd.FromCombatPile(
-                choiceContext,
-                drawPile,
-                Owner,
-                new CardSelectorPrefs(CardSelectorPrefs.TransformSelectionPrompt, 0, 1),
-                card => card.IsTransformable)).FirstOrDefault();
-
-            if (selected != null)
+            var drawPile = PileType.Draw.GetPile(Owner);
+            if (drawPile.Cards.Any(card => card.IsTransformable))
             {
-                var burn = CombatState!.CreateCard<Burn>(Owner);
-                await CardCmd.Transform(selected, burn);
+                var selected = (await CardSelectCmd.FromCombatPile(
+                    choiceContext,
+                    drawPile,
+                    Owner,
+                    new CardSelectorPrefs(CardSelectorPrefs.TransformSelectionPrompt, 0, 1),
+                    card => card.IsTransformable)).FirstOrDefault();
+
+                if (selected != null)
+                {
+                    var burn = CombatState!.CreateCard<Burn>(Owner);
+                    await CardCmd.Transform(selected, burn);
+                }
             }
         }
 
@@ -87,12 +92,15 @@ public sealed class AlchemyStarsFireCommon4 : ModCardTemplate
             LightElement.Fire,
             cardPlay);
 
-        await PowerCmd.Apply<VulnerablePower>(
-            choiceContext,
-            cardPlay.Target,
-            DynamicVars.Vulnerable.BaseValue,
-            Owner.Creature,
-            this);
+        if (consumedFire)
+        {
+            await PowerCmd.Apply<VulnerablePower>(
+                choiceContext,
+                cardPlay.Target,
+                DynamicVars.Vulnerable.BaseValue,
+                Owner.Creature,
+                this);
+        }
     }
 
     protected override void OnUpgrade()

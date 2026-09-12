@@ -28,7 +28,7 @@ public sealed class AlchemyStarsKarenBrightSoul : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Ancient;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
-    private const decimal HitDamage = 6m;
+    private const decimal HitDamage = 4m;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -128,6 +128,7 @@ public sealed class AlchemyStarsKarenBrightSoul : ModCardTemplate
     protected override void OnUpgrade()
     {
         EnergyCost.UpgradeBy(-1);
+        DynamicVars.Damage.UpgradeValueBy(1m);
     }
 
     /// <summary>

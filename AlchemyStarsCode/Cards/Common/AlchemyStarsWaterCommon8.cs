@@ -14,7 +14,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 柳叶冰刃·渡：获得水光能并对目标施加虚弱，升级后额外施加随机减益�?/// </summary>
+/// 柳叶冰刃·渡：获得水光能并对目标施加虚弱；可再消耗水光能，按水属性格数施加中毒。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterCommon8 : ModCardTemplate
 {
@@ -23,14 +24,17 @@ public sealed class AlchemyStarsWaterCommon8 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
-    private const decimal WeakAmount = 2m;
-    private const decimal UpgradedRandomDebuffAmount = 2m;
+    private const int BaseWaterLightGain = 1;
+    private const int BaseWaterLightConsume = 1;
+    private const decimal WeakAmount = 1m;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
+        new IntVar("WaterLightGain", BaseWaterLightGain),
+        new IntVar("WaterLightConsume", BaseWaterLightConsume),
         new PowerVar<WeakPower>(WeakAmount),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
     ];
@@ -43,8 +47,8 @@ public sealed class AlchemyStarsWaterCommon8 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
-        
-        HoverTipFactory.FromPower<WeakPower>()
+        HoverTipFactory.FromPower<WeakPower>(),
+        HoverTipFactory.FromPower<PoisonPower>()
     ];
 
     public AlchemyStarsWaterCommon8()
@@ -56,7 +60,11 @@ public sealed class AlchemyStarsWaterCommon8 : ModCardTemplate
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
-        LightMechanic.TryGrantLightEnergy(Owner, LightElement.Water);
+        LightMechanic.TryGrantLightEnergyMany(
+            Owner,
+            LightElement.Water,
+            DynamicVars["WaterLightGain"].IntValue);
+
         await PowerCmd.Apply<WeakPower>(
             choiceContext,
             cardPlay.Target,
@@ -64,14 +72,34 @@ public sealed class AlchemyStarsWaterCommon8 : ModCardTemplate
             Owner.Creature,
             this);
 
-        if (IsUpgraded)
+        var consumed = 0;
+        var maxConsume = DynamicVars["WaterLightConsume"].IntValue;
+        for (var n = 0; n < maxConsume; n++)
         {
-            await AlchemyStarsCardHelpers.TryApplyRandomDebuff(
-                choiceContext,
-                cardPlay.Target,
-                UpgradedRandomDebuffAmount,
-                Owner.Creature,
-                this);
+            if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Water]))
+                break;
+
+            consumed++;
         }
+
+        if (consumed <= 0)
+            return;
+
+        var poison = LightMechanic.CountWaterAttributeCells(Owner) * consumed;
+        if (poison <= 0)
+            return;
+
+        await PowerCmd.Apply<PoisonPower>(
+            choiceContext,
+            cardPlay.Target,
+            poison,
+            Owner.Creature,
+            this);
+    }
+
+    protected override void OnUpgrade()
+    {
+        DynamicVars["WaterLightGain"].UpgradeValueBy(1m);
+        DynamicVars["WaterLightConsume"].UpgradeValueBy(1m);
     }
 }

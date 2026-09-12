@@ -13,10 +13,13 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 结晶：敌人回合结束时失去 1% 生命�?/// </summary>
+/// 结晶：敌人回合结束时，每层造成 1 点固伤。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsCrystallizationPower : ModPowerTemplate
 {
+    private const decimal DamagePerStack = 1m;
+
     public override PowerType Type => PowerType.Debuff;
 
     public override PowerStackType StackType => PowerStackType.Counter;
@@ -29,14 +32,14 @@ public sealed class AlchemyStarsCrystallizationPower : ModPowerTemplate
         if (side != CombatSide.Enemy || Owner.IsDead || Amount <= 0)
             return;
 
-        var loss = Owner.MaxHp * 0.01m * Amount;
-        if (loss <= 0m)
+        var damage = DamagePerStack * Amount;
+        if (damage <= 0m)
             return;
 
         await CreatureCmd.Damage(
             choiceContext,
             Owner,
-            loss,
+            damage,
             ValueProp.Unblockable | ValueProp.Unpowered,
             null,
             null);

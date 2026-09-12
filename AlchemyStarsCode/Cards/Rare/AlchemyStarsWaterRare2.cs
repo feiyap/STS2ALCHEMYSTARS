@@ -113,6 +113,9 @@ public sealed class AlchemyStarsWaterRare2 : ModCardTemplate
         }
 
         var tax = AlchemyStarsCapitalTaxPower.TaxAmount;
+        if (Owner.Gold < tax)
+            return;
+
         await PlayerCmd.LoseGold(tax, Owner);
         AlchemyStarsCapitalTaxPower.RecordTax(this, tax);
     }

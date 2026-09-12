@@ -28,10 +28,11 @@ public sealed class AlchemyStarsVice : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Basic;
     private const TargetType CardTarget = TargetType.RandomEnemy;
     private const bool ShowInCardLibrary = true;
-    private const int BaseHitCount = 4;
+    private const int BaseHitCount = 5;
     private const int BonusHitCount = 1;
     private const int MaxWaterLightConsume = 2;
-    private const decimal HitDamage = 2m;
+    private const decimal HitDamage = 1m;
+    private const decimal LightDamageBonus = 1m;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -63,14 +64,22 @@ public sealed class AlchemyStarsVice : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        var hitCount = DynamicVars.CalculationBase.IntValue;
+        var consumed = 0;
         for (var n = 0; n < MaxWaterLightConsume; n++)
         {
             if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Water]))
                 break;
 
-            hitCount += DynamicVars.CalculationExtra.IntValue;
+            consumed++;
         }
+
+        var hitCount = DynamicVars.CalculationBase.IntValue;
+        if (consumed >= 2)
+            hitCount += DynamicVars.CalculationExtra.IntValue;
+
+        var hitDamage = DynamicVars.Damage.BaseValue;
+        if (consumed >= 1)
+            hitDamage += LightDamageBonus;
 
         for (var i = 0; i < hitCount; i++)
         {
@@ -83,7 +92,7 @@ public sealed class AlchemyStarsVice : ModCardTemplate
                 Owner,
                 this,
                 target,
-                DynamicVars.Damage.BaseValue,
+                hitDamage,
                 LightElement.Water,
                 cardPlay);
 
@@ -113,6 +122,6 @@ public sealed class AlchemyStarsVice : ModCardTemplate
         if (card.Owner == null)
             return 0m;
 
-        return Math.Min(MaxWaterLightConsume, LightMechanic.CountWaterLightEnergy(card.Owner));
+        return LightMechanic.CountWaterLightEnergy(card.Owner) >= MaxWaterLightConsume ? 1m : 0m;
     }
 }

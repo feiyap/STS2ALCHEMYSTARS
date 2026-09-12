@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 卡莲：回合结束时按转色栏水属性格数量获得格挡�?
+/// 卡莲：回合结束时按转色栏水属性格数量获得格挡。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsKarenGuardPower : ModPowerTemplate
@@ -25,7 +25,7 @@ public sealed class AlchemyStarsKarenGuardPower : ModPowerTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new BlockVar(5m, ValueProp.Move)
+        new BlockVar(4m, ValueProp.Move)
     ];
 
     public override async Task AfterSideTurnEnd(

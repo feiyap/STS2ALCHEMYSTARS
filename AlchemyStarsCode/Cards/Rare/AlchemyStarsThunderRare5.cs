@@ -17,7 +17,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ����֮�����������£��������ϣ�Ⱥ�����˲�ʩ�ӵ۹�������
+/// 帝国之雷·索尔拉德：需消耗雷光能；先造成全体雷伤，再施加帝国雷霆。升级时先上印记再攻击。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderRare5 : ModCardTemplate
@@ -30,6 +30,10 @@ public sealed class AlchemyStarsThunderRare5 : ModCardTemplate
     private const decimal HitDamage = 7m;
     private const int BaseHitCount = 1;
     private const int ImperialThunderApplyAmount = 99;
+
+    protected override bool IsPlayable => LightMechanic.HasThunderLightEnergy(Owner);
+
+    protected override bool ShouldGlowGoldInternal => IsPlayable;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -54,7 +58,6 @@ public sealed class AlchemyStarsThunderRare5 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.RighteousMajesty)),
         HoverTipFactory.FromPower<AlchemyStarsImperialThunderPower>()
     ];
@@ -66,14 +69,24 @@ public sealed class AlchemyStarsThunderRare5 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        LightMechanic.TryGrantLightEnergy(Owner, LightElement.Thunder);
+        if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
+            return;
+
+        if (IsUpgraded)
+            await ApplyImperialThunder(choiceContext);
 
         foreach (var enemy in CombatState!.HittableEnemies.ToList())
             await AttackEnemyWithRighteousMajesty(choiceContext, enemy, cardPlay);
 
+        if (!IsUpgraded)
+            await ApplyImperialThunder(choiceContext);
+    }
+
+    private async Task ApplyImperialThunder(PlayerChoiceContext choiceContext)
+    {
         await PowerCmd.Apply<AlchemyStarsImperialThunderPower>(
             choiceContext,
-            CombatState.HittableEnemies,
+            CombatState!.HittableEnemies,
             DynamicVars["AlchemyStarsImperialThunderPower"].BaseValue,
             Owner.Creature,
             this);
@@ -114,20 +127,20 @@ public sealed class AlchemyStarsThunderRare5 : ModCardTemplate
 
             await PowerCmd.Decrement(imperialThunder);
 
-            if (IsUpgraded && !enemy.IsDead)
-            {
-                var bonus = enemy.MaxHp * 0.07m;
-                if (bonus > 0m)
-                {
-                    await CreatureCmd.Damage(
-                        choiceContext,
-                        enemy,
-                        bonus,
-                        ValueProp.Unblockable | ValueProp.Unpowered,
-                        this,
-                        cardPlay);
-                }
-            }
+            if (enemy.IsDead)
+                continue;
+
+            var bonus = enemy.MaxHp * 0.07m;
+            if (bonus <= 0m)
+                continue;
+
+            await CreatureCmd.Damage(
+                choiceContext,
+                enemy,
+                bonus,
+                ValueProp.Unblockable | ValueProp.Unpowered,
+                this,
+                cardPlay);
         }
     }
 }

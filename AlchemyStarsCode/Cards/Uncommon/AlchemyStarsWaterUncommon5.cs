@@ -15,7 +15,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 小魔隐尾·贝菲尔：影镇茶话会；造成水属性伤害，消耗水光能时附加弗兰克爪击�?/// </summary>
+/// 小魔隐尾·贝菲尔：影镇茶话会；造成水属性伤害并施加爪击，可再消耗水光能额外施加爪击。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterUncommon5 : ModCardTemplate
 {
@@ -70,12 +71,19 @@ public sealed class AlchemyStarsWaterUncommon5 : ModCardTemplate
             LightElement.Water,
             cardPlay);
 
+        await PowerCmd.Apply<AlchemyStarsFrankClawPower>(
+            choiceContext,
+            cardPlay.Target,
+            DynamicVars["AlchemyStarsFrankClawPower"].BaseValue,
+            Owner.Creature,
+            this);
+
         if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Water]))
         {
             await PowerCmd.Apply<AlchemyStarsFrankClawPower>(
                 choiceContext,
                 cardPlay.Target,
-                DynamicVars["AlchemyStarsFrankClawPower"].BaseValue,
+                1m,
                 Owner.Creature,
                 this);
         }
@@ -83,6 +91,7 @@ public sealed class AlchemyStarsWaterUncommon5 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
+        DynamicVars.Damage.UpgradeValueBy(2m);
         DynamicVars["AlchemyStarsFrankClawPower"].UpgradeValueBy(1m);
     }
 }

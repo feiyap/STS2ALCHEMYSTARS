@@ -6,7 +6,6 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models.Powers;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
-using AlchemyStars.Mechanics;
 using AlchemyStars.Powers;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Keywords;
@@ -15,7 +14,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 球球雀雀·塔塔：获得飞行并对敌人施加虚弱；打出前已飞行则获得万色光能�?/// </summary>
+/// 球球雀雀·塔塔：获得飞行；仅打出前已飞行时对敌人施加虚弱。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterCommon1 : ModCardTemplate
 {
@@ -66,15 +66,15 @@ public sealed class AlchemyStarsWaterCommon1 : ModCardTemplate
             Owner.Creature,
             this);
 
+        if (!hadFlying)
+            return;
+
         await PowerCmd.Apply<WeakPower>(
             choiceContext,
             cardPlay.Target,
             DynamicVars.Weak.BaseValue,
             Owner.Creature,
             this);
-
-        if (hadFlying)
-            LightMechanic.TryGrantLightEnergy(Owner, LightElement.Prismatic);
     }
 
     protected override void OnUpgrade()

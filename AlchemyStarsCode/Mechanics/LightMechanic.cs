@@ -1071,6 +1071,48 @@ public static class LightMechanic
         TryConvertRandomNonElementCells(player, LightElement.Fire, maxCount);
 
     /// <summary>
+    /// 将非深色格转为火深色格；每转 1 格消耗 1 点火光能，光能不足则停止。
+    /// </summary>
+    public static int TryConvertNonDarkCellsToFireDark(Player player)
+    {
+        var state = GetActiveState(player);
+        if (state == null)
+            return 0;
+
+        var pending = state.AttributeCells.Items.Count(cell => cell.Kind != AttributeCellKind.Dark);
+        var converted = 0;
+        for (var n = 0; n < pending; n++)
+        {
+            if (!HasFireLightEnergy(player))
+                break;
+
+            state = GetActiveState(player);
+            if (state == null)
+                break;
+
+            var cells = state.AttributeCells.Items.ToList();
+            var index = cells.FindIndex(cell => cell.Kind != AttributeCellKind.Dark);
+            if (index < 0)
+                break;
+
+            var source = cells[index];
+            cells[index] = new AttributeCell(
+                LightElement.Fire,
+                AttributeCellKind.Dark,
+                source.EnhancedCardTypeName);
+            state.AttributeCells.ReplaceAll(cells);
+            LightMechanicUiBootstrap.RefreshForPlayer(player);
+
+            if (!TryConsumeLightEnergy(player, [LightElement.Fire]))
+                break;
+
+            converted++;
+        }
+
+        return converted;
+    }
+
+    /// <summary>
     /// 随机消耗最多 maxCount 点非火光能（含万色），每点生成 1 火属性格；返回成功生成的格数。
     /// </summary>
     public static int TryConvertRandomNonFireLightEnergyToFireCells(Player player, int maxCount)

@@ -14,7 +14,9 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 言绝：每获�?3 个森属性强化格，获�?1 层飞行�?/// </summary>
+/// 言绝：每获得 3 个森属性强化格，获得 Amount 层飞行。
+/// Amount = 份数（第二份起每次阈值结算给予更多飞行）。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsWordAbsolutePower : ModPowerTemplate
 {
@@ -24,7 +26,7 @@ public sealed class AlchemyStarsWordAbsolutePower : ModPowerTemplate
 
     public override PowerType Type => PowerType.Buff;
 
-    public override PowerStackType StackType => PowerStackType.Single;
+    public override PowerStackType StackType => PowerStackType.Counter;
 
     internal void NotifyEnhancedCellsGained(int count)
     {
@@ -55,10 +57,11 @@ public sealed class AlchemyStarsWordAbsolutePower : ModPowerTemplate
         while (_pendingEnhancedCells >= EnhancedCellsPerFlying)
         {
             _pendingEnhancedCells -= EnhancedCellsPerFlying;
+            var flyingAmount = Amount > 0m ? Amount : 1m;
             await PowerCmd.Apply<AlchemyStarsFlyingPower>(
                 choiceContext,
                 Owner,
-                1m,
+                flyingAmount,
                 Owner,
                 null);
         }

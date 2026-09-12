@@ -16,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 薇丝·空瞳：先古攻击。对所有敌人附加无时之印，按层数施加锁定并造成水属性伤害。
+/// 薇丝·空瞳：先古攻击。对所有敌人附加无时之印与固定锁定，再按印层数次造成水属性伤害。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsViceEmptyPupil : ModCardTemplate
@@ -27,8 +27,8 @@ public sealed class AlchemyStarsViceEmptyPupil : ModCardTemplate
     private const TargetType CardTarget = TargetType.AllEnemies;
     private const bool ShowInCardLibrary = true;
     private const int SealStacks = 5;
-    private const int SealStacksUpgradeBy = 2;
-    private const decimal HitDamage = 2m;
+    private const int LockStacks = 5;
+    private const decimal HitDamage = 1m;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -37,6 +37,7 @@ public sealed class AlchemyStarsViceEmptyPupil : ModCardTemplate
     [
         new DamageVar(HitDamage, ValueProp.Move),
         new PowerVar<AlchemyStarsTimelessSealPower>(SealStacks),
+        new PowerVar<AlchemyStarsLockPower>(LockStacks),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water),
         AlchemyStarsKeywordText.InlineTitleVar("LockTitle", AlchemyStarsKeywordIds.Lock),
         AlchemyStarsKeywordText.InlineTitleVar("TimelessSealTitle", AlchemyStarsKeywordIds.TimelessSeal)
@@ -73,20 +74,16 @@ public sealed class AlchemyStarsViceEmptyPupil : ModCardTemplate
             Owner.Creature,
             this);
 
-        // 先给全体上锁定，避免伤害循环中途中断导致后续敌人吃不到减益。
+        // 先给全体上固定锁定，避免伤害循环中途中断导致后续敌人吃不到减益。
         foreach (var enemy in enemies)
         {
             if (enemy.IsDead)
                 continue;
 
-            var sealAmount = enemy.GetPowerAmount<AlchemyStarsTimelessSealPower>();
-            if (sealAmount <= 0)
-                continue;
-
             await PowerCmd.Apply<AlchemyStarsLockPower>(
                 choiceContext,
                 enemy,
-                sealAmount,
+                DynamicVars["AlchemyStarsLockPower"].BaseValue,
                 Owner.Creature,
                 this);
         }
@@ -120,6 +117,6 @@ public sealed class AlchemyStarsViceEmptyPupil : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        DynamicVars["AlchemyStarsTimelessSealPower"].UpgradeValueBy(SealStacksUpgradeBy);
+        DynamicVars.Damage.UpgradeValueBy(1m);
     }
 }

@@ -17,7 +17,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 躁动炎雀·匹皮：消耗 1 张手牌，对目标施加易伤并获得飞行；已飞行则额外易伤；升级获能。
+/// 躁动炎雀·匹皮：消耗 1 张手牌并获得飞行；仅打出前已飞行时施加易伤；升级获能。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireCommon6 : ModCardTemplate
@@ -28,7 +28,6 @@ public sealed class AlchemyStarsFireCommon6 : ModCardTemplate
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
     private const decimal VulnerableAmount = 1m;
-    private const decimal ExtraVulnerableWhenFlying = 1m;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -79,16 +78,16 @@ public sealed class AlchemyStarsFireCommon6 : ModCardTemplate
         }
 
         var hadFlying = Owner.Creature.GetPowerAmount<AlchemyStarsFlyingPower>() > 0;
-        var vulnerable = DynamicVars.Vulnerable.BaseValue;
-        if (hadFlying)
-            vulnerable += ExtraVulnerableWhenFlying;
 
-        await PowerCmd.Apply<VulnerablePower>(
-            choiceContext,
-            cardPlay.Target,
-            vulnerable,
-            Owner.Creature,
-            this);
+        if (hadFlying)
+        {
+            await PowerCmd.Apply<VulnerablePower>(
+                choiceContext,
+                cardPlay.Target,
+                DynamicVars.Vulnerable.BaseValue,
+                Owner.Creature,
+                this);
+        }
 
         await PowerCmd.Apply<AlchemyStarsFlyingPower>(
             choiceContext,

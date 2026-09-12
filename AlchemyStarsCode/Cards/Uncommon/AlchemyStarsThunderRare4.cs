@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 霹雳皎蛇·芙罗琳：获得雷光能；可消耗雷光能使下一张雷属性牌额外打出。
+/// 霹雳皎蛇·芙罗琳：获得雷光能；可消耗雷光能使接下来的雷属性牌各额外打出 1 次。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderRare4 : ModCardTemplate

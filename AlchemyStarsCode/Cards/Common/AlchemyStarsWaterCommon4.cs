@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.RestSite;
@@ -12,6 +13,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
 using AlchemyStars.Mechanics;
+using AlchemyStars.Powers;
 using AlchemyStars.RestSite;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Keywords;
@@ -20,7 +22,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 豪荣铁颚·巴顿：军团长；全体失去生命，获得水光能与覆甲。
+/// 豪荣铁颚·巴顿：军团长；获得水光能与格挡，可选耗水光能向每名敌人随机施加异常。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterCommon4 : ModCardTemplate
@@ -28,20 +30,22 @@ public sealed class AlchemyStarsWaterCommon4 : ModCardTemplate
     private const int BaseEnergyCost = 1;
     private const CardType CardKind = CardType.Skill;
     private const CardRarity CardRarityValue = CardRarity.Common;
-    private const TargetType CardTarget = TargetType.AllEnemies;
+    private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const decimal HpLoss = 4m;
-    private const int WaterEnergyGain = 2;
-    private const decimal BasePlating = 2m;
-    private const decimal PlatingUpgradeBy = 2m;
+    private const int BaseWaterEnergyGain = 1;
+    private const int WaterEnergyGainUpgradeBy = 1;
+    private const decimal BaseStatusAmount = 1m;
+
+    public override bool GainsBlock => true;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new HpLossVar(HpLoss),
-        new PowerVar<PlatingPower>(BasePlating),
+        new IntVar("WaterLightGain", BaseWaterEnergyGain),
+        new BlockVar(4m, ValueProp.Move),
+        new PowerVar<AlchemyStarsTremorPower>(BaseStatusAmount),
         AlchemyStarsKeywordText.InlineTitleVar("LegionCommander", AlchemyStarsKeywordIds.LegionCommander),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
     ];
@@ -58,7 +62,12 @@ public sealed class AlchemyStarsWaterCommon4 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LegionCommander)),
-        HoverTipFactory.FromPower<PlatingPower>()
+        HoverTipFactory.FromPower<DexterityPower>(),
+        HoverTipFactory.FromPower<AlchemyStarsTremorPower>(),
+        HoverTipFactory.FromPower<AlchemyStarsFrankClawPower>(),
+        HoverTipFactory.FromPower<AlchemyStarsVelvetNeedlePower>(),
+        HoverTipFactory.FromPower<PoisonPower>(),
+        HoverTipFactory.FromPower<AlchemyStarsDragonFangMarkPower>()
     ];
 
     public AlchemyStarsWaterCommon4()
@@ -71,33 +80,61 @@ public sealed class AlchemyStarsWaterCommon4 : ModCardTemplate
         await AlchemyStarsCardHelpers.TryApplyLegionCommanderStat<DexterityPower>(
             choiceContext, Owner, this);
 
+        LightMechanic.TryGrantLightEnergyMany(
+            Owner,
+            LightElement.Water,
+            DynamicVars["WaterLightGain"].IntValue);
+
+        await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
+
+        if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Water]))
+            return;
+
+        var amount = DynamicVars["AlchemyStarsTremorPower"].BaseValue;
         foreach (var enemy in CombatState!.HittableEnemies.ToList())
         {
             if (enemy.IsDead)
                 continue;
 
-            await CreatureCmd.Damage(
-                choiceContext,
-                enemy,
-                HpLoss,
-                ValueProp.Unblockable | ValueProp.Unpowered | ValueProp.Move,
-                this,
-                cardPlay);
+            await ApplyRandomStatus(choiceContext, enemy, amount);
         }
+    }
 
-        LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Water, WaterEnergyGain);
-
-        await PowerCmd.Apply<PlatingPower>(
-            choiceContext,
-            Owner.Creature,
-            DynamicVars["PlatingPower"].BaseValue,
-            Owner.Creature,
-            this);
+    private async Task ApplyRandomStatus(
+        PlayerChoiceContext choiceContext,
+        Creature enemy,
+        decimal amount)
+    {
+        var roll = Owner.RunState.Rng.CombatTargets.NextInt(5);
+        switch (roll)
+        {
+            case 0:
+                await PowerCmd.Apply<AlchemyStarsTremorPower>(
+                    choiceContext, enemy, amount, Owner.Creature, this);
+                break;
+            case 1:
+                await PowerCmd.Apply<AlchemyStarsFrankClawPower>(
+                    choiceContext, enemy, amount, Owner.Creature, this);
+                break;
+            case 2:
+                await PowerCmd.Apply<AlchemyStarsVelvetNeedlePower>(
+                    choiceContext, enemy, amount, Owner.Creature, this);
+                break;
+            case 3:
+                await PowerCmd.Apply<PoisonPower>(
+                    choiceContext, enemy, amount, Owner.Creature, this);
+                break;
+            default:
+                await PowerCmd.Apply<AlchemyStarsDragonFangMarkPower>(
+                    choiceContext, enemy, amount, Owner.Creature, this);
+                break;
+        }
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars["PlatingPower"].UpgradeValueBy(PlatingUpgradeBy);
+        DynamicVars["WaterLightGain"].UpgradeValueBy(WaterEnergyGainUpgradeBy);
+        DynamicVars["AlchemyStarsTremorPower"].UpgradeValueBy(1m);
     }
 
     public override bool TryModifyRestSiteOptions(Player player, ICollection<RestSiteOption> options)

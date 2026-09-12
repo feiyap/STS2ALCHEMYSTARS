@@ -17,20 +17,19 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 壮志凌云·巴顿：篝火合成产物（先古，不进空裔卡池）；全体 2×6 万色伤，获得 2 点万色光能并转化 2 格为万色。
+/// 壮志凌云·巴顿：篝火合成产物（先古，不进空裔卡池）；全体 2 次万色伤，获得万色光能并转化格子。
 /// </summary>
 [RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsWaterRareBarton : ModCardTemplate
 {
-    private const int BaseEnergyCost = 2;
+    private const int BaseEnergyCost = 1;
     private const CardType CardKind = CardType.Skill;
     private const CardRarity CardRarityValue = CardRarity.Ancient;
-    private const int PrismaticEnergyGain = 2;
-    private const int PrismaticCellConvert = 2;
+    private const int PrismaticEnergyGain = 1;
     private const TargetType CardTarget = TargetType.AllEnemies;
     private const bool ShowInCardLibrary = true;
     private const int HitCount = 2;
-    private const decimal HitDamage = 6m;
+    private const decimal HitDamage = 4m;
 
     public override bool CanBeGeneratedInCombat => false;
 
@@ -43,6 +42,7 @@ public sealed class AlchemyStarsWaterRareBarton : ModCardTemplate
     [
         new DamageVar(HitDamage, ValueProp.Move),
         new RepeatVar(HitCount),
+        new IntVar("PrismaticGain", PrismaticEnergyGain),
         AlchemyStarsKeywordText.InlineTitleVar("RebellionBurning", AlchemyStarsKeywordIds.RebellionBurning),
         AlchemyStarsKeywordText.InlineTitleVar("PrismaticTitle", AlchemyStarsKeywordIds.Prismatic),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
@@ -85,12 +85,15 @@ public sealed class AlchemyStarsWaterRareBarton : ModCardTemplate
             }
         }
 
-        LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Prismatic, PrismaticEnergyGain);
-        LightMechanic.TryConvertRandomNonElementCells(Owner, LightElement.Prismatic, PrismaticCellConvert);
+        var prismaticGain = DynamicVars["PrismaticGain"].IntValue;
+        LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Prismatic, prismaticGain);
+        LightMechanic.TryConvertRandomNonElementCells(Owner, LightElement.Prismatic, prismaticGain);
     }
 
     protected override void OnUpgrade()
     {
+        DynamicVars.Damage.UpgradeValueBy(2m);
+        DynamicVars["PrismaticGain"].UpgradeValueBy(1m);
         AddKeyword(CardKeyword.Retain);
     }
 }

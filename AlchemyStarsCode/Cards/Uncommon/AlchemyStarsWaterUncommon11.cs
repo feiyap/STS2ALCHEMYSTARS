@@ -15,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 影狼逆齿·休拉德：需水光能打出，造成水属性伤害并施加原版缓慢。多人模式。
+/// 影狼逆齿·休拉德：耗 1 点水光能造成伤害并施加缓慢。多人模式。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterUncommon11 : ModCardTemplate
@@ -26,6 +26,7 @@ public sealed class AlchemyStarsWaterUncommon11 : ModCardTemplate
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
     private const decimal BaseDamage = 4m;
+    private const decimal BaseSlow = 1m;
 
     public override CardMultiplayerConstraint MultiplayerConstraint =>
         CardMultiplayerConstraint.MultiplayerOnly;
@@ -40,6 +41,7 @@ public sealed class AlchemyStarsWaterUncommon11 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new DamageVar(BaseDamage, ValueProp.Move),
+        new PowerVar<SlowPower>(BaseSlow),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
     ];
 
@@ -63,25 +65,24 @@ public sealed class AlchemyStarsWaterUncommon11 : ModCardTemplate
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
-        if (IsUpgraded)
-            LightMechanic.TryGrantLightEnergy(Owner, LightElement.Water);
+        if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Water]))
+            return;
 
-        LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Water]);
-
-        await LightMechanic.DealElementalAttackDamage(
-            choiceContext,
-            Owner,
-            this,
-            cardPlay.Target,
-            DynamicVars.Damage.BaseValue,
-            LightElement.Water,
-            cardPlay);
+        await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
+            .FromCard(this, cardPlay)
+            .Targeting(cardPlay.Target)
+            .Execute(choiceContext);
 
         await PowerCmd.Apply<SlowPower>(
             choiceContext,
             cardPlay.Target,
-            1m,
+            DynamicVars["SlowPower"].BaseValue,
             Owner.Creature,
             this);
+    }
+
+    protected override void OnUpgrade()
+    {
+        DynamicVars["SlowPower"].UpgradeValueBy(1m);
     }
 }

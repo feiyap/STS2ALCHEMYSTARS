@@ -16,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 逐焰黑犬·哈提：需有效火属性格不少于 2 个；对所有敌人造成火伤并将灼伤放入弃牌堆。
+/// 逐焰黑犬·哈提：需有效火属性格不少于 1 个；对所有敌人造成火伤并将灼伤放入弃牌堆。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireCommon5 : ModCardTemplate
@@ -26,7 +26,7 @@ public sealed class AlchemyStarsFireCommon5 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.AllEnemies;
     private const bool ShowInCardLibrary = true;
-    private const int RequiredFireCells = 2;
+    private const int RequiredFireCells = 1;
     private const int BurnGain = 2;
 
     protected override bool IsPlayable =>

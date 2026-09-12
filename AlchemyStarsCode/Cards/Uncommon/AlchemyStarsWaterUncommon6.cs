@@ -6,10 +6,8 @@ using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
-using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
-using AlchemyStars.Mechanics;
 using AlchemyStars.Powers;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Keywords;
@@ -31,8 +29,6 @@ public sealed class AlchemyStarsWaterUncommon6 : ModCardTemplate
     private const int BaseDarkTurns = 1;
     private const int DarkTurnsUpgradeBy = 1;
     private const int ReturnTurns = 2;
-
-    public override bool GainsBlock => true;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -71,10 +67,6 @@ public sealed class AlchemyStarsWaterUncommon6 : ModCardTemplate
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         await TryPickFromDrawPile(choiceContext);
-
-        var block = LightMechanic.CountEffectiveWaterCells(Owner);
-        if (block > 0)
-            await CreatureCmd.GainBlock(Owner.Creature, new BlockVar(block, ValueProp.Move), cardPlay);
 
         var power = await PowerCmd.Apply<AlchemyStarsTinaTurnStartPower>(
             choiceContext,

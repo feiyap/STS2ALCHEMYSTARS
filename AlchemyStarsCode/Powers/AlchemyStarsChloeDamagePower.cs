@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
@@ -10,13 +9,16 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 哀伤之弦：获得 15% 伤害加成�?/// </summary>
+/// 哀伤之弦：每份使攻击伤害提升 50%。Amount = 份数。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsChloeDamagePower : ModPowerTemplate
 {
+    private const decimal DamageBonusPerCopy = 0.5m;
+
     public override PowerType Type => PowerType.Buff;
 
-    public override PowerStackType StackType => PowerStackType.Single;
+    public override PowerStackType StackType => PowerStackType.Counter;
 
     public override decimal ModifyDamageMultiplicative(
         Creature? target,
@@ -29,6 +31,7 @@ public sealed class AlchemyStarsChloeDamagePower : ModPowerTemplate
         if (dealer != Owner || !props.IsPoweredAttack())
             return 1m;
 
-        return 1.15m;
+        var copies = Amount > 0m ? Amount : 1m;
+        return 1m + copies * DamageBonusPerCopy;
     }
 }

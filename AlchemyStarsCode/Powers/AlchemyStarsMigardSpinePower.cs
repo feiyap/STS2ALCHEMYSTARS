@@ -21,21 +21,11 @@ public sealed class AlchemyStarsMigardSpinePower : ModPowerTemplate
 {
     private const decimal BonusDamage = 4m;
 
-    private bool _executeOnLowHp;
     private bool _isResolving;
 
     public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Single;
-
-    /// <summary>
-    /// 升级弥加德后启用：额外伤害结算后，若目标生命低于 10% 则斩杀。
-    /// </summary>
-    public void ConfigureExecuteOnLowHp(bool enabled)
-    {
-        if (enabled)
-            _executeOnLowHp = true;
-    }
 
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
@@ -67,8 +57,7 @@ public sealed class AlchemyStarsMigardSpinePower : ModPowerTemplate
                     cardPlay: null,
                     playAttackerAnim: false);
 
-                if (_executeOnLowHp)
-                    await AlchemyStarsCardHelpers.TryExecuteBelowHpThreshold(choiceContext, target);
+                await AlchemyStarsCardHelpers.TryExecuteBelowHpThreshold(choiceContext, target);
             }
 
             LightMechanic.TryEnhanceRandomUnenhancedCell(player);

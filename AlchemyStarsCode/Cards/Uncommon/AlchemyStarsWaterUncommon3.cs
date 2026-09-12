@@ -28,7 +28,6 @@ public sealed class AlchemyStarsWaterUncommon3 : ModCardTemplate
     private const TargetType CardTarget = TargetType.AllEnemies;
     private const bool ShowInCardLibrary = true;
     private const decimal BaseDamage = 6m;
-    private const int UpgradeDebuffAmount = 2;
 
     protected override bool IsPlayable => LightMechanic.HasWaterLightEnergy(Owner);
 
@@ -100,17 +99,12 @@ public sealed class AlchemyStarsWaterUncommon3 : ModCardTemplate
                     Owner.Creature,
                     this);
             }
-
-            if (IsUpgraded)
-            {
-                await AlchemyStarsCardHelpers.TryApplyRandomDebuff(
-                    choiceContext,
-                    enemy,
-                    UpgradeDebuffAmount,
-                    Owner.Creature,
-                    this);
-            }
         }
+    }
+
+    protected override void OnUpgrade()
+    {
+        DynamicVars.Damage.UpgradeValueBy(2m);
     }
 
     /// <summary>
