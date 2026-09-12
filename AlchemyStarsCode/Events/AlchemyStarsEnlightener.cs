@@ -12,9 +12,16 @@ namespace AlchemyStars.Events;
 public sealed class AlchemyStarsEnlightener : ModAncientEventTemplate
 {
     public const string EventEntry = "ALCHEMY_STARS_ENLIGHTENER";
+    public const string PortraitPath = $"{Entry.ResPath}/images/events/AlchemyStarsEnlightener.png";
 
     public override LocString InitialDescription =>
         L10NLookup($"{EventEntry}.pages.INITIAL.description");
+
+    public override EventAssetProfile AssetProfile => new(
+        InitialPortraitPath: PortraitPath);
+
+    public override AncientEventPresentationAssetProfile AncientPresentationAssetProfile => new(
+        StageProcedural: CreateStageVisuals());
 
     public override bool IsValidForAct(ActModel act) => false;
 
@@ -23,4 +30,12 @@ public sealed class AlchemyStarsEnlightener : ModAncientEventTemplate
     public override IEnumerable<EventOption> AllPossibleOptions => [];
 
     protected override IReadOnlyList<EventOption> GenerateInitialOptions() => [];
+
+    /// <summary>
+    /// 用启迪者立绘铺满先古事件舞台。
+    /// </summary>
+    public static AncientEventStageProceduralVisualSet CreateStageVisuals() =>
+        AncientEventStageProceduralVisualSetBuilder.Create()
+            .Background(cues => cues.Single("loop", PortraitPath))
+            .Build();
 }

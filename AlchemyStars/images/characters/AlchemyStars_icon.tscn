@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://mnmqexvg7x2m"]
+
+[ext_resource type="Texture2D" uid="uid://bl7a8wdws2a01" path="res://AlchemyStars/images/characters/AlchemyStars_icon.png" id="1_nwfcc"]
+
+[node name="AlchemyStarsIcon" type="TextureRect"]
+texture = ExtResource("1_nwfcc")

@@ -1,4 +1,5 @@
 using System.Reflection;
+using AlchemyStars.Cards;
 using AlchemyStars.Mechanics;
 using AlchemyStars.Patches;
 using AlchemyStars.Patches.Enlightener;
@@ -39,6 +40,7 @@ public partial class Entry
 
         // 注册战斗左侧的光能 / 转色栏 UI。
         LightMechanicUiBootstrap.Register();
+        AlchemyStarsCardArtSettingsStore.Register();
 
         var patcher = RitsuLibFramework.CreatePatcher(ModId, "core");
         patcher.RegisterPatch<ArchaicToothTransformRemainingStartersPatch>();
@@ -46,6 +48,10 @@ public partial class Entry
         patcher.RegisterPatch<UpgradedCardPortraitPathPatch>();
         patcher.RegisterPatch<UpgradedCardAllPortraitPathsPatch>();
         patcher.RegisterPatch<UpgradedCardArtReloadPatch>();
+        patcher.RegisterPatch<InspectCardAlternateArtReadyPatch>();
+        patcher.RegisterPatch<InspectCardAlternateArtSetCardPatch>();
+        patcher.RegisterPatch<InspectCardAlternateArtUpdateDisplayPatch>();
+        patcher.RegisterPatch<InspectCardAlternateArtOpenClosePatch>();
         patcher.RegisterPatch<EnlightenerFollowUpDonePatch>();
         patcher.RegisterPatch<EnlightenerRefreshVisualPatch>();
         RitsuLibFramework.ApplyRequiredPatcher(patcher, DisableMod);

@@ -1,6 +1,7 @@
 using AlchemyStars.Keywords;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using STS2RitsuLib.Interop.AutoRegistration;
+using STS2RitsuLib.Scaffolding.Content;
 
 namespace AlchemyStars.Cards;
 
@@ -11,4 +12,7 @@ namespace AlchemyStars.Cards;
 public sealed class AlchemyStarsEnlightenerChoiceMuYuebai : AlchemyStarsEnlightenerChoiceCardBase
 {
     protected override string AttributeKeywordId => AlchemyStarsKeywordIds.Water;
+
+    public override CardAssetProfile AssetProfile => new(
+        PortraitPath: $"{Entry.ResPath}/images/cards/AlchemyStarsEnlightenerChoiceMuYuebai.png");
 }

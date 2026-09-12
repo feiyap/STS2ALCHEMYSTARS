@@ -51,6 +51,8 @@ public sealed class AlchemyStarsCharacter : ModCharacterTemplate<AlchemyStarsCar
             IconTexturePath: $"{ImageRoot}/AlchemyStars_character_icon.png",
             // 人物头像轮廓。
             IconOutlineTexturePath: $"{ImageRoot}/AlchemyStars_character_icon_outline.png",
+            // 游戏左上角头像、角色统计页头像、每日挑战角色头像。这个是场景而不是图片。参考下方附赠资源搭建。
+            IconPath: $"{ImageRoot}/AlchemyStars_icon.tscn",
             // 人物选择背景。
             CharacterSelectBgPath: CharacterSelectBgScenePath,
             // 人物选择图标。
@@ -58,7 +60,12 @@ public sealed class AlchemyStarsCharacter : ModCharacterTemplate<AlchemyStarsCar
             // 人物选择图标-锁定状态。
             CharacterSelectLockedIconPath: $"{ImageRoot}/AlchemyStars_character_select_locked.png",
             // 地图上的角色标记图标、表情轮盘上的角色头像。
-            MapMarkerPath: $"{ImageRoot}/AlchemyStars_map_marker.png"));
+            MapMarkerPath: $"{ImageRoot}/AlchemyStars_map_marker.png"),
+        Multiplayer: new CharacterMultiplayerAssetSet(
+            ArmPointingTexturePath: $"{ImageRoot}/AlchemyStars_hand_point.png",
+            ArmRockTexturePath: $"{ImageRoot}/AlchemyStars_hand_rock.png",
+            ArmPaperTexturePath: $"{ImageRoot}/AlchemyStars_hand_paper.png",
+            ArmScissorsTexturePath: $"{ImageRoot}/AlchemyStars_hand_scissors.png"));
 
     // 某个字段没写时，RitsuLib 会从占位角色配置里补齐。
     public override string? PlaceholderCharacterId => "ironclad";

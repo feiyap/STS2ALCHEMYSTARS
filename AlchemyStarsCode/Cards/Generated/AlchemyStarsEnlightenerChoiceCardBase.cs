@@ -9,9 +9,9 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ??? A/B ???????????????????????
+/// 启迪者锁属性展示牌：状态牌，卡图按先古样式展示。
 /// </summary>
-public abstract class AlchemyStarsEnlightenerChoiceCardBase : ModCardTemplate
+public abstract class AlchemyStarsEnlightenerChoiceCardBase : ModCardTemplate, IAncientCardArtStyle
 {
     private const int BaseEnergyCost = -1;
     private const CardType CardKind = CardType.Status;
@@ -24,10 +24,6 @@ public abstract class AlchemyStarsEnlightenerChoiceCardBase : ModCardTemplate
     public override bool CanBeGeneratedInCombat => false;
 
     public override CardPoolModel VisualCardPool => ModelDb.CardPool<ColorlessCardPool>();
-
-    // ???????????????????????
-    public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/AlchemyStarsShoot.png");
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [

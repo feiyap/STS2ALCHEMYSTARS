@@ -34,6 +34,12 @@ internal static class LightMechanicUiAssets
         _ => $"{CellDir}/forest_cell.png",
     };
 
+    /// <summary>属性格出现时的光点贴图。</summary>
+    public static string CellSparkPath => $"{CellDir}/cell_spark.png";
+
+    /// <summary>属性格出现时的光线贴图。</summary>
+    public static string CellRayPath => $"{CellDir}/cell_ray.png";
+
     public static Texture2D? Load(string path)
     {
         if (Cache.TryGetValue(path, out var cached))

@@ -37,7 +37,7 @@ public sealed class AlchemyStarsWaterRareBarton : ModCardTemplate
     public override CardPoolModel VisualCardPool => ModelDb.CardPool<AlchemyStarsCardPool>();
 
     public override CardAssetProfile AssetProfile => new(
-        PortraitPath: $"{Entry.ResPath}/images/cards/AlchemyStarsWaterCommon4.png");
+        PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
