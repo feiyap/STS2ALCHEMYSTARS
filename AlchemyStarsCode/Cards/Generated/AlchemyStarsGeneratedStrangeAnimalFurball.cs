@@ -65,6 +65,8 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalFurball : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         await PlayerCmd.GainEnergy(DynamicVars.Energy.IntValue, Owner);
     }
 

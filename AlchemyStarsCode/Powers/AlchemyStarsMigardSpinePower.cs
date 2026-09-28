@@ -17,7 +17,7 @@ namespace AlchemyStars.Powers;
 /// 潜庭之脊：攻击时附加森属性伤害，并随机强化属性栏中一格。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsMigardSpinePower : ModPowerTemplate
+public sealed class AlchemyStarsMigardSpinePower : AlchemyStarsPowerBase
 {
     private const decimal BonusDamage = 4m;
 

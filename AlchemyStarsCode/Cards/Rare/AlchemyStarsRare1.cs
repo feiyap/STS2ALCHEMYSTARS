@@ -42,6 +42,8 @@ public sealed class AlchemyStarsRare1 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
+
         var power = await PowerCmd.Apply<AlchemyStarsAwakeningFormPower>(
             choiceContext,
             Owner.Creature,

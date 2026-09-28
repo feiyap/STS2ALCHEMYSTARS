@@ -84,7 +84,7 @@
   "ALCHEMY_STARS_KEYWORD_THUNDER_MONOCHROME.description": "这张牌不造成伤害，但在攻击后会为敌人施加破绽，并且能触发所有攻击特效。",
   "ALCHEMY_STARS_KEYWORD_FLAW.title": "破绽",
   "ALCHEMY_STARS_KEYWORD_FLAW.description": "每层破绽被队友攻击命中时破碎，以你为伤害来源对其造成 1 点雷属性伤害，并使所有人获得 5 金币。",
-  "ALCHEMY_STARS_KEYWORD_GOLDEN_SCALE_STAR.title": "金泽之星",
+  "ALCHEMY_STARS_KEYWORD_GOLDEN_SCALE_STAR.title": "灿星天秤",
   "ALCHEMY_STARS_KEYWORD_GOLDEN_SCALE_STAR.description": "只能对队友使用，且你的血量必须高于目标才能打出。",
   "ALCHEMY_STARS_KEYWORD_FOREST.title": "森",
   "ALCHEMY_STARS_KEYWORD_FOREST.description": "森属性。",
@@ -107,7 +107,7 @@
   "ALCHEMY_STARS_KEYWORD_EMERALD_MARK.title": "碧翠印记",
   "ALCHEMY_STARS_KEYWORD_EMERALD_MARK.description": "每 1 层印记增加 2% 的伤害。",
   "ALCHEMY_STARS_KEYWORD_PAPER_WOUND.title": "纸伤",
-  "ALCHEMY_STARS_KEYWORD_PAPER_WOUND.description": "每层[gold]纸伤[/gold]使其受到伤害时减少 2 点生命上限。",
+  "ALCHEMY_STARS_KEYWORD_PAPER_WOUND.description": "每层[gold]纸伤[/gold]使其受到伤害时减少 1 点生命上限。",
   "ALCHEMY_STARS_KEYWORD_HARVEST_CONSCIOUSNESS.title": "收割意识",
   "ALCHEMY_STARS_KEYWORD_HARVEST_CONSCIOUSNESS.description": "每层[gold]收割意识[/gold]都会使 10% 伤害穿透格挡。超过 10 层时，转为增加 10% 伤害。未拥有格挡的敌人，每 1 层[gold]收割意识[/gold]使其多受到 10% 伤害。",
   "ALCHEMY_STARS_KEYWORD_NORTHERN_REALM.title": "北境之力",
@@ -159,9 +159,7 @@
   "ALCHEMY_STARS_KEYWORD_CLEAR_ALL.title": "全部消除！",
   "ALCHEMY_STARS_KEYWORD_CLEAR_ALL.description": "将非[gold]深色格[/gold]转为火属性[gold]深色格[/gold]，每转 1 格消耗{fireLightPrefix:lightIcons(1)}。",
   "ALCHEMY_STARS_KEYWORD_HIGH_NOON.title": "午时已到",
-  "ALCHEMY_STARS_KEYWORD_HIGH_NOON.description": "这张卡的子弹数量增加[gold]消耗牌堆[/gold]数量。",
-  "ALCHEMY_STARS_KEYWORD_NO_SURVIVORS.title": "无人生还",
-  "ALCHEMY_STARS_KEYWORD_NO_SURVIVORS.description": "这张牌会[gold]消耗[/gold]全部灼燃层数，每 [blue]1[/blue] 层提供 [blue]15%[/blue] 伤害加成。",
+  "ALCHEMY_STARS_KEYWORD_HIGH_NOON.description": "这张卡的子弹数量等于[gold]消耗牌堆[/gold]数量。",
   "ALCHEMY_STARS_KEYWORD_DEAD_CELEBRATION.title": "亡者庆典",
   "ALCHEMY_STARS_KEYWORD_DEAD_CELEBRATION.description": "[gold]消耗[/gold]一半的卡组（[gold]抽牌堆[/gold]与[gold]弃牌堆[/gold]），优先[gold]消耗[/gold][gold]状态[/gold]牌与[purple]诅咒[/purple]牌。",
   "ALCHEMY_STARS_KEYWORD_BOX_MELODY.title": "箱中之音",
@@ -169,5 +167,7 @@
   "ALCHEMY_STARS_KEYWORD_SPIRIT_STAFF_BLESSING.title": "灵杖庇佑",
   "ALCHEMY_STARS_KEYWORD_SPIRIT_STAFF_BLESSING.description": "恢复 [blue]4[/blue] 点体力。",
   "ALCHEMY_STARS_KEYWORD_LIGHT_SWORD_ARMOR.title": "光之剑甲",
-  "ALCHEMY_STARS_KEYWORD_LIGHT_SWORD_ARMOR.description": "拥有 [blue]10[/blue] 血量，帮助抵挡所有伤害的剑甲。"
+  "ALCHEMY_STARS_KEYWORD_LIGHT_SWORD_ARMOR.description": "拥有 [blue]10[/blue] 血量，帮助抵挡所有伤害的剑甲。",
+  "ALCHEMY_STARS_KEYWORD_MOBIUS_COMBO.title": "莫比乌斯连招",
+  "ALCHEMY_STARS_KEYWORD_MOBIUS_COMBO.description": "火火火火：获得 [blue]1[/blue] 点力量\n水水水水：恢复 [blue]2[/blue] HP\n雷雷雷雷：接下来的 [blue]2[/blue] 张攻击牌额外攻击 [blue]1[/blue] 次\n森森森森：获得 [blue]1[/blue] 点敏捷\n森火雷：灼烧所有敌人 [blue]3[/blue] 回合，永久降低它们 [blue]1[/blue] 点力量\n火水雷：为所有敌人施加缓慢，永久降低它们 [blue]1[/blue] 点力量\n雷森水：击晕所有敌人，永久降低它们 [blue]1[/blue] 点力量\n万色万色万色：对所有敌人造成 [blue]40[/blue] 点万色属性伤害"
 }

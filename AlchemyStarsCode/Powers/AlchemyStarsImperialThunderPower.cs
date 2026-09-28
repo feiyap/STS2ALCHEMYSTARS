@@ -11,7 +11,7 @@ namespace AlchemyStars.Powers;
 /// 帝国雷霆：正道威严等效果的目标标记，层数上限 99。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsImperialThunderPower : ModPowerTemplate
+public sealed class AlchemyStarsImperialThunderPower : AlchemyStarsPowerBase
 {
     public const int MaxStacks = 99;
 

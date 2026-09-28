@@ -83,6 +83,8 @@ public sealed class AlchemyStarsKarenBrightSoul : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         if (AlchemyStarsCardHelpers.HasOtherTagInHand(this, Owner, AlchemyStarsCardTags.HighCourtGuard))
             await PlayerCmd.GainEnergy(1, Owner);
 

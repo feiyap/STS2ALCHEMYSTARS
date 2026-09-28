@@ -66,6 +66,8 @@ public sealed class AlchemyStarsGeneratedStrangeAnimalBica : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         var selected = (await CardSelectCmd.FromHand(
             choiceContext,
             Owner,

@@ -16,7 +16,7 @@ namespace AlchemyStars.Powers;
 /// 结晶：敌人回合结束时，每层造成 1 点固伤。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsCrystallizationPower : ModPowerTemplate
+public sealed class AlchemyStarsCrystallizationPower : AlchemyStarsPowerBase
 {
     private const decimal DamagePerStack = 1m;
 

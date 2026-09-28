@@ -16,7 +16,7 @@ namespace AlchemyStars.Powers;
 /// 灼燃：增强下次火属性伤害 20%（灼灼海棠下额外 +20%），并消耗 1 层。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsIgnitionPower : ModPowerTemplate
+public sealed class AlchemyStarsIgnitionPower : AlchemyStarsPowerBase
 {
     public const decimal BaseBonusRate = 0.2m;
     public const decimal BegoniaExtraRate = 0.2m;

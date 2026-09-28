@@ -55,6 +55,8 @@ public sealed class AlchemyStarsFireCommon3 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         LightMechanic.TryGrantLightEnergy(Owner, LightElement.Fire);
         await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
 

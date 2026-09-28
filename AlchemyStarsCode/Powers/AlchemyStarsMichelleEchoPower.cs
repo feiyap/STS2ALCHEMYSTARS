@@ -17,7 +17,7 @@ namespace AlchemyStars.Powers;
 /// <summary>
 /// 静默雷霆：回合结束时再次对所有敌人造成等值雷属性伤害�?/// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsMichelleEchoPower : ModPowerTemplate
+public sealed class AlchemyStarsMichelleEchoPower : AlchemyStarsPowerBase
 {
     private decimal _echoDamage;
 

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AlchemyStars.Mechanics;
 using MegaCrit.Sts2.Core.Combat;
@@ -17,7 +17,7 @@ namespace AlchemyStars.Powers;
 /// 审判：受到雷属性伤害时自身 +1 层；到达 25 层时眩晕并移除所有审判；回合结束时 -1 层。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsJudgmentPower : ModPowerTemplate
+public sealed class AlchemyStarsJudgmentPower : AlchemyStarsPowerBase
 {
     private const int StunThreshold = 25;
 

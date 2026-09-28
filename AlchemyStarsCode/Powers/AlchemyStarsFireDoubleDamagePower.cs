@@ -15,7 +15,7 @@ namespace AlchemyStars.Powers;
 /// 本回合内火属性伤害翻倍（千痕影主）。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsFireDoubleDamagePower : ModPowerTemplate
+public sealed class AlchemyStarsFireDoubleDamagePower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 

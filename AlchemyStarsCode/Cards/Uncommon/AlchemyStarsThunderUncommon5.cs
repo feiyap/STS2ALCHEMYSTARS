@@ -64,6 +64,8 @@ public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         if (await AlchemyStarsCardHelpers.TryConsumeOverloadFromHand(choiceContext, Owner))
             await PlayerCmd.GainEnergy(OverloadEnergyGain, Owner);
 

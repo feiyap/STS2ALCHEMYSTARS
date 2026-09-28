@@ -53,6 +53,8 @@ public sealed class AlchemyStarsThunderCommon6 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
 
         if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))

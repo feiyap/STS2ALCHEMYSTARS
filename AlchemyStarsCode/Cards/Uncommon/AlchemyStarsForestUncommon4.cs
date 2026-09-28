@@ -57,6 +57,8 @@ public sealed class AlchemyStarsForestUncommon4 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Forest, ForestEnergyGain);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
         LightMechanic.TryAddForestCellsWithEnhancedChance(

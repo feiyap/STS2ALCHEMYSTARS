@@ -57,6 +57,8 @@ public sealed class AlchemyStarsThunderUncommon3 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Thunder, ThunderEnergyGain);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
         LightMechanic.TryAddThunderCellsWithPrismChance(Owner, ThunderCellCreateCount, PrismCellChancePercent);

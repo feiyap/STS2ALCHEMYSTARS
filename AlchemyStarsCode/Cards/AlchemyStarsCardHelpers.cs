@@ -1,4 +1,5 @@
 using System.Linq;
+using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
 using AlchemyStars.Mechanics;
 using AlchemyStars.Powers;
@@ -330,6 +331,40 @@ internal static class AlchemyStarsCardHelpers
 
             await PowerCmd.ModifyAmount(choiceContext, power, power.Amount, applier, source);
         }
+    }
+
+    /// <summary>
+    /// 技能牌施法动画。空裔按属性播放对应 Spine；其他角色播放默认 Cast。
+    /// 森 skill_green，雷 skill_yellow，水 skill_blue，火 skill_red，无属性或同时带多种属性 skill_color。
+    /// </summary>
+    public static Task TriggerSkillCastAnim(CardModel card)
+    {
+        var owner = card.Owner;
+        if (owner?.Creature == null || owner.Creature.IsDead || owner.Character == null)
+            return Task.CompletedTask;
+
+        var trigger = owner.Character is AlchemyStarsCharacter
+            ? ResolveAlchemyStarsSkillAnim(card)
+            : "Cast";
+        return CreatureCmd.TriggerAnim(owner.Creature, trigger, owner.Character.CastAnimDelay);
+    }
+
+    private static string ResolveAlchemyStarsSkillAnim(CardModel card)
+    {
+        var forest = HasForestKeyword(card);
+        var thunder = HasThunderKeyword(card);
+        var water = HasWaterKeyword(card);
+        var fire = HasFireKeyword(card);
+        var count = (forest ? 1 : 0) + (thunder ? 1 : 0) + (water ? 1 : 0) + (fire ? 1 : 0);
+        if (count != 1)
+            return "skill_color";
+        if (forest)
+            return "skill_green";
+        if (thunder)
+            return "skill_yellow";
+        if (water)
+            return "skill_blue";
+        return "skill_red";
     }
 }
 

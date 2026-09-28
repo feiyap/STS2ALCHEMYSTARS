@@ -14,7 +14,7 @@ namespace AlchemyStars.Powers;
 /// 绿晶巨角：下个回合开始时抽牌。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsOfinaDrawPower : ModPowerTemplate
+public sealed class AlchemyStarsOfinaDrawPower : AlchemyStarsPowerBase
 {
     private int _drawCount = 1;
 

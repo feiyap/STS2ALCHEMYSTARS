@@ -12,7 +12,7 @@ namespace AlchemyStars.Powers;
 /// 哀伤之弦：每份使攻击伤害提升 50%。Amount = 份数。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsChloeDamagePower : ModPowerTemplate
+public sealed class AlchemyStarsChloeDamagePower : AlchemyStarsPowerBase
 {
     private const decimal DamageBonusPerCopy = 0.5m;
 

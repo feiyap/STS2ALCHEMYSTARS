@@ -14,7 +14,7 @@ namespace AlchemyStars.Powers;
 /// 凌空：每当消耗的光能属性与上次不同时，抽牌；升级后额外获得能量。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsSoaringPower : ModPowerTemplate
+public sealed class AlchemyStarsSoaringPower : AlchemyStarsPowerBase
 {
     private int _pendingDraws;
     private int _pendingEnergy;

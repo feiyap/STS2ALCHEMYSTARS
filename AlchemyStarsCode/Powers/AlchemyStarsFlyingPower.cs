@@ -18,7 +18,7 @@ namespace AlchemyStars.Powers;
 /// 图标借用原版翱翔（SoarPower）。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsFlyingPower : ModPowerTemplate
+public sealed class AlchemyStarsFlyingPower : AlchemyStarsPowerBase
 {
     private const string DamageDecreaseKey = "DamageDecrease";
 

@@ -17,7 +17,7 @@ namespace AlchemyStars.Powers;
 /// 反叛灼燃·莱因哈特：回合末对全体敌人造成已损失生命 70% 的火/雷伤害。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsRebellionBurningEchoPower : ModPowerTemplate
+public sealed class AlchemyStarsRebellionBurningEchoPower : AlchemyStarsPowerBase
 {
     public const decimal MissingHpDamageRatio = 0.70m;
 

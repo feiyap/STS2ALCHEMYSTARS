@@ -62,6 +62,8 @@ public sealed class AlchemyStarsFireUncommon2 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Fire]))
             return;
 

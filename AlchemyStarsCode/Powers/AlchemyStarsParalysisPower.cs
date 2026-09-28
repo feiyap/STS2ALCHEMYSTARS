@@ -13,7 +13,7 @@ namespace AlchemyStars.Powers;
 /// 麻痹：每层使受到的雷属性伤害增加 2%。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsParalysisPower : ModPowerTemplate
+public sealed class AlchemyStarsParalysisPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Debuff;
 

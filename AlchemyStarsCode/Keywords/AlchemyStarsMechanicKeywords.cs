@@ -265,10 +265,6 @@ namespace AlchemyStars.Keywords;
     CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
 
 [RegisterOwnedCardKeyword(
-    "no_survivors",
-    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
-
-[RegisterOwnedCardKeyword(
     "dead_celebration",
     CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
 
@@ -279,6 +275,9 @@ namespace AlchemyStars.Keywords;
 [RegisterOwnedCardKeyword(
     "spirit_staff_blessing",
     CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+/// <summary>故我自在莫比乌斯：连招一览（遗物悬停提示栏）。</summary>
+[RegisterOwnedCardKeyword("mobius_combo")]
 
 public sealed class AlchemyStarsMechanicKeywords;
 

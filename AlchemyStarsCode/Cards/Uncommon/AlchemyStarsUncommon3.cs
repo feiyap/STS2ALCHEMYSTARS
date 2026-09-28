@@ -30,6 +30,8 @@ public sealed class AlchemyStarsUncommon3 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         await CardPileCmd.Draw(choiceContext, 1m, Owner);
 
         var discardPile = PileType.Discard.GetPile(Owner);

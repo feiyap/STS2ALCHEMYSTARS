@@ -19,7 +19,7 @@ namespace AlchemyStars.Powers;
 /// <summary>
 /// 工备：回合结束时每层造成 1 点雷属性伤害并获得同额格挡；每 3 层获�?1 点雷属性光能�?/// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsWorkshopPrepPower : ModPowerTemplate
+public sealed class AlchemyStarsWorkshopPrepPower : AlchemyStarsPowerBase
 {
     private const int LightEnergyInterval = 3;
 

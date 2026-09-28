@@ -15,11 +15,13 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 易位王影：本回合为所有队友承担未格挡伤害，且持有者无法打出攻击牌。自身回合开始时移除。
+/// 易位王影：本回合为所有队友承担未格挡伤害（先消耗自身格挡），且持有者无法打出攻击牌。自身回合开始时移除。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsDisplacementKingShadowPower : ModPowerTemplate
+public sealed class AlchemyStarsDisplacementKingShadowPower : AlchemyStarsPowerBase
 {
+    private bool _applyOwnerBlockToRedirectedDamage;
+
     public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Single;
@@ -57,7 +59,26 @@ public sealed class AlchemyStarsDisplacementKingShadowPower : ModPowerTemplate
         if (!target.IsPlayer || target.Side != Owner.Side)
             return target;
 
+        _applyOwnerBlockToRedirectedDamage = true;
         Flash();
         return Owner;
+    }
+
+    public override decimal ModifyHpLostAfterOsty(
+        Creature target,
+        decimal amount,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource)
+    {
+        if (!_applyOwnerBlockToRedirectedDamage)
+            return amount;
+
+        _applyOwnerBlockToRedirectedDamage = false;
+        if (target != Owner || amount <= 0m)
+            return amount;
+
+        var blocked = Owner.DamageBlockInternal(amount, props);
+        return Math.Max(amount - blocked, 0m);
     }
 }

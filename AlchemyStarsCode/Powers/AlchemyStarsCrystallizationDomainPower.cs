@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using AlchemyStars.Keywords;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -11,7 +11,7 @@ namespace AlchemyStars.Powers;
 /// 保留此类以免旧存档/引用缺失；不再由拜里厄打出时施加。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsCrystallizationDomainPower : ModPowerTemplate
+public sealed class AlchemyStarsCrystallizationDomainPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 

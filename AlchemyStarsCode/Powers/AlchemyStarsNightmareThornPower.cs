@@ -14,7 +14,7 @@ namespace AlchemyStars.Powers;
 /// 梦魇荆棘：敌人身上每有 1 层减益，克娜莉对其最终伤害增加 2%。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsNightmareThornPower : ModPowerTemplate
+public sealed class AlchemyStarsNightmareThornPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 

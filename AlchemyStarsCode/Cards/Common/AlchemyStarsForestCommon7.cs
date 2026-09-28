@@ -61,6 +61,8 @@ public sealed class AlchemyStarsForestCommon7 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         var maxDiscard = DynamicVars["Discard"].IntValue;
         var discarded = (await CardSelectCmd.FromHandForDiscard(
             choiceContext,

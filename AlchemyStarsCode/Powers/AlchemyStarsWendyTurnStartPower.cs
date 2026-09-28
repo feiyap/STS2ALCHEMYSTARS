@@ -16,7 +16,7 @@ namespace AlchemyStars.Powers;
 /// 飓风灵鸮：下个回合开始时额外获得 1 点能量与 1 点森属性光能。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsWendyTurnStartPower : ModPowerTemplate
+public sealed class AlchemyStarsWendyTurnStartPower : AlchemyStarsPowerBase
 {
     private const int BonusEnergy = 1;
     private const int BonusForestLightEnergy = 1;

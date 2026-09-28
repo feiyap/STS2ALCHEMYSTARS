@@ -17,7 +17,7 @@ namespace AlchemyStars.Powers;
 /// 卡莲：回合结束时按转色栏水属性格数量获得格挡。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsKarenGuardPower : ModPowerTemplate
+public sealed class AlchemyStarsKarenGuardPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 

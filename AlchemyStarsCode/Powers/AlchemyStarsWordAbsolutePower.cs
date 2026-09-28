@@ -18,7 +18,7 @@ namespace AlchemyStars.Powers;
 /// Amount = 份数（第二份起每次阈值结算给予更多飞行）。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsWordAbsolutePower : ModPowerTemplate
+public sealed class AlchemyStarsWordAbsolutePower : AlchemyStarsPowerBase
 {
     private const int EnhancedCellsPerFlying = 3;
 

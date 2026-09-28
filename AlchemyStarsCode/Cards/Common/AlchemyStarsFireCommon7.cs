@@ -60,6 +60,8 @@ public sealed class AlchemyStarsFireCommon7 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         var drawPile = PileType.Draw.GetPile(Owner);
         var maxSelect = DynamicVars["Select"].IntValue;
         if (drawPile.Cards.Count == 0 || maxSelect <= 0)

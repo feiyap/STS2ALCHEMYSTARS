@@ -55,6 +55,8 @@ public sealed class AlchemyStarsWaterUncommon7 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
+
         await PowerCmd.Apply<AlchemyStarsCharlotteConvertPower>(
             choiceContext,
             Owner.Creature,

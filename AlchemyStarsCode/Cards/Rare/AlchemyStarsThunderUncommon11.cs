@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
@@ -22,8 +23,6 @@ namespace AlchemyStars.Cards;
 public sealed class AlchemyStarsThunderUncommon11 : ModCardTemplate, IAncientCardArtStyle
 {
     private const int BaseEnergyCost = 1;
-    private const decimal BaseLostHpHealPercent = 0.35m;
-    private const decimal UpgradedLostHpHealPercent = 0.50m;
     private const CardType CardKind = CardType.Power;
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.AnyAlly;
@@ -34,6 +33,11 @@ public sealed class AlchemyStarsThunderUncommon11 : ModCardTemplate, IAncientCar
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
+
+    protected override IEnumerable<DynamicVar> CanonicalVars =>
+    [
+        new DynamicVar("HealPercent", 35m)
+    ];
 
     protected override HashSet<CardTag> CanonicalTags => [AlchemyStarsCardTags.GoldenScaleStar];
 
@@ -65,6 +69,8 @@ public sealed class AlchemyStarsThunderUncommon11 : ModCardTemplate, IAncientCar
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
+
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
         if (Owner.Creature.CurrentHp <= cardPlay.Target.CurrentHp)
@@ -84,12 +90,12 @@ public sealed class AlchemyStarsThunderUncommon11 : ModCardTemplate, IAncientCar
             1m,
             self,
             this);
-        power?.ConfigureLostHpHealPercent(IsUpgraded ? UpgradedLostHpHealPercent : BaseLostHpHealPercent);
+        power?.ConfigureLostHpHealPercent(DynamicVars["HealPercent"].BaseValue / 100m);
     }
 
     protected override void OnUpgrade()
     {
-        // 升级只提高胜利时已损失生命治疗比例，由 ConfigureLostHpHealPercent 传入。
+        DynamicVars["HealPercent"].UpgradeValueBy(15m);
     }
 
     private bool HasEligibleAllyTarget()

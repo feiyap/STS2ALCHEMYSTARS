@@ -77,6 +77,8 @@ public sealed class AlchemyStarsWaterCommon4 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         await AlchemyStarsCardHelpers.TryApplyLegionCommanderStat<DexterityPower>(
             choiceContext, Owner, this);
 

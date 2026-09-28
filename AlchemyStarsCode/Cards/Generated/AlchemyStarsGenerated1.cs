@@ -54,6 +54,8 @@ public sealed class AlchemyStarsGenerated1 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         var drawPile = PileType.Draw.GetPile(Owner);
         var statuses = drawPile.Cards.Where(card => card.Type == CardType.Status).ToList();
 

@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://dioj73wrhjesy"
+path="res://.godot/imported/sljt.skel-8f3402721ef4a42680386ed93375de87.spskel"
+
+[deps]
+
+source_file="res://AlchemyStars/scenes/spine/sljt.skel"
+dest_files=["res://.godot/imported/sljt.skel-8f3402721ef4a42680386ed93375de87.spskel"]
+
+[params]
+

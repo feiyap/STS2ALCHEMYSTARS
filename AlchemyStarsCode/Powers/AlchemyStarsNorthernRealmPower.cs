@@ -15,7 +15,7 @@ namespace AlchemyStars.Powers;
 /// Amount = 重放次数（每份 +1）。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsNorthernRealmPower : ModPowerTemplate
+public sealed class AlchemyStarsNorthernRealmPower : AlchemyStarsPowerBase
 {
     private static readonly AttachedState<CardModel, bool> HasReplayedOnFirstPlay = new(_ => false);
 

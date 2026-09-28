@@ -16,7 +16,7 @@ namespace AlchemyStars.Powers;
 /// 破绽：被施加者的队友攻击命中时破碎，以施加者为来源造成 1 点雷伤并全员获金。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsFlawPower : ModPowerTemplate
+public sealed class AlchemyStarsFlawPower : AlchemyStarsPowerBase
 {
     private const decimal GoldPerBreak = 5m;
 

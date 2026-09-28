@@ -48,6 +48,8 @@ public sealed class AlchemyStarsUncommon2 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         var pool = ModelDb.CardPool<AlchemyStarsCardPool>();
         var candidates = pool
             .GetUnlockedCards(Owner.UnlockState, Owner.RunState.CardMultiplayerConstraint)

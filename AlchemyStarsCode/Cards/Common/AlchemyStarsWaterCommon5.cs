@@ -57,6 +57,8 @@ public sealed class AlchemyStarsWaterCommon5 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
 
         var converted = LightMechanic.TryConvertRandomNonWaterLightEnergyToWaterCells(

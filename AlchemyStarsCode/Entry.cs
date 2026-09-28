@@ -44,7 +44,9 @@ public partial class Entry
 
         var patcher = RitsuLibFramework.CreatePatcher(ModId, "core");
         patcher.RegisterPatch<ArchaicToothTransformRemainingStartersPatch>();
+        patcher.RegisterPatch<KeyOfManyDoorsPendingEventPatch>();
         patcher.RegisterPatch<AncientCardArtStylePatch>();
+        patcher.RegisterPatch<CardAttributeIconPatch>();
         patcher.RegisterPatch<UpgradedCardPortraitPathPatch>();
         patcher.RegisterPatch<UpgradedCardAllPortraitPathsPatch>();
         patcher.RegisterPatch<UpgradedCardArtReloadPatch>();
@@ -54,6 +56,10 @@ public partial class Entry
         patcher.RegisterPatch<InspectCardAlternateArtOpenClosePatch>();
         patcher.RegisterPatch<EnlightenerFollowUpDonePatch>();
         patcher.RegisterPatch<EnlightenerRefreshVisualPatch>();
+        patcher.RegisterPatch<SmoothCompassBossLabelPatch>();
+        patcher.RegisterPatch<SmoothCompassEliteLabelPatch>();
+        patcher.RegisterPatch<SmoothCompassEliteEncounterPatch>();
+        patcher.RegisterPatch<LockOfObsessionShuffleIfNecessaryPatch>();
         RitsuLibFramework.ApplyRequiredPatcher(patcher, DisableMod);
 
         Logger.Info("AlchemyStars initialized.");

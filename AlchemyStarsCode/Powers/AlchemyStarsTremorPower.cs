@@ -13,7 +13,7 @@ namespace AlchemyStars.Powers;
 /// 颤栗：层数达到 4 时移除并眩晕。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsTremorPower : ModPowerTemplate
+public sealed class AlchemyStarsTremorPower : AlchemyStarsPowerBase
 {
     private const int StunThreshold = 4;
 

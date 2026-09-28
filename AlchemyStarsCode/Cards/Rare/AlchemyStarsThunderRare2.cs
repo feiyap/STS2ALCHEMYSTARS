@@ -67,6 +67,8 @@ public sealed class AlchemyStarsThunderRare2 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         LightMechanic.TryConvertAllCellsAuspiciousThunder(Owner);
 
         LightMechanic.TryConsumeLightEnergy(

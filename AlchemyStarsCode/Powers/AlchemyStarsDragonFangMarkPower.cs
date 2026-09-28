@@ -12,7 +12,7 @@ namespace AlchemyStars.Powers;
 /// <summary>
 /// 龙牙印记：每层提高对其最终伤�?2%�?/// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsDragonFangMarkPower : ModPowerTemplate
+public sealed class AlchemyStarsDragonFangMarkPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Debuff;
 

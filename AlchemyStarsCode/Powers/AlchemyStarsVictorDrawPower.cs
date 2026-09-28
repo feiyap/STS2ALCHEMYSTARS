@@ -12,7 +12,7 @@ namespace AlchemyStars.Powers;
 /// 林影觅踪：回合开始时额外抽 Amount 张牌（每份 +1）。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsVictorDrawPower : ModPowerTemplate
+public sealed class AlchemyStarsVictorDrawPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 

@@ -9,7 +9,7 @@ namespace AlchemyStars.Powers;
 /// <summary>
 /// 花海毒池：此牌消耗光能生成的属性格必然为深色格�?/// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsPoisonFlowerPoolPower : ModPowerTemplate
+public sealed class AlchemyStarsPoisonFlowerPoolPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 

@@ -13,11 +13,12 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 纸伤：受到伤害时减少最大生命�?/// </summary>
+/// 纸伤：受到伤害时每层减少 1 点最大生命。
+/// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsPaperWoundPower : ModPowerTemplate
+public sealed class AlchemyStarsPaperWoundPower : AlchemyStarsPowerBase
 {
-    private const decimal MaxHpLossPerStack = 2m;
+    private const decimal MaxHpLossPerStack = 1m;
 
     public override PowerType Type => PowerType.Debuff;
 

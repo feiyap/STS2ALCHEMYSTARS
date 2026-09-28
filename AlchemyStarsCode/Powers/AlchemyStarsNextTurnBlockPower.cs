@@ -15,7 +15,7 @@ namespace AlchemyStars.Powers;
 /// 下回合开始时获得格挡。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsNextTurnBlockPower : ModPowerTemplate
+public sealed class AlchemyStarsNextTurnBlockPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 

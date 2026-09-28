@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -15,7 +15,7 @@ namespace AlchemyStars.Powers;
 /// 冥河列车·卡戎：下次洗牌时，消耗一半抽牌堆（优先状态与诅咒）。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsDeadCelebrationPower : ModPowerTemplate
+public sealed class AlchemyStarsDeadCelebrationPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 

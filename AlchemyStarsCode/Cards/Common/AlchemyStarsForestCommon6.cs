@@ -83,6 +83,8 @@ public sealed class AlchemyStarsForestCommon6 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Forest]);
         await PlayerCmd.GainEnergy(EnergyGain, Owner);
         AlchemyStarsForestState.ResetShinopuEnhanceUses(this);

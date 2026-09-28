@@ -71,6 +71,8 @@ public sealed class AlchemyStarsForestRare6 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         var forestCells = LightMechanic.CountEffectiveForestCellsForDamage(Owner);
         var block = forestCells * DynamicVars.Block.BaseValue;
         if (block > 0m)

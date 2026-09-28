@@ -13,7 +13,7 @@ namespace AlchemyStars.Powers;
 /// <summary>
 /// 缘木求叶：下个回合开始时抽牌�?/// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsYuraDrawPower : ModPowerTemplate
+public sealed class AlchemyStarsYuraDrawPower : AlchemyStarsPowerBase
 {
     private int _drawCount = 1;
 

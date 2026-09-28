@@ -19,7 +19,7 @@ namespace AlchemyStars.Powers;
 /// 资本征收：抽到论资本牌时支付金币并提升该牌伤害；战斗胜利后退还。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsCapitalTaxPower : ModPowerTemplate
+public sealed class AlchemyStarsCapitalTaxPower : AlchemyStarsPowerBase
 {
     private const int TaxGold = 20;
     private const decimal DamageIncreaseRate = 0.1m;

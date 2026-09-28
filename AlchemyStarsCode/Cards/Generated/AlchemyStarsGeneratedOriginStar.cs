@@ -57,6 +57,8 @@ public sealed class AlchemyStarsGeneratedOriginStar : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         var drawPile = PileType.Draw.GetPile(Owner);
         var preview = drawPile.Cards.Take(ForesightCount).ToList();
         if (preview.Count > 0)

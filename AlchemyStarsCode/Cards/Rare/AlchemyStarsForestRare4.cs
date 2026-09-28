@@ -82,6 +82,8 @@ public sealed class AlchemyStarsForestRare4 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         await AddOriginCard<AlchemyStarsGeneratedOriginSun>(choiceContext);
         await AddOriginCard<AlchemyStarsGeneratedOriginMoon>(choiceContext);
         await AddOriginCard<AlchemyStarsGeneratedOriginStar>(choiceContext);

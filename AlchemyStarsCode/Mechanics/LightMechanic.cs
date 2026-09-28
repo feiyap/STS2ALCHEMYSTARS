@@ -69,6 +69,7 @@ public static class LightMechanic
         if (element == LightElement.Forest && kind != AttributeCellKind.Enhanced)
             AlchemyStarsForestState.NotifyForestCellProduced(player);
 
+        NotifyAttributeCellGenerated(player);
         return true;
     }
 
@@ -476,6 +477,7 @@ public static class LightMechanic
                 var overflow = state.AddAttributeCell(cell);
                 if (overflow.Count > 0)
                     NotifyAttributeCellsRemoved(player, overflow);
+                NotifyAttributeCellGenerated(player);
 
                 if (cell.Element == LightElement.Forest)
                     forestCreated++;
@@ -605,7 +607,10 @@ public static class LightMechanic
         state.LightEnergy.ReplaceAll(remaining);
 
         foreach (var element in waterEnergy)
+        {
             state.AddAttributeCell(element);
+            NotifyAttributeCellGenerated(player);
+        }
 
         LightMechanicUiBootstrap.RefreshForPlayer(player);
         NotifyLightEnergyConsumed(player, waterEnergy);
@@ -615,7 +620,7 @@ public static class LightMechanic
     /// <summary>
     /// 消耗全部光能（不生成属性格）。
     /// </summary>
-    public static int ConsumeAllLightEnergy(Player player)
+    public static int ConsumeAllLightEnergy(Player player, bool notify = true)
     {
         var state = GetActiveState(player);
         if (state == null)
@@ -627,7 +632,8 @@ public static class LightMechanic
 
         state.LightEnergy.ReplaceAll([]);
         LightMechanicUiBootstrap.RefreshForPlayer(player);
-        NotifyLightEnergyConsumed(player, consumed);
+        if (notify)
+            NotifyLightEnergyConsumed(player, consumed);
         return consumed.Count;
     }
 
@@ -1410,12 +1416,19 @@ public static class LightMechanic
             state.AddAttributeCell(element);
             if (element == LightElement.Forest)
                 AlchemyStarsForestState.NotifyForestCellProduced(player);
+            NotifyAttributeCellGenerated(player);
         }
 
         LightMechanicUiBootstrap.RefreshForPlayer(player);
         NotifyLightEnergyConsumed(player, consumed);
         return true;
     }
+
+    /// <summary>
+    /// 通知遗物等：刚生成了属性格。
+    /// </summary>
+    public static void NotifyAttributeCellGenerated(Player player) =>
+        Relics.Ancients.AlchemyStarsTruthLordsBlessing.OnAttributeCellGenerated(player);
 
     /// <summary>
     /// 通知能力：玩家消耗了光能（用于觉醒形态、凌空等效果）。
@@ -1445,6 +1458,8 @@ public static class LightMechanic
 
         player.Creature.GetPower<AlchemyStarsAuroraMomentPower>()
             ?.NotifyLightEnergyConsumed(consumed.Count);
+
+        Relics.Character.AlchemyStarsLightAmber.OnLightEnergyConsumed(player, consumed);
 
         if (differedCount > 0)
         {
@@ -1651,6 +1666,9 @@ public static class LightMechanic
                     stacks,
                     player.Creature,
                     cardSource);
+                var scorch = target.GetPower<AlchemyStarsScorchPower>();
+                if (scorch != null)
+                    Relics.Ancients.AlchemyStarsNudgeTheFlow.CapScorchStacks(scorch);
             }
             else if (procElement == LightElement.Thunder)
             {
@@ -1660,6 +1678,7 @@ public static class LightMechanic
                     stacks,
                     player.Creature,
                     cardSource);
+                await Relics.Ancients.AlchemyStarsNudgeTheFlow.AfterParalysisApplied(target, player);
             }
         }
     }
@@ -1765,6 +1784,12 @@ public static class LightMechanic
         if (state == null)
             return;
 
+        if (Relics.Ancients.AlchemyStarsNudgeTheFlow.IsActive(player))
+        {
+            await Relics.Ancients.AlchemyStarsNudgeTheFlow.ResolveForestBlockOverride(player);
+            return;
+        }
+
         var forestProcs = state.GetEffectiveCount(LightElement.Forest) / 4;
         if (forestProcs <= 0)
             return;
@@ -1783,9 +1808,16 @@ public static class LightMechanic
         if (state == null)
             return;
 
-        var waterProcs = state.GetEffectiveCount(LightElement.Water) / 4;
-        for (var i = 0; i < waterProcs; i++)
-            await CreatureCmd.Heal(player.Creature, 1m);
+        if (Relics.Ancients.AlchemyStarsNudgeTheFlow.IsActive(player))
+        {
+            await Relics.Ancients.AlchemyStarsNudgeTheFlow.ResolveWaterOverride(player);
+        }
+        else
+        {
+            var waterProcs = state.GetEffectiveCount(LightElement.Water) / 4;
+            for (var i = 0; i < waterProcs; i++)
+                await CreatureCmd.Heal(player.Creature, 1m);
+        }
 
         // 结算前按当前格子重算，避免缓存状态与「万色补缺口」规则不一致。
         state.UpdateRainbowState();

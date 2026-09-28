@@ -15,7 +15,7 @@ namespace AlchemyStars.Powers;
 /// Amount = 份数。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsFeliciaHealPower : ModPowerTemplate
+public sealed class AlchemyStarsFeliciaHealPower : AlchemyStarsPowerBase
 {
     private const decimal LostHpHealPercent = 0.04m;
     private const decimal MaxHpHealPercent = 0.04m;

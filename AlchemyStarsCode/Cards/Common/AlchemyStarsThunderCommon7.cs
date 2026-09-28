@@ -49,6 +49,8 @@ public sealed class AlchemyStarsThunderCommon7 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         if (IsUpgraded)
         {
             await CardPileCmd.AddToCombatAndPreview<Dazed>(

@@ -52,6 +52,8 @@ public sealed class AlchemyStarsThunderUncommon6 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Thunder, ThunderEnergyGain);
         LightMechanic.TryAddAttributeCell(Owner, LightElement.Thunder, AttributeCellKind.Prism);
         await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);

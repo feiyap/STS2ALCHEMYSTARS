@@ -77,6 +77,8 @@ public sealed class AlchemyStarsForestRare2 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         foreach (var power in Owner.Creature.Powers.ToList())
         {
             if (power.Type == PowerType.Debuff)

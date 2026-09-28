@@ -9,7 +9,7 @@ namespace AlchemyStars.Powers;
 /// 无时之印：可叠加的标记，供薇丝·空瞳等效果读取层数。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsTimelessSealPower : ModPowerTemplate
+public sealed class AlchemyStarsTimelessSealPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Debuff;
 

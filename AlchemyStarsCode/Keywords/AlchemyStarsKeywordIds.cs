@@ -88,9 +88,9 @@ public static class AlchemyStarsKeywordIds
     public const string InvestmentRisk = "ALCHEMY_STARS_KEYWORD_INVESTMENT_RISK";
     public const string ClearAll = "ALCHEMY_STARS_KEYWORD_CLEAR_ALL";
     public const string HighNoon = "ALCHEMY_STARS_KEYWORD_HIGH_NOON";
-    public const string NoSurvivors = "ALCHEMY_STARS_KEYWORD_NO_SURVIVORS";
     public const string DeadCelebration = "ALCHEMY_STARS_KEYWORD_DEAD_CELEBRATION";
     public const string BoxMelody = "ALCHEMY_STARS_KEYWORD_BOX_MELODY";
     public const string SpiritStaffBlessing = "ALCHEMY_STARS_KEYWORD_SPIRIT_STAFF_BLESSING";
+    public const string MobiusCombo = "ALCHEMY_STARS_KEYWORD_MOBIUS_COMBO";
 }
 

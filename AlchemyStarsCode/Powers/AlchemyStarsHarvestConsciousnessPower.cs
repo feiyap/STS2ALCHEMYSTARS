@@ -17,7 +17,7 @@ namespace AlchemyStars.Powers;
 /// 收割意识：前 10 层每层 10% 伤害穿透格挡；超过 10 层每层 +10% 伤害；无格挡敌人每层多受 10% 伤害。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsHarvestConsciousnessPower : ModPowerTemplate
+public sealed class AlchemyStarsHarvestConsciousnessPower : AlchemyStarsPowerBase
 {
     private readonly Dictionary<Creature, (decimal OriginalBlock, decimal Amount, decimal PierceRatio)> _pierceAdjustments = new();
 

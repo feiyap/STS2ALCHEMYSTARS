@@ -57,6 +57,8 @@ public sealed class AlchemyStarsFireUncommon8 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
+
         await CreatureCmd.Heal(Owner.Creature, PlayHealAmount);
         await PowerCmd.Apply<AlchemyStarsSpiritStaffBlessingPower>(
             choiceContext,

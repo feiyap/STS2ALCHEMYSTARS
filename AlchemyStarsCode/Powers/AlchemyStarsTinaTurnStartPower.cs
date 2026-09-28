@@ -15,7 +15,7 @@ namespace AlchemyStars.Powers;
 /// 蒂娜：层数表示回手倒计时（固定 2）；另计深色格剩余次数（1/2）。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsTinaTurnStartPower : ModPowerTemplate
+public sealed class AlchemyStarsTinaTurnStartPower : AlchemyStarsPowerBase
 {
     private CardModel? _exhaustedCard;
     private int _darkCellsRemaining;

@@ -1,9 +1,13 @@
 using Godot;
+using MegaCrit.Sts2.Core.Animation;
+using MegaCrit.Sts2.Core.Bindings.MegaSpine;
 using MegaCrit.Sts2.Core.Entities.Characters;
 using MegaCrit.Sts2.Core.Nodes.Combat;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Characters;
+using STS2RitsuLib.Scaffolding.Content;
 using STS2RitsuLib.Scaffolding.Godot;
+using STS2RitsuLib.Scaffolding.Visuals.StateMachine;
 
 namespace AlchemyStars.Characters;
 
@@ -65,7 +69,17 @@ public sealed class AlchemyStarsCharacter : ModCharacterTemplate<AlchemyStarsCar
             ArmPointingTexturePath: $"{ImageRoot}/AlchemyStars_hand_point.png",
             ArmRockTexturePath: $"{ImageRoot}/AlchemyStars_hand_rock.png",
             ArmPaperTexturePath: $"{ImageRoot}/AlchemyStars_hand_paper.png",
-            ArmScissorsTexturePath: $"{ImageRoot}/AlchemyStars_hand_scissors.png"));
+            ArmScissorsTexturePath: $"{ImageRoot}/AlchemyStars_hand_scissors.png"),
+        // 原版「美味饼干」按角色换图标；空裔使用专属曲奇立绘。
+        VanillaRelicVisualOverrides:
+        [
+            new(
+                CharacterOwnedVanillaRelicModelId.YummyCookie,
+                new RelicAssetProfile(
+                    IconPath: $"{Entry.ResPath}/images/relics/AlchemyStarsYummyCookie.png",
+                    IconOutlinePath: $"{Entry.ResPath}/images/relics/AlchemyStarsYummyCookie.png",
+                    BigIconPath: $"{Entry.ResPath}/images/relics/AlchemyStarsYummyCookie.png"))
+        ]);
 
     // 某个字段没写时，RitsuLib 会从占位角色配置里补齐。
     public override string? PlaceholderCharacterId => "ironclad";
@@ -74,6 +88,28 @@ public sealed class AlchemyStarsCharacter : ModCharacterTemplate<AlchemyStarsCar
     // 攻击和施法动画延迟，以对齐动画。静态占位资源不需要延迟。
     public override float AttackAnimDelay => 0f;
     public override float CastAnimDelay => 0f;
+
+    // 在默认施法之外，为四种属性技能和无属性技能注册 Spine 动画。
+    protected override CreatureAnimator? SetupCustomCreatureAnimator(MegaSprite controller)
+    {
+        var animator = ModAnimStateMachines.Standard(
+            controller,
+            idleName: "idle_loop",
+            deadName: "die",
+            hitName: "hurt",
+            attackName: "attack",
+            castName: "cast",
+            relaxedName: "relaxed_loop");
+
+        var idle = new AnimState("idle_loop", isLooping: true);
+        foreach (var animName in new[] { "skill_blue", "skill_color", "skill_green", "skill_red", "skill_yellow" })
+        {
+            var state = new AnimState(animName) { NextState = idle };
+            animator.AddAnyState(animName, state);
+        }
+
+        return animator;
+    }
 
     // 让 RitsuLib 把普通 Godot 场景转换成游戏需要的 NCreatureVisuals。
     // 自动转换人物场景，让你不需要手动挂脚本。复制即可。

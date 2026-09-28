@@ -59,6 +59,8 @@ public sealed class AlchemyStarsFireCommon6 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
         var selectable = PileType.Hand.GetPile(Owner).Cards

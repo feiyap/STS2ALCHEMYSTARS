@@ -17,7 +17,7 @@ namespace AlchemyStars.Powers;
 /// Amount = 剩余回合数。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsBlueFireTherapyPower : ModPowerTemplate
+public sealed class AlchemyStarsBlueFireTherapyPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 

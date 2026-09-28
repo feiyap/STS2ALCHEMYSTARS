@@ -120,7 +120,10 @@ public sealed class AlchemyStarsWaterUncommon3 : ModCardTemplate
             return;
 
         foreach (var element in consumed)
+        {
             state.AddAttributeCell(element, AttributeCellKind.Dark);
+            LightMechanic.NotifyAttributeCellGenerated(player);
+        }
 
         LightMechanicUiBootstrap.RefreshForPlayer(player);
         LightMechanic.NotifyLightEnergyConsumed(player, consumed);

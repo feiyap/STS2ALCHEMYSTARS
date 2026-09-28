@@ -66,6 +66,8 @@ public sealed class AlchemyStarsWaterUncommon6 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         await TryPickFromDrawPile(choiceContext);
 
         var power = await PowerCmd.Apply<AlchemyStarsTinaTurnStartPower>(

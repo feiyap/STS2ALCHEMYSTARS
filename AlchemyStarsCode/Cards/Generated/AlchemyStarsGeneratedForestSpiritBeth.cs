@@ -69,6 +69,8 @@ public sealed class AlchemyStarsGeneratedForestSpiritBeth : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
 
         var exhaustPileSize = PileType.Exhaust.GetPile(Owner).Cards.Count;

@@ -19,7 +19,7 @@ namespace AlchemyStars.Powers;
 /// 灵杖庇佑：每回合开始时选择消耗 1 张牌，获得 1 层灼燃并恢复 2 点体力。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsSpiritStaffBlessingPower : ModPowerTemplate
+public sealed class AlchemyStarsSpiritStaffBlessingPower : AlchemyStarsPowerBase
 {
     private const int HealAmount = 2;
     private const int IgnitionAmount = 1;

@@ -15,7 +15,7 @@ namespace AlchemyStars.Powers;
 /// <summary>
 /// 弗兰克爪击：每层使目标额外受�?1 点伤害�?/// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsFrankClawPower : ModPowerTemplate
+public sealed class AlchemyStarsFrankClawPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Debuff;
 

@@ -16,7 +16,7 @@ namespace AlchemyStars.Powers;
 /// 南极光绒针：敌人回合结束时一次性引爆全部层数，造成等额水属性伤害并为施加者恢复等额生命。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsVelvetNeedlePower : ModPowerTemplate
+public sealed class AlchemyStarsVelvetNeedlePower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Debuff;
 

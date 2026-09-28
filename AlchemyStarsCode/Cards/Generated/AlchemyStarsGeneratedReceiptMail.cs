@@ -58,6 +58,8 @@ public sealed class AlchemyStarsGeneratedReceiptMail : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         var targetHandSize = AlchemyStarsForestState.GetReceiptMailHandSize(this);
         if (targetHandSize <= 0)
             targetHandSize = Owner.PlayerCombatState?.Hand.Cards.Count ?? 0;

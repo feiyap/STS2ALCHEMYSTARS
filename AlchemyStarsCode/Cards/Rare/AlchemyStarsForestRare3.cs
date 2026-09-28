@@ -82,6 +82,8 @@ public sealed class AlchemyStarsForestRare3 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
+
         if (AlchemyStarsForestState.GetWordAbsoluteInitialCost(this) <= 0)
         {
             AlchemyStarsForestState.SetWordAbsoluteInitialCost(

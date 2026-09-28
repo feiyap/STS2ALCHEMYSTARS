@@ -49,6 +49,8 @@ public sealed class AlchemyStarsKaren : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         if (HasOtherHighCourtGuardInHand())
             await PlayerCmd.GainEnergy(1, Owner);
 

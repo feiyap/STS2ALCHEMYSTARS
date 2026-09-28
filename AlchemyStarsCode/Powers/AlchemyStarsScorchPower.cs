@@ -15,7 +15,7 @@ namespace AlchemyStars.Powers;
 /// 灼烧：回合开始时，每层失�?1% 最大生命值�?
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsScorchPower : ModPowerTemplate
+public sealed class AlchemyStarsScorchPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Debuff;
 
@@ -32,7 +32,10 @@ public sealed class AlchemyStarsScorchPower : ModPowerTemplate
         if (Amount <= 0)
             return;
 
-        var damage = (int)System.Math.Ceiling(Owner.MaxHp * 0.01m * Amount);
+        AlchemyStars.Relics.Ancients.AlchemyStarsNudgeTheFlow.CapScorchStacks(this);
+
+        var damage = (decimal)System.Math.Ceiling((double)(Owner.MaxHp * 0.01m * Amount));
+        damage = AlchemyStars.Relics.Ancients.AlchemyStarsNudgeTheFlow.ModifyScorchDamage(Owner, damage);
         if (damage <= 0)
             return;
 

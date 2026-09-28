@@ -56,6 +56,8 @@ public sealed class AlchemyStarsForestCommon9 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         var hadFlying = Owner.Creature.GetPowerAmount<AlchemyStarsFlyingPower>() > 0;
 
         await PowerCmd.Apply<AlchemyStarsFlyingPower>(

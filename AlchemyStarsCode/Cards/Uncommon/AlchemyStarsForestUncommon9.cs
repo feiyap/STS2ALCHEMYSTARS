@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
@@ -6,6 +7,7 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
@@ -97,13 +99,24 @@ public sealed class AlchemyStarsForestUncommon9 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        SyncDamageDisplay();
+        DynamicVars.Damage.UpgradeValueBy(1m);
+        if (Owner?.PlayerCombatState != null)
+            SyncDamageDisplay();
     }
+
+    public override Task AfterCombatEnd(CombatRoom room)
+    {
+        ResetDamageDisplay();
+        return Task.CompletedTask;
+    }
+
+    private decimal GetBaseHitDamage() =>
+        IsUpgraded ? BaseHitDamage + 1m : BaseHitDamage;
 
     private decimal GetCombatDamage()
     {
-        var baseDamage = IsUpgraded ? BaseHitDamage + 1m : BaseHitDamage;
-        if (Owner == null)
+        var baseDamage = GetBaseHitDamage();
+        if (Owner?.PlayerCombatState == null)
             return baseDamage;
 
         return baseDamage + AlchemyStarsForestState.GetRetainEffectCount(Owner);
@@ -112,6 +125,11 @@ public sealed class AlchemyStarsForestUncommon9 : ModCardTemplate
     private void SyncDamageDisplay()
     {
         DynamicVars.Damage.BaseValue = GetCombatDamage();
+    }
+
+    private void ResetDamageDisplay()
+    {
+        DynamicVars.Damage.BaseValue = GetBaseHitDamage();
     }
 
     /// <summary>
@@ -127,6 +145,28 @@ public sealed class AlchemyStarsForestUncommon9 : ModCardTemplate
         {
             if (card is AlchemyStarsForestUncommon9 leo)
                 leo.SyncDamageDisplay();
+        }
+    }
+
+    /// <summary>
+    /// 战斗结束后恢复列奥牌面为基础伤害，避免篝火升级仍显示累计值。
+    /// </summary>
+    public static void ResetAllThornSealDamageDisplays(Player player)
+    {
+        foreach (var card in player.Deck.Cards)
+        {
+            if (card is AlchemyStarsForestUncommon9 leo)
+                leo.ResetDamageDisplay();
+        }
+
+        var combat = player.PlayerCombatState;
+        if (combat == null)
+            return;
+
+        foreach (var card in combat.AllCards)
+        {
+            if (card is AlchemyStarsForestUncommon9 leo)
+                leo.ResetDamageDisplay();
         }
     }
 }

@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.RestSite;
 
 /// <summary>
-/// 篝火合成：消耗水/森巴顿各 1 张，获得壮志凌云·巴顿；任一素材已升级时产物也升级。
+/// 觉醒：消耗水/森巴顿各 1 张，获得壮志凌云·巴顿；任一素材已升级时产物也升级。
 /// </summary>
 public sealed class AlchemyStarsBartonFusionRestSiteOption : ModRestSiteOptionTemplate
 {
@@ -79,7 +79,7 @@ public sealed class AlchemyStarsBartonFusionRestSiteOption : ModRestSiteOptionTe
             .FirstOrDefault();
 
     /// <summary>
-    /// 向篝火选项列表追加合成项（若尚未存在且材料齐全）。
+    /// 向篝火选项列表追加觉醒项（若尚未存在且材料齐全）。
     /// </summary>
     public static bool TryAddOption(Player player, ICollection<RestSiteOption> options)
     {

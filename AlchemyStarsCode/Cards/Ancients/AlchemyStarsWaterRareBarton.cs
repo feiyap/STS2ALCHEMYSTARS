@@ -17,7 +17,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 壮志凌云·巴顿：篝火合成产物（先古，不进空裔卡池）；全体 2 次万色伤，获得万色光能并转化格子。
+/// 壮志凌云·巴顿：觉醒产物（先古，不进空裔卡池）；全体 2 次万色伤，获得万色光能并转化格子。
 /// </summary>
 [RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsWaterRareBarton : ModCardTemplate
@@ -70,6 +70,8 @@ public sealed class AlchemyStarsWaterRareBarton : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         foreach (var enemy in CombatState!.HittableEnemies.ToList())
         {
             for (var i = 0; i < HitCount; i++)

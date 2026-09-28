@@ -34,6 +34,18 @@ internal static class LightMechanicUiAssets
         _ => $"{CellDir}/forest_cell.png",
     };
 
+    private const string AttributeDir = $"{Entry.ResPath}/images/ui/attributes";
+
+    /// <summary>卡面费用下方的属性角标贴图。</summary>
+    public static string GetCardAttributeIconPath(LightElement element) => element switch
+    {
+        LightElement.Forest => $"{AttributeDir}/forest_attribute_icon.png",
+        LightElement.Thunder => $"{AttributeDir}/thunder_attribute_icon.png",
+        LightElement.Water => $"{AttributeDir}/water_attribute_icon.png",
+        LightElement.Fire => $"{AttributeDir}/fire_attribute_icon.png",
+        _ => $"{AttributeDir}/forest_attribute_icon.png",
+    };
+
     /// <summary>属性格出现时的光点贴图。</summary>
     public static string CellSparkPath => $"{CellDir}/cell_spark.png";
 

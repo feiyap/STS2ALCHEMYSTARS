@@ -19,7 +19,7 @@ namespace AlchemyStars.Powers;
 /// Amount = 剩余可转化生命上限。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsPanaceaPower : ModPowerTemplate
+public sealed class AlchemyStarsPanaceaPower : AlchemyStarsPowerBase
 {
     public Creature? MarkedTarget { get; set; }
 

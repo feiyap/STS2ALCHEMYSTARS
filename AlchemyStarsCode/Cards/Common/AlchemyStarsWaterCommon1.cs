@@ -55,6 +55,8 @@ public sealed class AlchemyStarsWaterCommon1 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
         var hadFlying = Owner.Creature.GetPowerAmount<AlchemyStarsFlyingPower>() > 0;

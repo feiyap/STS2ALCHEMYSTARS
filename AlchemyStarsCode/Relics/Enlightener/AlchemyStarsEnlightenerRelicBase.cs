@@ -14,7 +14,7 @@ public abstract class AlchemyStarsEnlightenerRelicBase : ModRelicTemplate
     public override bool IsAllowed(IRunState runState) => false;
 
     public override RelicAssetProfile AssetProfile => new(
-        IconPath: $"{Entry.ResPath}/images/relics/AlchemyStarsRelic.png",
-        IconOutlinePath: $"{Entry.ResPath}/images/relics/AlchemyStarsRelic.png",
-        BigIconPath: $"{Entry.ResPath}/images/relics/AlchemyStarsRelic.png");
+        IconPath: $"{Entry.ResPath}/images/relics/{GetType().Name}.png",
+        IconOutlinePath: $"{Entry.ResPath}/images/relics/{GetType().Name}.png",
+        BigIconPath: $"{Entry.ResPath}/images/relics/{GetType().Name}.png");
 }

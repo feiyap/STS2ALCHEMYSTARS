@@ -13,7 +13,7 @@ namespace AlchemyStars.Powers;
 /// 至高宝典：本场战斗结束时随机升级 1 张牌。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsSupremeCodexPower : ModPowerTemplate
+public sealed class AlchemyStarsSupremeCodexPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 

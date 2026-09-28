@@ -59,6 +59,8 @@ public sealed class AlchemyStarsGeneratedForestSpiritPoit : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
         await PlayerCmd.GainEnergy(DynamicVars.Energy.IntValue, Owner);
         await PowerCmd.Apply<AlchemyStarsEmeraldMarkPower>(

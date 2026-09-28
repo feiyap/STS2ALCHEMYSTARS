@@ -59,6 +59,8 @@ public sealed class AlchemyStarsFireUncommon4 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Fire, FireEnergyGain);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
         LightMechanic.TryAddFireCellsWithDarkChance(

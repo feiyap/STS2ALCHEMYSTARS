@@ -12,7 +12,7 @@ namespace AlchemyStars.Powers;
 /// <summary>
 /// 碧翠印记：每层增�?2% 伤害�?/// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsEmeraldMarkPower : ModPowerTemplate
+public sealed class AlchemyStarsEmeraldMarkPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 

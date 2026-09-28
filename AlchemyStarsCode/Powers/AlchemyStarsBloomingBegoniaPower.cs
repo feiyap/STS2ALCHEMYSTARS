@@ -16,7 +16,7 @@ namespace AlchemyStars.Powers;
 /// 灼灼海棠：灼燃增幅额外提高 20%；回合开始生成火属性格；火格被移出时获能与灼燃。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsBloomingBegoniaPower : ModPowerTemplate
+public sealed class AlchemyStarsBloomingBegoniaPower : AlchemyStarsPowerBase
 {
     private int _pendingEnergy;
     private int _pendingIgnition;

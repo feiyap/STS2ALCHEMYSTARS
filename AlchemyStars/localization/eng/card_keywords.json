@@ -67,7 +67,7 @@
   "ALCHEMY_STARS_KEYWORD_EMERALD_MARK.title": "Emerald Mark",
   "ALCHEMY_STARS_KEYWORD_EMERALD_MARK.description": "Each stack increases damage by 2%.",
   "ALCHEMY_STARS_KEYWORD_PAPER_WOUND.title": "Paper Wound",
-  "ALCHEMY_STARS_KEYWORD_PAPER_WOUND.description": "Each stack reduces Max HP by 2 when damage is taken.",
+  "ALCHEMY_STARS_KEYWORD_PAPER_WOUND.description": "Each stack reduces Max HP by 1 when damage is taken.",
   "ALCHEMY_STARS_KEYWORD_HARVEST_CONSCIOUSNESS.title": "Harvest Consciousness",
   "ALCHEMY_STARS_KEYWORD_HARVEST_CONSCIOUSNESS.description": "Each stack lets [blue]10%[/blue] damage bypass [gold]Block[/gold]. Above [blue]10[/blue] stacks, each excess stack increases damage by [blue]10%[/blue]. Enemies without [gold]Block[/gold] take [blue]10%[/blue] more damage per stack.",
   "ALCHEMY_STARS_KEYWORD_NORTHERN_REALM.title": "Northern Realm",
@@ -119,9 +119,7 @@
   "ALCHEMY_STARS_KEYWORD_CLEAR_ALL.title": "Clear All!",
   "ALCHEMY_STARS_KEYWORD_CLEAR_ALL.description": "Convert non-[gold]Dark Cells[/gold] into Fire [gold]Dark Cells[/gold], spending {fireLightPrefix:lightIcons(1)} per cell.",
   "ALCHEMY_STARS_KEYWORD_HIGH_NOON.title": "High Noon",
-  "ALCHEMY_STARS_KEYWORD_HIGH_NOON.description": "This card's bullet count increases by the number of cards in your Exhaust pile.",
-  "ALCHEMY_STARS_KEYWORD_NO_SURVIVORS.title": "No Survivors",
-  "ALCHEMY_STARS_KEYWORD_NO_SURVIVORS.description": "Spends all Ignition; each stack adds 15% damage.",
+  "ALCHEMY_STARS_KEYWORD_HIGH_NOON.description": "This card's bullet count equals the number of cards in your [gold]Exhaust pile[/gold].",
   "ALCHEMY_STARS_KEYWORD_DEAD_CELEBRATION.title": "Dead Celebration",
   "ALCHEMY_STARS_KEYWORD_DEAD_CELEBRATION.description": "[gold]Exhaust[/gold] half of your deck ([gold]Draw[/gold] and [gold]Discard[/gold] piles), prioritizing [gold]Status[/gold] and [purple]Curse[/purple] cards.",
   "ALCHEMY_STARS_KEYWORD_BOX_MELODY.title": "Box Melody",
@@ -158,6 +156,8 @@
   "ALCHEMY_STARS_KEYWORD_IMPERIAL_THUNDER.description": "A debuff marked by Righteous Majesty. Capped at [blue]99[/blue] stacks.",
   "ALCHEMY_STARS_KEYWORD_REBELLION_BURNING.title": "Rebellion Burning",
   "ALCHEMY_STARS_KEYWORD_REBELLION_BURNING.description": "The first time you play two [gold]Rebellion Burning[/gold] cards each turn, play a random [gold]Rebellion Burning[/gold] card from your [gold]draw pile[/gold].",
-  "ALCHEMY_STARS_KEYWORD_GOLDEN_SCALE_STAR.title": "Golden Scale Star",
-  "ALCHEMY_STARS_KEYWORD_GOLDEN_SCALE_STAR.description": "Can only target a teammate, and only if your HP is higher than theirs."
+  "ALCHEMY_STARS_KEYWORD_GOLDEN_SCALE_STAR.title": "Radiant Star Scale",
+  "ALCHEMY_STARS_KEYWORD_GOLDEN_SCALE_STAR.description": "Can only target a teammate, and only if your HP is higher than theirs.",
+  "ALCHEMY_STARS_KEYWORD_MOBIUS_COMBO.title": "Mobius Combos",
+  "ALCHEMY_STARS_KEYWORD_MOBIUS_COMBO.description": "Fire×4: Gain [blue]1[/blue] Strength\nWater×4: Heal [blue]2[/blue] HP\nThunder×4: Your next [blue]2[/blue] Attacks hit [blue]1[/blue] extra time\nForest×4: Gain [blue]1[/blue] Dexterity\nForest-Fire-Thunder: Apply [blue]3[/blue] Scorch to all enemies and permanently reduce their Strength by [blue]1[/blue]\nFire-Water-Thunder: Apply Slow to all enemies and permanently reduce their Strength by [blue]1[/blue]\nThunder-Forest-Water: Stun all enemies and permanently reduce their Strength by [blue]1[/blue]\nPrismatic×3: Deal [blue]40[/blue] Prismatic damage to all enemies"
 }

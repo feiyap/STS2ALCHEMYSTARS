@@ -63,6 +63,8 @@ public sealed class AlchemyStarsWaterUncommon4 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
+
         LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Water]);
 
         var count = LightMechanic.CountWaterAttributeCells(Owner);

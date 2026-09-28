@@ -16,7 +16,7 @@ namespace AlchemyStars.Powers;
 /// Amount = 份数。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsCharlotteConvertPower : ModPowerTemplate
+public sealed class AlchemyStarsCharlotteConvertPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 

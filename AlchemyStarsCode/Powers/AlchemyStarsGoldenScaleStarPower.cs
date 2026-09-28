@@ -8,11 +8,11 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 金泽之星：胜利时全体玩家各得金币，并按已损失生命百分比治疗。
+/// 灿星天秤：胜利时全体玩家各得金币，并按已损失生命百分比治疗。
 /// 必须用 AfterCombatEnd：引擎会在 AfterCombatVictory 前清掉能力。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsGoldenScaleStarPower : ModPowerTemplate
+public sealed class AlchemyStarsGoldenScaleStarPower : AlchemyStarsPowerBase
 {
     private const decimal VictoryGold = 40m;
 

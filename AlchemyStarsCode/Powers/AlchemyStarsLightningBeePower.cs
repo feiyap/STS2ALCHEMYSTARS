@@ -13,7 +13,7 @@ namespace AlchemyStars.Powers;
 /// 闪电机蜂：每回合开始时消耗 1 层，获得 1 点雷属性光能并抽 1 张牌。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsLightningBeePower : ModPowerTemplate
+public sealed class AlchemyStarsLightningBeePower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 

@@ -14,7 +14,7 @@ namespace AlchemyStars.Powers;
 /// 接下来若干张雷属性牌各额外打出 1 次。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsThunderExtraPlayPower : ModPowerTemplate
+public sealed class AlchemyStarsThunderExtraPlayPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 

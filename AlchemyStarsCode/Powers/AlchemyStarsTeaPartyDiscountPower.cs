@@ -14,7 +14,7 @@ namespace AlchemyStars.Powers;
 /// 影镇茶话会：下一张茶话会成员卡牌费用 -1；消耗后进入冷却。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsTeaPartyDiscountPower : ModPowerTemplate
+public sealed class AlchemyStarsTeaPartyDiscountPower : AlchemyStarsPowerBase
 {
     /// <summary>与词条一致：效果结算后冷却 1 回合。</summary>
     public const int CooldownTurns = 1;

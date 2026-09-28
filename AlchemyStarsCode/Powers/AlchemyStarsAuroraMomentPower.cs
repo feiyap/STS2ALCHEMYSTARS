@@ -16,7 +16,7 @@ namespace AlchemyStars.Powers;
 /// 极光时刻：每消耗 15 点光能，当前手牌本回合耗能变为 0，并临时获得虚无。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsAuroraMomentPower : ModPowerTemplate
+public sealed class AlchemyStarsAuroraMomentPower : AlchemyStarsPowerBase
 {
     private const int LightEnergyPerTrigger = 15;
 

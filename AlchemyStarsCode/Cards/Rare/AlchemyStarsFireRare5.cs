@@ -1,11 +1,11 @@
-using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
@@ -14,18 +14,15 @@ using AlchemyStars.Powers;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Keywords;
 using STS2RitsuLib.Scaffolding.Content;
-using STS2RitsuLib.Utils;
 
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 左轮之徒·约拿：装填子弹后消耗灼燃连射，需足够火属性格才能打出。
+/// 左轮之徒·约拿：子弹数等于当前消耗牌堆数量，打出时消耗全部灼燃。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireRare5 : ModCardTemplate
 {
-    private static readonly AttachedState<CardModel, int> Bullets = new(_ => 0);
-
     private const int BaseEnergyCost = 1;
     private const CardType CardKind = CardType.Attack;
     private const CardRarity CardRarityValue = CardRarity.Rare;
@@ -49,23 +46,19 @@ public sealed class AlchemyStarsFireRare5 : ModCardTemplate
         new DamageVar(BaseBulletDamage, ValueProp.Move),
         new DynamicVar("Bullets", 0),
         AlchemyStarsKeywordText.InlineTitleVar("HighNoon", AlchemyStarsKeywordIds.HighNoon),
-        AlchemyStarsKeywordText.InlineTitleVar("NoSurvivors", AlchemyStarsKeywordIds.NoSurvivors),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire),
-        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.HighNoon),
-        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.NoSurvivors)
+        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.HighNoon)
     ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.HighNoon)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.NoSurvivors)),
-        
         HoverTipFactory.FromPower<AlchemyStarsIgnitionPower>()
     ];
 
@@ -82,9 +75,17 @@ public sealed class AlchemyStarsFireRare5 : ModCardTemplate
         if (!ReferenceEquals(card, this))
             return;
 
-        Bullets[this] += PileType.Exhaust.GetPile(Owner).Cards.Count * BulletsPerExhaustCard;
-        DynamicVars["Bullets"].BaseValue = Bullets[this];
+        SyncBulletDisplay();
         await Task.CompletedTask;
+    }
+
+    public override Task AfterCardExhausted(
+        PlayerChoiceContext choiceContext,
+        CardModel card,
+        bool causedByEthereal)
+    {
+        SyncBulletDisplay();
+        return Task.CompletedTask;
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
@@ -98,7 +99,7 @@ public sealed class AlchemyStarsFireRare5 : ModCardTemplate
 
         var damageMultiplier = 1m + ignitionAmount * IgnitionBonusRate;
         var bulletDamage = DynamicVars.Damage.BaseValue * damageMultiplier;
-        var shotCount = Bullets[this];
+        var shotCount = GetBulletCount();
 
         for (var i = 0; i < shotCount; i++)
         {
@@ -115,12 +116,40 @@ public sealed class AlchemyStarsFireRare5 : ModCardTemplate
                 cardPlay);
         }
 
-        Bullets[this] = 0;
-        DynamicVars["Bullets"].BaseValue = 0;
+        SyncBulletDisplay();
     }
 
     protected override void OnUpgrade()
     {
         DynamicVars.Damage.UpgradeValueBy(2m);
+    }
+
+    private int GetBulletCount()
+    {
+        if (Owner == null)
+            return 0;
+
+        return PileType.Exhaust.GetPile(Owner).Cards.Count * BulletsPerExhaustCard;
+    }
+
+    private void SyncBulletDisplay()
+    {
+        DynamicVars["Bullets"].BaseValue = GetBulletCount();
+    }
+
+    /// <summary>
+    /// 消耗牌堆变化后，同步所有约拿牌面的子弹数。
+    /// </summary>
+    public static void SyncAllBulletDisplays(Player player)
+    {
+        var combat = player.PlayerCombatState;
+        if (combat == null)
+            return;
+
+        foreach (var card in combat.AllCards)
+        {
+            if (card is AlchemyStarsFireRare5 jonah)
+                jonah.SyncBulletDisplay();
+        }
     }
 }

@@ -19,7 +19,7 @@ namespace AlchemyStars.Powers;
 /// 白矮星守护：受到攻击前对攻击者施加 1 层虚弱；己方回合开始时失去 1 层。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsWhiteDwarfGuardPower : ModPowerTemplate
+public sealed class AlchemyStarsWhiteDwarfGuardPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 

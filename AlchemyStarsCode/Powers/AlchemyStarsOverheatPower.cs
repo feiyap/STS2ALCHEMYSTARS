@@ -11,7 +11,7 @@ namespace AlchemyStars.Powers;
 /// 过热：令过热战技卡牌费用 -1。不会自动移除。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsOverheatPower : ModPowerTemplate
+public sealed class AlchemyStarsOverheatPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Debuff;
 

@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.ValueProps;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Models;
@@ -45,6 +46,28 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
         }
 
         await Task.CompletedTask;
+    }
+
+    public override Task AfterCombatEnd(CombatRoom room)
+    {
+        foreach (var player in room.CombatState.Players)
+        {
+            AlchemyStarsForestState.ResetCombatTracking(player);
+            AlchemyStarsForestUncommon9.ResetAllThornSealDamageDisplays(player);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public override Task AfterCardExhausted(
+        PlayerChoiceContext choiceContext,
+        CardModel card,
+        bool causedByEthereal)
+    {
+        if (card.Owner != null)
+            AlchemyStarsFireRare5.SyncAllBulletDisplays(card.Owner);
+
+        return Task.CompletedTask;
     }
 
     public override Task AfterFlush(

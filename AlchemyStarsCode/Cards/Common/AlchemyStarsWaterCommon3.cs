@@ -56,6 +56,8 @@ public sealed class AlchemyStarsWaterCommon3 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         var consumed = 0;
         for (var n = 0; n < MaxWaterLightConsume; n++)
         {

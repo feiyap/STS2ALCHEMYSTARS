@@ -12,7 +12,7 @@ namespace AlchemyStars.Powers;
 /// ??????????????????????????
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsNoDrawThisTurnPower : ModPowerTemplate
+public sealed class AlchemyStarsNoDrawThisTurnPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Debuff;
 

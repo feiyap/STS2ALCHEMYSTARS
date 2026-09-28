@@ -67,6 +67,8 @@ public sealed class AlchemyStarsWaterRare3 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         await PowerCmd.Apply<IntangiblePower>(
             choiceContext,
             Owner.Creature,

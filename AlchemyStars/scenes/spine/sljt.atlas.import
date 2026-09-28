@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://c6ct1m248ap8u"
+path="res://.godot/imported/sljt.atlas-a67a6089ba6aa97bcfb2f0cdf41faac5.spatlas"
+
+[deps]
+
+source_file="res://AlchemyStars/scenes/spine/sljt.atlas"
+dest_files=["res://.godot/imported/sljt.atlas-a67a6089ba6aa97bcfb2f0cdf41faac5.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"

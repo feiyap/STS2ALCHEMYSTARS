@@ -18,7 +18,7 @@ namespace AlchemyStars.Powers;
 /// <summary>
 /// 蛮牛蜃影：回合开始时对全体敌人造成森属性伤害�?/// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsMilosBarragePower : ModPowerTemplate
+public sealed class AlchemyStarsMilosBarragePower : AlchemyStarsPowerBase
 {
     private decimal _damage = 5m;
     private int _turnsRemaining;

@@ -10,7 +10,7 @@ namespace AlchemyStars.Powers;
 /// 觉醒形态：每消耗 15 点光能，将转色栏重置为四种不同属性。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsAwakeningFormPower : ModPowerTemplate
+public sealed class AlchemyStarsAwakeningFormPower : AlchemyStarsPowerBase
 {
     private const int LightEnergyPerReset = 15;
 

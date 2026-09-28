@@ -48,6 +48,8 @@ public sealed class AlchemyStarsDefend : ModCardTemplate
     // 打出时的效果逻辑，这里是获得格挡。
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
     }
 

@@ -15,7 +15,7 @@ namespace AlchemyStars.Powers;
 /// 静声之雷：受到伤害时，额外受到最大生命值 1% × 层数的伤害（不消耗层数）。
 /// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsSilentThunderPower : ModPowerTemplate
+public sealed class AlchemyStarsSilentThunderPower : AlchemyStarsPowerBase
 {
     private const decimal MaxHpBonusPercentPerStack = 0.01m;
 

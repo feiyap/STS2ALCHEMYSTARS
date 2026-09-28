@@ -14,7 +14,7 @@ namespace AlchemyStars.Powers;
 /// <summary>
 /// 蛮牛蜃影升级：攻击时随机强化一格森属性格�?/// </summary>
 [RegisterPower]
-public sealed class AlchemyStarsMilosAttackEnhancePower : ModPowerTemplate
+public sealed class AlchemyStarsMilosAttackEnhancePower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 

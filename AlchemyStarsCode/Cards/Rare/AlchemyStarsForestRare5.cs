@@ -78,6 +78,8 @@ public sealed class AlchemyStarsForestRare5 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         var value = BaseValue + RadiantBloomBonus;
 
         await CreatureCmd.Heal(Owner.Creature, value);

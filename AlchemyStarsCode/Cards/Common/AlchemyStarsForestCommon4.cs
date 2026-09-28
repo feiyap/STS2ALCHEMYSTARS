@@ -56,6 +56,8 @@ public sealed class AlchemyStarsForestCommon4 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
         var energyGain = DynamicVars["ForestLightGain"].IntValue;
         LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Forest, energyGain);
         LightMechanic.ResetAllCellsWithEnhanced(Owner, LightElement.Forest);
