@@ -17,19 +17,33 @@ namespace AlchemyStars.Mechanics;
 /// </summary>
 public static class LightMechanic
 {
+    private const int BaseCharacterSlotLimit = 4;
+    private const int UpgradedRelicBonusSlots = 4;
+
+    /// <summary>
+    /// 是否拥有光能初始/先古遗物（仅用于开战赠送光能等遗物绑定效果）。
+    /// </summary>
     public static bool HasMechanicRelic(Player player) =>
         player.GetRelic<Relics.AlchemyStarsLumenRelic>() != null ||
         player.GetRelic<Relics.AlchemyStarsLumenRelicUpgraded>() != null;
 
+    /// <summary>
+    /// 空裔角色或持有光能遗物时启用光能机制（栏位绑角色，不再依赖初始遗物）。
+    /// </summary>
+    public static bool ShouldEnableMechanic(Player player) =>
+        player.Character is Characters.AlchemyStarsCharacter || HasMechanicRelic(player);
+
     public static int GetSlotLimit(Player player)
     {
+        if (!ShouldEnableMechanic(player))
+            return 0;
+
+        // 栏位默认绑角色：基础 4；自由和弦再 +4。
+        var slots = BaseCharacterSlotLimit;
         if (player.GetRelic<Relics.AlchemyStarsLumenRelicUpgraded>() != null)
-            return 8;
+            slots += UpgradedRelicBonusSlots;
 
-        if (player.GetRelic<Relics.AlchemyStarsLumenRelic>() != null)
-            return 4;
-
-        return 0;
+        return slots;
     }
 
     public static void InitializeForCombat(Player player)
@@ -40,7 +54,9 @@ public static class LightMechanic
 
         var state = LightMechanicCombatState.Get(player);
         state.Configure(slotLimit);
-        state.GrantStartingLightEnergy();
+        // 开战四色光能仍由光能遗物提供，避免无遗物时白嫖。
+        if (HasMechanicRelic(player))
+            state.GrantStartingLightEnergy();
         LightMechanicUiBootstrap.RefreshForPlayer(player);
     }
 
@@ -914,6 +930,46 @@ public static class LightMechanic
         return converted;
     }
 
+    /// <summary>
+    /// 为转色栏中所有未强化的森属性格赋予强化（不改变其他属性格）。
+    /// </summary>
+    public static int EnhanceAllForestCells(Player player)
+    {
+        var state = GetActiveState(player);
+        if (state == null)
+            return 0;
+
+        var enhanced = 0;
+        while (state.TryEnhanceRandomCell(LightElement.Forest, player.RunState.Rng.Niche))
+        {
+            enhanced++;
+            state = GetActiveState(player);
+            if (state == null)
+                break;
+        }
+
+        if (enhanced > 0)
+        {
+            LightMechanicUiBootstrap.RefreshForPlayer(player);
+            NotifyForestEnhancedCellGained(player, enhanced);
+        }
+
+        return enhanced;
+    }
+
+    /// <summary>
+    /// 统计火属性深色格数量。
+    /// </summary>
+    public static int CountFireDarkCells(Player player)
+    {
+        var state = GetActiveState(player);
+        if (state == null)
+            return 0;
+
+        return state.AttributeCells.Items.Count(cell =>
+            cell.Element == LightElement.Fire && cell.Kind == AttributeCellKind.Dark);
+    }
+
     public static int CountWaterAttributeCells(Player player)
     {
         var state = GetActiveState(player);
@@ -949,17 +1005,17 @@ public static class LightMechanic
     }
 
     /// <summary>
-    /// 光能机制当前是否对玩家生效（有遗物且存活）。
+    /// 光能机制当前是否对玩家生效（空裔角色或持有遗物，且存活）。
     /// </summary>
     public static bool IsMechanicActive(Player player) =>
-        HasMechanicRelic(player) && player.Creature is { IsDead: false };
+        ShouldEnableMechanic(player) && player.Creature is { IsDead: false };
 
     /// <summary>
     /// 死亡后静默清空光能与转色栏；不触发属性格移除相关效果。
     /// </summary>
     public static void ClearOnDeath(Player player)
     {
-        if (!HasMechanicRelic(player))
+        if (!ShouldEnableMechanic(player))
             return;
 
         if (!LightMechanicCombatState.TryGet(player, out var state))
@@ -970,7 +1026,7 @@ public static class LightMechanic
     }
 
     /// <summary>
-    /// 玩家拥有光能遗物且存活时，确保战斗状态已创建并完成栏位配置。
+    /// 机制启用且存活时，确保战斗状态已创建并完成栏位配置。
     /// 死亡后返回 null，使属性格相关效果不再触发。
     /// </summary>
     internal static LightMechanicCombatState? GetActiveState(Player player)
@@ -1280,6 +1336,32 @@ public static class LightMechanic
         LightMechanicUiBootstrap.RefreshForPlayer(player);
     }
 
+    /// <summary>
+    /// 以万色格填满转色栏至上限（觉醒形态）。
+    /// </summary>
+    public static void FillAttributeBarWithPrismatic(Player player)
+    {
+        var state = GetActiveState(player);
+        if (state == null)
+            return;
+
+        var maxSlots = state.AttributeCells.MaxSlots;
+        if (maxSlots <= 0)
+            return;
+
+        var removed = state.AttributeCells.Items.ToList();
+        var cells = new List<AttributeCell>(maxSlots);
+        for (var i = 0; i < maxSlots; i++)
+            cells.Add(new AttributeCell(LightElement.Prismatic));
+
+        state.AttributeCells.ReplaceAll(cells);
+        state.UpdateRainbowState();
+        if (removed.Count > 0)
+            NotifyAttributeCellsRemoved(player, removed);
+
+        LightMechanicUiBootstrap.RefreshForPlayer(player);
+    }
+
     public static bool HasForestLightEnergy(Player player) =>
         HasLightEnergy(player, [LightElement.Forest]);
 
@@ -1452,12 +1534,6 @@ public static class LightMechanic
                 state.LastConsumedLightElement = element;
             }
         }
-
-        player.Creature.GetPower<AlchemyStarsAwakeningFormPower>()
-            ?.NotifyLightEnergyConsumed(consumed.Count);
-
-        player.Creature.GetPower<AlchemyStarsAuroraMomentPower>()
-            ?.NotifyLightEnergyConsumed(consumed.Count);
 
         Relics.Character.AlchemyStarsLightAmber.OnLightEnergyConsumed(player, consumed);
 

@@ -24,13 +24,15 @@ public sealed class AlchemyStarsThunderRare4 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int ThunderEnergyGain = 2;
+    private const int BaseThunderEnergyGain = 1;
+    private const int ThunderEnergyGainUpgradeBy = 1;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
+        new IntVar("ThunderGain", BaseThunderEnergyGain),
         new PowerVar<AlchemyStarsThunderExtraPlayPower>(1m),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
     ];
@@ -55,7 +57,10 @@ public sealed class AlchemyStarsThunderRare4 : ModCardTemplate
     {
         await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
 
-        LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Thunder, ThunderEnergyGain);
+        LightMechanic.TryGrantLightEnergyMany(
+            Owner,
+            LightElement.Thunder,
+            DynamicVars["ThunderGain"].IntValue);
 
         if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
         {
@@ -70,6 +75,7 @@ public sealed class AlchemyStarsThunderRare4 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
+        DynamicVars["ThunderGain"].UpgradeValueBy(ThunderEnergyGainUpgradeBy);
         DynamicVars["AlchemyStarsThunderExtraPlayPower"].UpgradeValueBy(1m);
     }
 }

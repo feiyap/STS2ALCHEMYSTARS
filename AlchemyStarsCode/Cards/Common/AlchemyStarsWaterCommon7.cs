@@ -13,7 +13,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 黑街见证·简：对生命值百分比最低的敌人造成水属性伤害，可消耗水光能增加伤害�?/// </summary>
+/// 黑街见证·简：对生命值百分比最低的敌人造成 9/12 点水属性伤害，可消耗水光能按水格加伤。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterCommon7 : ModCardTemplate
 {
@@ -22,7 +23,8 @@ public sealed class AlchemyStarsWaterCommon7 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.None;
     private const bool ShowInCardLibrary = true;
-    private const decimal BaseDamage = 10m;
+    private const decimal BaseDamage = 9m;
+    private const decimal DamageUpgradeBy = 3m;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -71,6 +73,6 @@ public sealed class AlchemyStarsWaterCommon7 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Damage.UpgradeValueBy(4m);
+        DynamicVars.Damage.UpgradeValueBy(DamageUpgradeBy);
     }
 }

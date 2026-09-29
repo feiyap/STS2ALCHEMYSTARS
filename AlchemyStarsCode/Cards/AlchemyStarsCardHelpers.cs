@@ -59,14 +59,33 @@ internal static class AlchemyStarsCardHelpers
                (plays.Count == 1 && ReferenceEquals(plays[0].CardPlay.Card, self));
     }
 
+    /// <summary>
+    /// 在手牌 / 抽牌堆 / 弃牌堆 / 消耗堆中查找超载。
+    /// </summary>
+    public static CardModel? FindOverloadAnywhere(Player owner)
+    {
+        foreach (var pileType in new[] { PileType.Hand, PileType.Draw, PileType.Discard, PileType.Exhaust })
+        {
+            var pile = pileType.GetPile(owner);
+            var found = pile?.Cards?.FirstOrDefault(card => card is AlchemyStarsGeneratedOverload);
+            if (found != null)
+                return found;
+        }
+
+        return null;
+    }
+
     public static CardModel? FindOverloadInHand(Player owner) =>
         owner.PlayerCombatState?.Hand.Cards.FirstOrDefault(card => card is AlchemyStarsGeneratedOverload);
 
-    public static async Task<bool> TryConsumeOverloadFromHand(
+    /// <summary>
+    /// 消耗任意战斗牌堆中的超载；强化超载额外令手牌雷属性牌重放。
+    /// </summary>
+    public static async Task<bool> TryConsumeOverloadAnywhere(
         PlayerChoiceContext choiceContext,
         Player owner)
     {
-        var overload = FindOverloadInHand(owner);
+        var overload = FindOverloadAnywhere(owner);
         if (overload == null)
             return false;
 
@@ -77,6 +96,11 @@ internal static class AlchemyStarsCardHelpers
 
         return true;
     }
+
+    public static Task<bool> TryConsumeOverloadFromHand(
+        PlayerChoiceContext choiceContext,
+        Player owner) =>
+        TryConsumeOverloadAnywhere(choiceContext, owner);
 
     /// <summary>
     /// 强化超载被消耗时：随机令手牌中 1 张雷属性牌重放 1 次。
@@ -196,6 +220,9 @@ internal static class AlchemyStarsCardHelpers
     {
         if (target.Block > 0)
             await CreatureCmd.LoseBlock(choiceContext, target, target.Block, null);
+
+        if (target.HasPower<ArtifactPower>())
+            await PowerCmd.Remove<ArtifactPower>(target);
 
         if (target.HasPower<SlipperyPower>())
             await PowerCmd.Remove<SlipperyPower>(target);

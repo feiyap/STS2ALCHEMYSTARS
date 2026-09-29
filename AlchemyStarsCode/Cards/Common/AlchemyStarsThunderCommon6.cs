@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 白夜城执法人·艾莉法：获得格挡；可消耗雷光能抽牌。
+/// 雷光闪击·艾莉法：非雷格转为雷格，获得 6/8 格挡；可消耗雷光能抽 1/2 张。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderCommon6 : ModCardTemplate
@@ -54,6 +54,9 @@ public sealed class AlchemyStarsThunderCommon6 : ModCardTemplate
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
+
+        // 非雷格全部转为雷格（不生成深色格）。
+        LightMechanic.TryConvertAllCellsToElement(Owner, LightElement.Thunder, darkChancePercent: 0);
 
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
 

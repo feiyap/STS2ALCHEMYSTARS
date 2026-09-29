@@ -27,7 +27,7 @@ public sealed class AlchemyStarsFireUncommon12 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int BaseDrawCount = 2;
+    private const int BaseDrawCount = 1;
     private const int DrawCountUpgradeBy = 1;
 
     public override CardMultiplayerConstraint MultiplayerConstraint =>

@@ -15,7 +15,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 奇巧机蜂·罗伊：获得格挡；消耗雷光能召唤闪电机蜂并抽牌�?/// </summary>
+/// 奇巧机蜂·罗伊：获得格挡；消耗雷光能召唤闪电机蜂（机蜂自身回合抽牌）。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon7 : ModCardTemplate
 {
@@ -35,7 +36,6 @@ public sealed class AlchemyStarsThunderUncommon7 : ModCardTemplate
     [
         new BlockVar(7m, ValueProp.Move),
         new PowerVar<AlchemyStarsLightningBeePower>(1m),
-        new CardsVar(1),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
     ];
 
@@ -47,7 +47,6 @@ public sealed class AlchemyStarsThunderUncommon7 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        
         HoverTipFactory.FromPower<AlchemyStarsLightningBeePower>()
     ];
 
@@ -71,8 +70,6 @@ public sealed class AlchemyStarsThunderUncommon7 : ModCardTemplate
             DynamicVars["AlchemyStarsLightningBeePower"].IntValue,
             Owner.Creature,
             this);
-
-        await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
     }
 
     protected override void OnUpgrade()

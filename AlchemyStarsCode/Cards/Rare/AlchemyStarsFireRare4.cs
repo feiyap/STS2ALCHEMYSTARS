@@ -15,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 千痕影主·伊斯塔万：从抽牌堆抽取火属性攻击牌，并可消耗火光能引爆弃牌堆。
+/// 千痕影主·伊斯塔万：从抽牌堆抽取火属性攻击牌，消耗弃牌堆并使本回合火伤翻倍。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireRare4 : ModCardTemplate
@@ -32,6 +32,7 @@ public sealed class AlchemyStarsFireRare4 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
+        new CardsVar(FireAttackDrawCount),
         AlchemyStarsKeywordText.InlineTitleVar("ShadowHerdMajesty", AlchemyStarsKeywordIds.ShadowHerdMajesty),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
     ];
@@ -57,11 +58,6 @@ public sealed class AlchemyStarsFireRare4 : ModCardTemplate
         await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
 
         await DrawFireAttacksFromDrawPile(choiceContext);
-
-        if (!LightMechanic.TryConsumeLightEnergy(
-                Owner,
-                [LightElement.Fire, LightElement.Fire]))
-            return;
 
         var discard = PileType.Discard.GetPile(Owner).Cards.ToList();
         foreach (var card in discard)

@@ -12,7 +12,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 极光时刻：先古能力。每消耗 15 点光能，本回合手牌耗能变为 0 并获得虚无。
+/// 极光时刻：先古能力。每打出 15 张牌，当前手牌本回合可无消耗打出。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsAuroraMoment : ModCardTemplate
@@ -28,8 +28,6 @@ public sealed class AlchemyStarsAuroraMoment : ModCardTemplate
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        
-        HoverTipFactory.FromKeyword(CardKeyword.Ethereal),
         HoverTipFactory.FromPower<AlchemyStarsAuroraMomentPower>()
     ];
 

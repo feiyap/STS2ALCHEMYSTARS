@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 苍笼树海·加百列：高庭卫队；获得森光能并填满/重置转色栏，每制造 1 森格获 5 点格挡。
+/// 苍笼树海·加百列：高庭卫队；获得森光能并填满/重置转色栏，每制造 1 森格获 3/4 点格挡。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestUncommon1 : ModCardTemplate
@@ -24,7 +24,8 @@ public sealed class AlchemyStarsForestUncommon1 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int BlockPerForestCell = 5;
+    private const int BlockPerForestCell = 3;
+    private const int BlockPerForestCellUpgradeBy = 1;
 
     /// <summary>大概率：普通森属性格。</summary>
     private const int LargeForestChancePercent = 60;
@@ -85,5 +86,10 @@ public sealed class AlchemyStarsForestUncommon1 : ModCardTemplate
                 new BlockVar(forestCreated * DynamicVars.Block.BaseValue, ValueProp.Move),
                 cardPlay);
         }
+    }
+
+    protected override void OnUpgrade()
+    {
+        DynamicVars.Block.UpgradeValueBy(BlockPerForestCellUpgradeBy);
     }
 }

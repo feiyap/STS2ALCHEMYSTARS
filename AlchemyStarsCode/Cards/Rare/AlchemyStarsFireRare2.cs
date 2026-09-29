@@ -16,7 +16,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 红油魁首·醒山：攻击前获灼燃，对目标与次要敌人造成火伤；可消耗火光能强化伤害。
+/// 红油魁首·醒山：攻击前获灼燃；对目标与其他敌人造成火伤。
+/// 拥有 2 个火属性格时：最近目标伤害翻倍；全员等距则对所有敌人造成翻倍全额伤害。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireRare2 : ModCardTemplate
@@ -28,6 +29,7 @@ public sealed class AlchemyStarsFireRare2 : ModCardTemplate
     private const bool ShowInCardLibrary = true;
     private const decimal BaseDamage = 15m;
     private const decimal IgnitionGain = 10m;
+    private const int RequiredFireCells = 2;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -72,26 +74,33 @@ public sealed class AlchemyStarsFireRare2 : ModCardTemplate
         if (enemies.Count == 0)
             return;
 
-        var consumed = LightMechanic.TryConsumeLightEnergy(
-            Owner,
-            [LightElement.Fire, LightElement.Fire]);
-
+        // 拥有 2 个火属性格时触发强化，不再消耗火光能。
+        var empowered = LightMechanic.CountFireAttributeCells(Owner) >= RequiredFireCells;
         var baseDamage = DynamicVars.Damage.BaseValue;
         var target = cardPlay.Target;
         var allSameDistance = AlchemyStarsCardHelpers.AreEnemiesAtSameDistance(enemies);
         var targetIsNearest = AlchemyStarsCardHelpers.IsNearestEnemy(target, enemies);
 
-        var targetDamage = baseDamage;
-        if (consumed && targetIsNearest)
-            targetDamage *= 2m;
-
-        var othersDealFullDamage = consumed && allSameDistance;
-
         foreach (var enemy in enemies)
         {
-            var damage = ReferenceEquals(enemy, target)
-                ? targetDamage
-                : othersDealFullDamage ? baseDamage : baseDamage / 2m;
+            decimal damage;
+            if (empowered && allSameDistance)
+            {
+                // 全员等距：对所有敌人造成翻倍后的全额伤害。
+                damage = baseDamage * 2m;
+            }
+            else if (empowered && targetIsNearest && ReferenceEquals(enemy, target))
+            {
+                damage = baseDamage * 2m;
+            }
+            else if (ReferenceEquals(enemy, target))
+            {
+                damage = baseDamage;
+            }
+            else
+            {
+                damage = baseDamage / 2m;
+            }
 
             await LightMechanic.DealElementalAttackDamage(
                 choiceContext,

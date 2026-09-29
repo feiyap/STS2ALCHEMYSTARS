@@ -12,7 +12,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 觉醒形态：每消耗 15 点光能重置转色栏，必定出现四种不同属性。
+/// 觉醒形态：每打出 15 张属性牌，用万色格填满转色栏。升级固有。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsRare1 : ModCardTemplate
@@ -28,10 +28,7 @@ public sealed class AlchemyStarsRare1 : ModCardTemplate
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        
-        
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DarkCell)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.EnhancedCell)),
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Prismatic)),
         HoverTipFactory.FromPower<AlchemyStarsAwakeningFormPower>()
     ];
 
@@ -44,13 +41,16 @@ public sealed class AlchemyStarsRare1 : ModCardTemplate
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
 
-        var power = await PowerCmd.Apply<AlchemyStarsAwakeningFormPower>(
+        await PowerCmd.Apply<AlchemyStarsAwakeningFormPower>(
             choiceContext,
             Owner.Creature,
             1m,
             Owner.Creature,
             this);
+    }
 
-        power?.Configure(IsUpgraded);
+    protected override void OnUpgrade()
+    {
+        AddKeyword(CardKeyword.Innate);
     }
 }

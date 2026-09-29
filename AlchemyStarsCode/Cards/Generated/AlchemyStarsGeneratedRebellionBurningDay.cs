@@ -32,10 +32,14 @@ public sealed class AlchemyStarsGeneratedRebellionBurningDay : ModCardTemplate
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [];
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+    [
+        CardKeyword.Exhaust
+    ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
+        HoverTipFactory.FromKeyword(CardKeyword.Exhaust),
         HoverTipFactory.FromCard<AlchemyStarsGeneratedRebellionBurningReinhardt>(),
         HoverTipFactory.FromPower<AlchemyStarsRebellionHpPayPower>()
     ];
@@ -52,11 +56,13 @@ public sealed class AlchemyStarsGeneratedRebellionBurningDay : ModCardTemplate
         AlchemyStarsRebellionBurningHelper.GrantRebellionBurningToAwakenedCards(Owner);
 
         var reinhardt = CombatState!.CreateCard<AlchemyStarsGeneratedRebellionBurningReinhardt>(Owner);
+        // 升级后提供升级版反叛灼燃·莱因哈特。
+        if (IsUpgraded)
+            reinhardt.UpgradeInternal();
+
         await CardPileCmd.AddGeneratedCardToCombat(reinhardt, PileType.Hand, Owner);
 
-        if (!IsUpgraded)
-            return;
-
+        // 基础效果：下回合起可用生命支付反叛灼燃牌费用。
         var existing = Owner.Creature.GetPower<AlchemyStarsRebellionHpPayPower>();
         if (existing != null)
         {

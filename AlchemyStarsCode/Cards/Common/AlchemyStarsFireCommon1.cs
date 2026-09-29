@@ -1,3 +1,4 @@
+using System.Linq;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -15,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 爆裂蜥蜴·玛吉：获得火光能、格挡，并在下回合开始时再获格挡。
+/// 爆裂蜥蜴·玛吉：获 2 点火光能与格挡；引爆全体灼烧（不消耗层数）。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireCommon1 : ModCardTemplate
@@ -35,7 +36,6 @@ public sealed class AlchemyStarsFireCommon1 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new BlockVar(6m, ValueProp.Move),
-        new PowerVar<AlchemyStarsNextTurnBlockPower>(3m),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
     ];
 
@@ -47,8 +47,7 @@ public sealed class AlchemyStarsFireCommon1 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
-        
-        HoverTipFactory.FromPower<AlchemyStarsNextTurnBlockPower>()
+        HoverTipFactory.FromPower<AlchemyStarsScorchPower>()
     ];
 
     public AlchemyStarsFireCommon1()
@@ -62,17 +61,30 @@ public sealed class AlchemyStarsFireCommon1 : ModCardTemplate
 
         LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Fire, FireEnergyGain);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
-        await PowerCmd.Apply<AlchemyStarsNextTurnBlockPower>(
-            choiceContext,
-            Owner.Creature,
-            DynamicVars["AlchemyStarsNextTurnBlockPower"].BaseValue,
-            Owner.Creature,
-            this);
+
+        // 引爆灼烧：造成等同回合开始结算的伤害，但不消耗层数。
+        foreach (var enemy in CombatState!.HittableEnemies.ToList())
+        {
+            var scorch = enemy.GetPower<AlchemyStarsScorchPower>();
+            if (scorch == null || scorch.Amount <= 0)
+                continue;
+
+            var damage = (decimal)System.Math.Ceiling((double)(enemy.MaxHp * 0.01m * scorch.Amount));
+            if (damage <= 0m)
+                continue;
+
+            await CreatureCmd.Damage(
+                choiceContext,
+                enemy,
+                damage,
+                ValueProp.Unblockable | ValueProp.Unpowered,
+                this,
+                cardPlay);
+        }
     }
 
     protected override void OnUpgrade()
     {
         DynamicVars.Block.UpgradeValueBy(2m);
-        DynamicVars["AlchemyStarsNextTurnBlockPower"].UpgradeValueBy(1m);
     }
 }

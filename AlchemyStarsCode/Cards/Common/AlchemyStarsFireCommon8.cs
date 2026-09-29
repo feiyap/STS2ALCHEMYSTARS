@@ -19,12 +19,12 @@ namespace AlchemyStars.Cards;
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireCommon8 : ModCardTemplate
 {
-    private const int BaseEnergyCost = 1;
+    private const int BaseEnergyCost = 0;
     private const CardType CardKind = CardType.Skill;
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int DrawCount = 3;
+    private const int DrawCount = 2;
     private const int DazedCount = 2;
 
     protected override bool IsPlayable => LightMechanic.HasFireLightEnergy(Owner);
@@ -36,6 +36,7 @@ public sealed class AlchemyStarsFireCommon8 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
+        new CardsVar(DrawCount),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
     ];
 
@@ -62,7 +63,7 @@ public sealed class AlchemyStarsFireCommon8 : ModCardTemplate
         if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Fire]))
             return;
 
-        await CardPileCmd.Draw(choiceContext, DrawCount, Owner);
+        await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
         await CardPileCmd.AddToCombatAndPreview<Dazed>(
             Owner.Creature,
             PileType.Discard,
@@ -72,6 +73,6 @@ public sealed class AlchemyStarsFireCommon8 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        EnergyCost.UpgradeBy(-1);
+        DynamicVars.Cards.UpgradeValueBy(1m);
     }
 }

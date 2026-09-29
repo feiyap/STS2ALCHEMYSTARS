@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -10,7 +9,6 @@ using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
 using AlchemyStars.Mechanics;
-using AlchemyStars.Powers;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Keywords;
 using STS2RitsuLib.Scaffolding.Content;
@@ -18,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 左轮之徒·约拿：子弹数等于当前消耗牌堆数量，打出时消耗全部灼燃。
+/// 左轮之徒·约拿：子弹数等于消耗牌堆数量；每发伤害为基础×(1+子弹数)。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireRare5 : ModCardTemplate
@@ -28,10 +26,9 @@ public sealed class AlchemyStarsFireRare5 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
-    private const int RequiredFireCells = 3;
-    private const decimal BaseBulletDamage = 2m;
+    private const int RequiredFireCells = 4;
+    private const decimal BaseBulletDamage = 1m;
     private const int BulletsPerExhaustCard = 1;
-    private const decimal IgnitionBonusRate = 0.15m;
 
     protected override bool IsPlayable =>
         LightMechanic.CountFireAttributeCells(Owner) >= RequiredFireCells;
@@ -51,15 +48,16 @@ public sealed class AlchemyStarsFireRare5 : ModCardTemplate
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
+        CardKeyword.Exhaust,
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire),
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.HighNoon)
     ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
+        HoverTipFactory.FromKeyword(CardKeyword.Exhaust),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.HighNoon)),
-        HoverTipFactory.FromPower<AlchemyStarsIgnitionPower>()
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.HighNoon))
     ];
 
     public AlchemyStarsFireRare5()
@@ -92,16 +90,11 @@ public sealed class AlchemyStarsFireRare5 : ModCardTemplate
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
-        var ignition = Owner.Creature.GetPower<AlchemyStarsIgnitionPower>();
-        var ignitionAmount = ignition?.Amount ?? 0;
-        if (ignition != null)
-            await PowerCmd.Remove(ignition);
+        var bullets = GetBulletCount();
+        // 1/2×(1+子弹数量)：每发 = 基础伤害 × (1+子弹数)
+        var perShot = DynamicVars.Damage.BaseValue * (1 + bullets);
 
-        var damageMultiplier = 1m + ignitionAmount * IgnitionBonusRate;
-        var bulletDamage = DynamicVars.Damage.BaseValue * damageMultiplier;
-        var shotCount = GetBulletCount();
-
-        for (var i = 0; i < shotCount; i++)
+        for (var i = 0; i < bullets; i++)
         {
             if (cardPlay.Target.IsDead)
                 break;
@@ -111,7 +104,7 @@ public sealed class AlchemyStarsFireRare5 : ModCardTemplate
                 Owner,
                 this,
                 cardPlay.Target,
-                bulletDamage,
+                perShot,
                 LightElement.Fire,
                 cardPlay);
         }
@@ -121,7 +114,7 @@ public sealed class AlchemyStarsFireRare5 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Damage.UpgradeValueBy(2m);
+        DynamicVars.Damage.UpgradeValueBy(1m);
     }
 
     private int GetBulletCount()

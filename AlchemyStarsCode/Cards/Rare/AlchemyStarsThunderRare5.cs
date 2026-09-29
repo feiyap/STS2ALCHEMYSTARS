@@ -17,7 +17,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 帝国之雷·索尔拉德：需消耗雷光能；先造成全体雷伤，再施加帝国雷霆。升级时先上印记再攻击。
+/// <summary>
+/// 帝国之雷·索尔拉德：耗雷光能；先上 99 帝国雷霆再造成 7 伤 1/2 次。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderRare5 : ModCardTemplate
@@ -72,14 +73,11 @@ public sealed class AlchemyStarsThunderRare5 : ModCardTemplate
         if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
             return;
 
-        if (IsUpgraded)
-            await ApplyImperialThunder(choiceContext);
+        // 始终先上帝国雷霆，再攻击。
+        await ApplyImperialThunder(choiceContext);
 
         foreach (var enemy in CombatState!.HittableEnemies.ToList())
             await AttackEnemyWithRighteousMajesty(choiceContext, enemy, cardPlay);
-
-        if (!IsUpgraded)
-            await ApplyImperialThunder(choiceContext);
     }
 
     private async Task ApplyImperialThunder(PlayerChoiceContext choiceContext)
@@ -142,5 +140,10 @@ public sealed class AlchemyStarsThunderRare5 : ModCardTemplate
                 this,
                 cardPlay);
         }
+    }
+
+    protected override void OnUpgrade()
+    {
+        DynamicVars.Repeat.UpgradeValueBy(1m);
     }
 }

@@ -14,7 +14,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 缘木求叶·尤拉：获得森光能并重置转色栏，下回合开始时抽牌�?/// </summary>
+/// 缘木求叶·尤拉：获得 1/2 森光能；将非森格转为森格（大概率强化）；下回合抽 1/2 张。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestCommon4 : ModCardTemplate
 {
@@ -27,6 +28,9 @@ public sealed class AlchemyStarsForestCommon4 : ModCardTemplate
     private const int ForestEnergyGainUpgradeBy = 1;
     private const int BaseDrawCount = 1;
     private const int DrawCountUpgradeBy = 1;
+
+    /// <summary>大概率赋予强化格。</summary>
+    private const int EnhancedChancePercent = 60;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -46,8 +50,7 @@ public sealed class AlchemyStarsForestCommon4 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest)),
-        
-        ];
+    ];
 
     public AlchemyStarsForestCommon4()
         : base(BaseEnergyCost, CardKind, CardRarityValue, CardTarget, ShowInCardLibrary)
@@ -60,7 +63,11 @@ public sealed class AlchemyStarsForestCommon4 : ModCardTemplate
 
         var energyGain = DynamicVars["ForestLightGain"].IntValue;
         LightMechanic.TryGrantLightEnergyMany(Owner, LightElement.Forest, energyGain);
-        LightMechanic.ResetAllCellsWithEnhanced(Owner, LightElement.Forest);
+        // 仅转化非森格为森格，大概率强化。
+        LightMechanic.ResetNonForestCells(
+            Owner,
+            normalChancePercent: 100 - EnhancedChancePercent,
+            enhancedChancePercent: EnhancedChancePercent);
 
         var drawCount = DynamicVars.Cards.IntValue;
         var drawPower = await PowerCmd.Apply<AlchemyStarsYuraDrawPower>(

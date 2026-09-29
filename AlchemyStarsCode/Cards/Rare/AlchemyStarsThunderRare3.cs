@@ -16,7 +16,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 启明之光·莱因哈特：贯通之星；按本回合雷伤次数追加攻击。
+/// 启明之光·莱因哈特：贯通之星；基础 2 次 5 点雷伤，按本回合雷伤次数追加攻击。
+/// 消耗 2 点雷光能且刚好清零时获得反叛灼燃之日；升级则提供升级后的该牌。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderRare3 : ModCardTemplate
@@ -28,7 +29,7 @@ public sealed class AlchemyStarsThunderRare3 : ModCardTemplate
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
     private const decimal BaseDamage = 5m;
-    private const decimal BaseHitCount = 1m;
+    private const decimal BaseHitCount = 2m;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -54,7 +55,6 @@ public sealed class AlchemyStarsThunderRare3 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.PenetratingStar)),
         HoverTipFactory.FromCard<AlchemyStarsGeneratedRebellionBurningDay>(),
         HoverTipFactory.FromCard<AlchemyStarsGeneratedRebellionBurningReinhardt>()
@@ -69,8 +69,7 @@ public sealed class AlchemyStarsThunderRare3 : ModCardTemplate
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
-        if (IsUpgraded)
-            await TryGrantRebellionBurningDayIfEmptiedThunderLightAsync(choiceContext);
+        await TryGrantRebellionBurningDayIfEmptiedThunderLightAsync();
 
         var hitCount = (int)((CalculatedVar)DynamicVars[CalculatedHitsKey]).Calculate(cardPlay.Target);
         for (var i = 0; i < hitCount; i++)
@@ -89,8 +88,7 @@ public sealed class AlchemyStarsThunderRare3 : ModCardTemplate
         }
     }
 
-    private async Task TryGrantRebellionBurningDayIfEmptiedThunderLightAsync(
-        PlayerChoiceContext choiceContext)
+    private async Task TryGrantRebellionBurningDayIfEmptiedThunderLightAsync()
     {
         if (LightMechanic.CountThunderLightEnergy(Owner) < 2)
             return;
@@ -102,13 +100,15 @@ public sealed class AlchemyStarsThunderRare3 : ModCardTemplate
             return;
 
         var card = CombatState!.CreateCard<AlchemyStarsGeneratedRebellionBurningDay>(Owner);
+        if (IsUpgraded)
+            card.UpgradeInternal();
+
         await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, Owner);
-        await Task.CompletedTask;
     }
 
     protected override void OnUpgrade()
     {
-        // 升级效果为：刚好把雷光能耗尽时获得反叛灼燃之日。
+        // 升级效果：刚好清零雷光能时提供升级后的反叛灼燃之日。
     }
 
     /// <summary>

@@ -283,7 +283,7 @@
   "THE_ARCHITECT.talk.ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.3-0r.next": "Continue",
   "THE_ARCHITECT.talk.ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.3-1r.ancient": "Is farewell courtesy—or obsession?\nWhy keep this ritual\nafter I've crushed you countless times?",
   "THE_ARCHITECT.talk.ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.3-1r.next": "Continue",
-  "THE_ARCHITECT.talk.ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.3-2r.char": "Without a word, it doesn't feel finished.\nI still don't understand you, but I'll say goodbye.\nAnd we've long been ready to return.",
+  "THE_ARCHITECT.talk.ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.3-2r.char": "I just want to settle this with you.\nI still don't understand you, but I'll say goodbye.\nAnd we've long been ready to return.",
   "THE_ARCHITECT.talk.ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.3-2r.next": "Continue",
   "THE_ARCHITECT.talk.ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.3-3r.char": "Sky Carrier—prepare for return!",
   "ALCHEMY_STARS_EVENT_ALCHEMY_STARS_ENLIGHTENER.title": "The Enlightener",
@@ -415,5 +415,8 @@
   "ALCHEMY_STARS_ANCIENT_ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_LIGHT_TRACKING_PLAN_C.title": "Light Tracking Plan C",
   "ALCHEMY_STARS_ANCIENT_ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_LIGHT_TRACKING_PLAN_C.description": "Each time you pick up a card of an attribute, that attribute's appearance weight increases by 15%.",
   "ALCHEMY_STARS_ANCIENT_ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_LIGHT_TRACKING_PLAN_D.title": "Light Tracking Plan D",
-  "ALCHEMY_STARS_ANCIENT_ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_LIGHT_TRACKING_PLAN_D.description": "No special tracking. Challenge the run in its original flavor."
+  "ALCHEMY_STARS_ANCIENT_ALCHEMY_STARS_ENLIGHTENER.pages.INITIAL.options.ALCHEMY_STARS_LIGHT_TRACKING_PLAN_D.description": "No special tracking. Challenge the run in its original flavor.",
+  "ALCHEMY_STARS_ENLIGHTENER.epithet": "Light Observer",
+  "ALCHEMY_STARS_EVENT_ALCHEMY_STARS_ENLIGHTENER.epithet": "Light Observer",
+  "ALCHEMY_STARS_ANCIENT_ALCHEMY_STARS_ENLIGHTENER.epithet": "Light Observer"
 }

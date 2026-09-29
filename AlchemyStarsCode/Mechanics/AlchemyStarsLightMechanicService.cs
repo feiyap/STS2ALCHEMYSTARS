@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using System.Linq;
 using AlchemyStars.Cards;
+using AlchemyStars.Powers;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.GameActions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Rooms;
@@ -37,15 +40,24 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
         {
             AlchemyStarsRebellionBurningHelper.ResetTurnTracking(player);
 
-            if (!LightMechanic.HasMechanicRelic(player))
+            if (!LightMechanic.ShouldEnableMechanic(player))
                 continue;
 
             LightMechanicCombatState.Reset(player);
             LightMechanic.InitializeForCombat(player);
             AlchemyStarsForestState.ResetCombatTracking(player);
-        }
 
-        await Task.CompletedTask;
+            if (player.Deck.Cards.OfType<AlchemyStarsRare3>().Any() &&
+                player.Creature.GetPower<AlchemyStarsPhantomThievesWatchPower>() == null)
+            {
+                await PowerCmd.Apply<AlchemyStarsPhantomThievesWatchPower>(
+                    new ThrowingPlayerChoiceContext(),
+                    player.Creature,
+                    1m,
+                    player.Creature,
+                    null);
+            }
+        }
     }
 
     public override Task AfterCombatEnd(CombatRoom room)
@@ -151,6 +163,7 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {
         AlchemyStarsRebellionBurningHelper.ResetTurnTracking(player);
+        AlchemyStarsPhantomThievesTracker.ResetTurn();
 
         if (!LightMechanic.IsMechanicActive(player))
             return;
@@ -175,7 +188,7 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
             return Task.CompletedTask;
 
         var player = creature.Player;
-        if (player == null || !LightMechanic.HasMechanicRelic(player))
+        if (player == null || !LightMechanic.ShouldEnableMechanic(player))
             return Task.CompletedTask;
 
         LightMechanic.ClearOnDeath(player);

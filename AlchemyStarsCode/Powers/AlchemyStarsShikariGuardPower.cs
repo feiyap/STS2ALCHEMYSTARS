@@ -12,12 +12,12 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 默陵之卫：每回合第一次攻击获得能量；每次攻击按份数增加收割意识，每份上限 20 层。
+/// 默陵之卫：每回合第一次攻击获得能量；每次攻击按份数增加收割意识，每份上限 10 层。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsShikariGuardPower : AlchemyStarsPowerBase
 {
-    private const decimal HarvestCapPerCopy = 20m;
+    private const decimal HarvestCapPerCopy = 10m;
 
     private readonly List<(decimal Increment, decimal Contributed)> _copies = [];
     private bool _gainedEnergyThisTurn;

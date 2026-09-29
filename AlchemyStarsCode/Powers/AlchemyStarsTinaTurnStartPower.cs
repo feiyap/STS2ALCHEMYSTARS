@@ -12,7 +12,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 蒂娜：层数表示回手倒计时（固定 2）；另计深色格剩余次数（1/2）。
+/// 蒂娜：层数表示回手倒计时（固定 3）；另计深色格剩余次数（1/2）。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsTinaTurnStartPower : AlchemyStarsPowerBase
@@ -23,6 +23,12 @@ public sealed class AlchemyStarsTinaTurnStartPower : AlchemyStarsPowerBase
     public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Counter;
+
+    /// <summary>
+    /// 是否正在追踪指定消耗卡牌的回手。
+    /// </summary>
+    public bool IsTracking(CardModel card) =>
+        _exhaustedCard != null && ReferenceEquals(_exhaustedCard, card);
 
     /// <summary>
     /// 登记待回手的消耗卡牌，以及接下来若干回合开始时获得水深色格的次数。

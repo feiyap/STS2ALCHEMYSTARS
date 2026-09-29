@@ -67,7 +67,7 @@ public sealed class AlchemyStarsThunderUncommon10 : ModCardTemplate
 
         await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
 
-        if (await AlchemyStarsCardHelpers.TryConsumeOverloadFromHand(choiceContext, Owner))
+        if (await AlchemyStarsCardHelpers.TryConsumeOverloadAnywhere(choiceContext, Owner))
             await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
 
         await PowerCmd.Apply<VulnerablePower>(

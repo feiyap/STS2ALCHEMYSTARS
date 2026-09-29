@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
@@ -14,18 +15,23 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 潜庭之脊：攻击时附加森属性伤害，并随机强化属性栏中一格。
+/// 潜庭之脊：攻击时按层数附加森属性伤害并随机强化一格；斩杀阈值固定 10%。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsMigardSpinePower : AlchemyStarsPowerBase
 {
-    private const decimal BonusDamage = 4m;
+    private const decimal BonusDamagePerStack = 4m;
 
     private bool _isResolving;
 
     public override PowerType Type => PowerType.Buff;
 
-    public override PowerStackType StackType => PowerStackType.Single;
+    public override PowerStackType StackType => PowerStackType.Counter;
+
+    protected override IEnumerable<DynamicVar> CanonicalVars =>
+    [
+        new DynamicVar("BonusDamage", BonusDamagePerStack)
+    ];
 
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
@@ -36,12 +42,14 @@ public sealed class AlchemyStarsMigardSpinePower : AlchemyStarsPowerBase
             return;
 
         var player = Owner.Player;
-        if (player == null)
+        if (player == null || Amount <= 0)
             return;
 
         _isResolving = true;
         try
         {
+            // 叠加只增加附加伤害，不改变斩杀阈值。
+            var bonus = BonusDamagePerStack * Amount;
             foreach (var target in ResolveAttackTargets(cardPlay))
             {
                 if (target.IsDead)
@@ -52,7 +60,7 @@ public sealed class AlchemyStarsMigardSpinePower : AlchemyStarsPowerBase
                     player,
                     cardPlay.Card,
                     target,
-                    BonusDamage,
+                    bonus,
                     LightElement.Forest,
                     cardPlay: null,
                     playAttackerAnim: false);

@@ -16,12 +16,12 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 强运天星·歌尔蒂：强耀绽放；数值随打出次数在本局游戏中成长，升级时全格转森强化格并获得能量。
+/// 强运天星·歌尔蒂：强耀绽放；数值随打出次数成长；升级后打出时强化森格并获 1 能。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestRare5 : ModCardTemplate
 {
-    private const int BaseEnergyCost = 0;
+    private const int BaseEnergyCost = 1;
     private const CardType CardKind = CardType.Skill;
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.Self;
@@ -102,14 +102,14 @@ public sealed class AlchemyStarsForestRare5 : ModCardTemplate
 
         if (IsUpgraded)
         {
-            LightMechanic.ConvertAllCellsToForestEnhanced(Owner);
+            LightMechanic.EnhanceAllForestCells(Owner);
             await PlayerCmd.GainEnergy(UpgradeEnergyGain, Owner);
         }
     }
 
     protected override void OnUpgrade()
     {
-        // 升级效果在打出时触发：全格转森强化格并获得 1 点能量。
+        // 升级效果在打出时触发：强化森属性格并获得 1 点能量。
     }
 
     /// <summary>

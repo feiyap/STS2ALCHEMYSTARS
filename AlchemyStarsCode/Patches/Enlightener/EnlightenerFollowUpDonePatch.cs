@@ -90,7 +90,7 @@ public sealed class EnlightenerFollowUpDonePatch : IPatchMethod
         var options = CreateOptions(hostEvent, eventEntry);
         var description = new LocString("ancients", $"{eventEntry}.pages.INITIAL.description");
         SetEventStateMethod.Invoke(hostEvent, [description, options]);
-        EnlightenerFollowUpVisuals.Apply(eventEntry);
+        EnlightenerFollowUpVisuals.Apply(eventEntry, hostEvent);
 
         Entry.Logger.Info($"[Enlightener] 在 {hostEvent.Id.Entry} 后展示启迪者续页。");
     }

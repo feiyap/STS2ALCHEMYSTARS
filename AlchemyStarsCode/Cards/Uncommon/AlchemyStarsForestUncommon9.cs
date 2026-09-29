@@ -1,8 +1,5 @@
-using System.Linq;
 using System.Threading.Tasks;
-using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
@@ -19,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 铁棘冠冕·列奥：荆印在身；消耗森光能，随机多段森伤；伤害随本场保留效果次数成长。
+/// 铁棘冠冕·列奥：荆印在身；耗森光对敌造成单段森伤，伤害随本场保留效果次数成长。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestUncommon9 : ModCardTemplate
@@ -27,10 +24,10 @@ public sealed class AlchemyStarsForestUncommon9 : ModCardTemplate
     private const int BaseEnergyCost = 1;
     private const CardType CardKind = CardType.Attack;
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
-    private const TargetType CardTarget = TargetType.RandomEnemy;
+    private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
-    private const int HitCount = 3;
-    private const decimal BaseHitDamage = 3m;
+    private const decimal BaseHitDamage = 9m;
+    private const decimal DamageUpgradeBy = 5m;
 
     protected override bool IsPlayable => LightMechanic.HasForestLightEnergy(Owner);
 
@@ -42,7 +39,6 @@ public sealed class AlchemyStarsForestUncommon9 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new DamageVar(BaseHitDamage, ValueProp.Move),
-        new RepeatVar(HitCount),
         AlchemyStarsKeywordText.InlineTitleVar("ThornSealOnBody", AlchemyStarsKeywordIds.ThornSealOnBody),
         AlchemyStarsKeywordText.InlineTitleVar("ForestTitle", AlchemyStarsKeywordIds.Forest)
     ];
@@ -66,40 +62,25 @@ public sealed class AlchemyStarsForestUncommon9 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Forest]);
+        ArgumentNullException.ThrowIfNull(cardPlay.Target);
+
+        if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Forest]))
+            return;
 
         SyncDamageDisplay();
-        var damage = DynamicVars.Damage.BaseValue;
-
-        for (var i = 0; i < HitCount; i++)
-        {
-            var target = PickRandomEnemy();
-            if (target == null)
-                break;
-
-            await LightMechanic.DealElementalAttackDamage(
-                choiceContext,
-                Owner,
-                this,
-                target,
-                damage,
-                LightElement.Forest,
-                cardPlay);
-        }
-    }
-
-    private Creature? PickRandomEnemy()
-    {
-        var enemies = CombatState?.HittableEnemies.ToList();
-        if (enemies == null || enemies.Count == 0)
-            return null;
-
-        return Owner.RunState.Rng.CombatTargets.NextItem(enemies);
+        await LightMechanic.DealElementalAttackDamage(
+            choiceContext,
+            Owner,
+            this,
+            cardPlay.Target,
+            DynamicVars.Damage.BaseValue,
+            LightElement.Forest,
+            cardPlay);
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Damage.UpgradeValueBy(1m);
+        DynamicVars.Damage.UpgradeValueBy(DamageUpgradeBy);
         if (Owner?.PlayerCombatState != null)
             SyncDamageDisplay();
     }
@@ -111,7 +92,7 @@ public sealed class AlchemyStarsForestUncommon9 : ModCardTemplate
     }
 
     private decimal GetBaseHitDamage() =>
-        IsUpgraded ? BaseHitDamage + 1m : BaseHitDamage;
+        IsUpgraded ? BaseHitDamage + DamageUpgradeBy : BaseHitDamage;
 
     private decimal GetCombatDamage()
     {
@@ -149,7 +130,7 @@ public sealed class AlchemyStarsForestUncommon9 : ModCardTemplate
     }
 
     /// <summary>
-    /// 战斗结束后恢复列奥牌面为基础伤害，避免篝火升级仍显示累计值。
+    /// 战斗结束后恢复列奥牌面为基础伤害。
     /// </summary>
     public static void ResetAllThornSealDamageDisplays(Player player)
     {

@@ -111,10 +111,11 @@ public sealed class AlchemyStarsGeneratedRebellionBurningReinhardt : ModCardTemp
 
         if (LightMechanic.TryExhaustAllAttributeCellsOnlyThunderAndFire(Owner))
         {
+            // 未升级 70%、升级 100% 已损失生命伤害。
             await PowerCmd.Apply<AlchemyStarsRebellionBurningEchoPower>(
                 choiceContext,
                 Owner.Creature,
-                1m,
+                IsUpgraded ? 100m : 70m,
                 Owner.Creature,
                 this);
         }

@@ -106,9 +106,36 @@ public static class AlchemyStarsEventHelpers
 
     public static async Task GainCharacterRelic(Player player)
     {
-        // 空裔专属：优先角色池遗物；若无可抽则退回普通随机。
-        var relic = RelicFactory.PullNextRelicFromFront(player).ToMutable();
-        await RelicCmd.Obtain(relic, player);
+        // 空裔专属遗物：直接从抓取袋按过滤器抽取，避免 RelicFactory 在无匹配时回退 Circlet。
+        static bool IsCharacterRelic(RelicModel relic) =>
+            relic is AlchemyStars.Relics.Character.AlchemyStarsCharacterRelicBase;
+
+        player.PopulateRelicGrabBagIfNecessary(player.PlayerRng.Rewards);
+
+        RelicModel? relic = null;
+        foreach (var rarity in new[]
+                 {
+                     RelicFactory.RollRarity(player),
+                     RelicRarity.Common,
+                     RelicRarity.Uncommon,
+                     RelicRarity.Rare,
+                     RelicRarity.Shop
+                 })
+        {
+            relic = player.RelicGrabBag.PullFromFront(rarity, IsCharacterRelic, player.RunState);
+            if (relic != null)
+                break;
+        }
+
+        if (relic == null)
+        {
+            // 角色专属已抽尽时退回普通随机。
+            await GainRandomRelic(player);
+            return;
+        }
+
+        player.RunState.SharedRelicGrabBag.Remove(relic);
+        await RelicCmd.Obtain(relic.ToMutable(), player);
     }
 
     public static async Task AddUpgradedCardToDeck<T>(Player player) where T : CardModel

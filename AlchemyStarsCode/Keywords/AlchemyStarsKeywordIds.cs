@@ -36,6 +36,7 @@ public static class AlchemyStarsKeywordIds
     public const string EmeraldMark = "ALCHEMY_STARS_KEYWORD_EMERALD_MARK";
     public const string PaperWound = "ALCHEMY_STARS_KEYWORD_PAPER_WOUND";
     public const string HarvestConsciousness = "ALCHEMY_STARS_KEYWORD_HARVEST_CONSCIOUSNESS";
+    public const string Calamity = "ALCHEMY_STARS_KEYWORD_CALAMITY";
     public const string Lock = "ALCHEMY_STARS_KEYWORD_LOCK";
     public const string TimelessSeal = "ALCHEMY_STARS_KEYWORD_TIMELESS_SEAL";
     public const string AuroraMoment = "ALCHEMY_STARS_KEYWORD_AURORA_MOMENT";
@@ -75,6 +76,9 @@ public static class AlchemyStarsKeywordIds
     public const string LightSwordArmor = "ALCHEMY_STARS_KEYWORD_LIGHT_SWORD_ARMOR";
     public const string AwakeningForm = "ALCHEMY_STARS_KEYWORD_AWAKENING_FORM";
     public const string Soaring = "ALCHEMY_STARS_KEYWORD_SOARING";
+    public const string Pursuit = "ALCHEMY_STARS_KEYWORD_PURSUIT";
+    public const string AllOutAttack = "ALCHEMY_STARS_KEYWORD_ALL_OUT_ATTACK";
+    public const string SinPiercingRound = "ALCHEMY_STARS_KEYWORD_SIN_PIERCING_ROUND";
 
     // 火属性词条
     public const string Ignition = "ALCHEMY_STARS_KEYWORD_IGNITION";
@@ -92,5 +96,7 @@ public static class AlchemyStarsKeywordIds
     public const string BoxMelody = "ALCHEMY_STARS_KEYWORD_BOX_MELODY";
     public const string SpiritStaffBlessing = "ALCHEMY_STARS_KEYWORD_SPIRIT_STAFF_BLESSING";
     public const string MobiusCombo = "ALCHEMY_STARS_KEYWORD_MOBIUS_COMBO";
+    public const string ForgivingOmniscience = "ALCHEMY_STARS_KEYWORD_FORGIVING_OMNISCIENCE";
+    public const string BloodMoonBanquet = "ALCHEMY_STARS_KEYWORD_BLOOD_MOON_BANQUET";
 }
 

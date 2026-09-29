@@ -101,7 +101,7 @@ public sealed class AlchemyStarsWaterCommon8 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
+        // 升级只增加获得的水光能，消耗保持 1。
         DynamicVars["WaterLightGain"].UpgradeValueBy(1m);
-        DynamicVars["WaterLightConsume"].UpgradeValueBy(1m);
     }
 }

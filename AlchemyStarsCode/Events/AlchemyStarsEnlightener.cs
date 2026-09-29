@@ -1,3 +1,4 @@
+using Godot;
 using MegaCrit.Sts2.Core.Events;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
@@ -12,7 +13,11 @@ namespace AlchemyStars.Events;
 public sealed class AlchemyStarsEnlightener : ModAncientEventTemplate
 {
     public const string EventEntry = "ALCHEMY_STARS_ENLIGHTENER";
+    /// <summary>对话本地化主键（与 ancients.json 中 EVENT 前缀一致）。</summary>
+    public const string DialogueEntry = "ALCHEMY_STARS_EVENT_ALCHEMY_STARS_ENLIGHTENER";
     public const string PortraitPath = $"{Entry.ResPath}/images/events/AlchemyStarsEnlightener.png";
+
+    public override Color DialogueColor => new("5BA3C9");
 
     public override LocString InitialDescription =>
         L10NLookup($"{EventEntry}.pages.INITIAL.description");

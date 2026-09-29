@@ -176,6 +176,8 @@ namespace AlchemyStars.Keywords;
 
 [RegisterOwnedCardKeyword("harvest_consciousness")]
 
+[RegisterOwnedCardKeyword("calamity")]
+
 [RegisterOwnedCardKeyword("northern_realm")]
 
 [RegisterOwnedCardKeyword(
@@ -276,8 +278,28 @@ namespace AlchemyStars.Keywords;
     "spirit_staff_blessing",
     CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
 
+[RegisterOwnedCardKeyword(
+    "pursuit",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword(
+    "all_out_attack",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword(
+    "sin_piercing_round",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
 /// <summary>故我自在莫比乌斯：连招一览（遗物悬停提示栏）。</summary>
 [RegisterOwnedCardKeyword("mobius_combo")]
+
+[RegisterOwnedCardKeyword(
+    "forgiving_omniscience",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword(
+    "blood_moon_banquet",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
 
 public sealed class AlchemyStarsMechanicKeywords;
 

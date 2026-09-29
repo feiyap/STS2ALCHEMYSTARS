@@ -20,7 +20,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 寂默之花·库斯库塔：影镇茶话会；保留时造成随机森伤并复制自身，打出时消耗并随机攻击�?/// </summary>
+/// 寂默之花·库斯库塔：影镇茶话会；保留时造成随机森伤并复制自身，打出时提升全场库斯库塔伤害。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestUncommon8 : ModCardTemplate
 {
@@ -30,8 +31,9 @@ public sealed class AlchemyStarsForestUncommon8 : ModCardTemplate
     private const TargetType CardTarget = TargetType.RandomEnemy;
     private const bool ShowInCardLibrary = true;
     private const int RetainBaseDamage = 5;
-    private const int RetainBonusBase = 1;
-    private const int RetainBonusUpgradeBy = 1;
+    private const int RetainDamageUpgradeBy = 1;
+    private const int PlayBonusBase = 1;
+    private const int PlayBonusUpgradeBy = 1;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -39,7 +41,7 @@ public sealed class AlchemyStarsForestUncommon8 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new DamageVar(RetainBaseDamage, ValueProp.Move),
-        new IntVar("Increase", RetainBonusBase),
+        new IntVar("Increase", PlayBonusBase),
         AlchemyStarsKeywordText.InlineTitleVar("ShadowTownTeaParty", AlchemyStarsKeywordIds.ShadowTownTeaParty),
         AlchemyStarsKeywordText.InlineTitleVar("ForestTitle", AlchemyStarsKeywordIds.Forest)
     ];
@@ -76,6 +78,7 @@ public sealed class AlchemyStarsForestUncommon8 : ModCardTemplate
         if (player != Owner || !retainedCards.Contains(this))
             return;
 
+        // 保留：只造成伤害并复制，不提升伤害。
         var damage = GetCombatDamage();
         var target = PickRandomEnemy();
         if (target != null)
@@ -89,11 +92,6 @@ public sealed class AlchemyStarsForestUncommon8 : ModCardTemplate
                 LightElement.Forest);
         }
 
-        AlchemyStarsForestState.IncrementKushkutaCombatDamageBonus(
-            Owner,
-            DynamicVars["Increase"].IntValue);
-        SyncAllKushkutaDamageDisplays(Owner);
-
         var copy = CombatState!.CreateCard<AlchemyStarsForestUncommon8>(Owner);
         if (IsUpgraded)
             copy.UpgradeInternal();
@@ -104,7 +102,9 @@ public sealed class AlchemyStarsForestUncommon8 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        DynamicVars["Increase"].UpgradeValueBy(RetainBonusUpgradeBy);
+        DynamicVars.Damage.UpgradeValueBy(RetainDamageUpgradeBy);
+        DynamicVars["Increase"].UpgradeValueBy(PlayBonusUpgradeBy);
+        SyncDamageDisplay();
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
@@ -113,21 +113,30 @@ public sealed class AlchemyStarsForestUncommon8 : ModCardTemplate
 
         var damage = GetCombatDamage();
         var target = PickRandomEnemy();
-        if (target == null)
-            return;
+        if (target != null)
+        {
+            await LightMechanic.DealElementalAttackDamage(
+                choiceContext,
+                Owner,
+                this,
+                target,
+                damage,
+                LightElement.Forest,
+                cardPlay);
+        }
 
-        await LightMechanic.DealElementalAttackDamage(
-            choiceContext,
+        // 打出：本场战斗所有库斯库塔伤害提升。
+        AlchemyStarsForestState.IncrementKushkutaCombatDamageBonus(
             Owner,
-            this,
-            target,
-            damage,
-            LightElement.Forest,
-            cardPlay);
+            DynamicVars["Increase"].IntValue);
+        SyncAllKushkutaDamageDisplays(Owner);
     }
 
+    private decimal GetFaceDamage() =>
+        IsUpgraded ? RetainBaseDamage + RetainDamageUpgradeBy : RetainBaseDamage;
+
     private decimal GetCombatDamage() =>
-        RetainBaseDamage + AlchemyStarsForestState.GetKushkutaCombatDamageBonus(Owner);
+        GetFaceDamage() + AlchemyStarsForestState.GetKushkutaCombatDamageBonus(Owner);
 
     private void SyncDamageDisplay()
     {

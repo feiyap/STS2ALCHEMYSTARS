@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
 using AlchemyStars.Powers;
@@ -16,7 +17,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 安息之辉·蒂娜：从抽牌堆选牌入手后消耗自身；深色格 1/2 回合，固定 2 回合后回手。
+/// 安息之辉·蒂娜：从抽牌堆选牌入手后消耗自身；深色格 1/2 回合，固定 3 回合后回手。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterUncommon6 : ModCardTemplate
@@ -28,7 +29,7 @@ public sealed class AlchemyStarsWaterUncommon6 : ModCardTemplate
     private const bool ShowInCardLibrary = true;
     private const int BaseDarkTurns = 1;
     private const int DarkTurnsUpgradeBy = 1;
-    private const int ReturnTurns = 2;
+    private const int ReturnTurns = 3;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -69,6 +70,29 @@ public sealed class AlchemyStarsWaterUncommon6 : ModCardTemplate
         await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
 
         await TryPickFromDrawPile(choiceContext);
+
+        await RegisterReturn(choiceContext);
+    }
+
+    /// <summary>
+    /// 任意途径消耗（含灼伤等）时登记回手；已在追踪中则跳过。
+    /// </summary>
+    public override async Task AfterCardExhausted(
+        PlayerChoiceContext choiceContext,
+        CardModel card,
+        bool causedByEthereal)
+    {
+        if (!ReferenceEquals(card, this) || Owner == null)
+            return;
+
+        await RegisterReturn(choiceContext);
+    }
+
+    private async Task RegisterReturn(PlayerChoiceContext choiceContext)
+    {
+        var existing = Owner.Creature.GetPower<AlchemyStarsTinaTurnStartPower>();
+        if (existing != null && existing.IsTracking(this))
+            return;
 
         var power = await PowerCmd.Apply<AlchemyStarsTinaTurnStartPower>(
             choiceContext,

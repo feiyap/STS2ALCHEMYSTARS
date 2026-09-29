@@ -1,3 +1,4 @@
+using System.Linq;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
@@ -16,18 +17,27 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 芒刺纹徽·普律玛：往昔溃裂；消耗森强化格获得重放，伤害随转色栏产出成长。
+/// 芒刺纹徽·普律玛：往昔溃裂；消耗森强化格获得重放，伤害随转色栏产出成长；升级后改为全体。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsForestRare1 : ModCardTemplate
 {
     private const string ReplayKey = "Replay";
-    private const int BaseEnergyCost = 3;
+    private const int BaseEnergyCost = 2;
     private const CardType CardKind = CardType.Attack;
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
-    private const decimal BaseDamage = 10m;
+    private const decimal BaseDamage = 5m;
+    private const decimal DamageUpgradeBy = 2m;
+
+    /// <summary>
+    /// 升级后改为全体敌人；未升级时保持单体目标。
+    /// </summary>
+    public override TargetType TargetType =>
+        IsUpgraded
+            ? MegaCrit.Sts2.Core.Entities.Cards.TargetType.AllEnemies
+            : MegaCrit.Sts2.Core.Entities.Cards.TargetType.AnyEnemy;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -72,10 +82,27 @@ public sealed class AlchemyStarsForestRare1 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        ArgumentNullException.ThrowIfNull(cardPlay.Target);
-
         SyncPastRuptureDamageDisplay();
         var damage = DynamicVars.Damage.BaseValue;
+
+        if (IsUpgraded)
+        {
+            foreach (var enemy in CombatState!.HittableEnemies.ToList())
+            {
+                await LightMechanic.DealElementalAttackDamage(
+                    choiceContext,
+                    Owner,
+                    this,
+                    enemy,
+                    damage,
+                    LightElement.Forest,
+                    cardPlay);
+            }
+
+            return;
+        }
+
+        ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
         await LightMechanic.DealElementalAttackDamage(
             choiceContext,
@@ -89,16 +116,17 @@ public sealed class AlchemyStarsForestRare1 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        EnergyCost.UpgradeBy(-1);
+        DynamicVars.Damage.UpgradeValueBy(DamageUpgradeBy);
         SyncPastRuptureDamageDisplay();
     }
 
     /// <summary>
-    /// 往昔溃裂加成变化后同步牌面伤害。
+    /// 往昔溃裂加成变化后同步牌面伤害（含升级伤害加成）。
     /// </summary>
     public void SyncPastRuptureDamageDisplay()
     {
-        DynamicVars.Damage.BaseValue = BaseDamage + AlchemyStarsForestState.GetPastRuptureBonus(this);
+        var upgradedBonus = IsUpgraded ? DamageUpgradeBy : 0m;
+        DynamicVars.Damage.BaseValue = BaseDamage + upgradedBonus + AlchemyStarsForestState.GetPastRuptureBonus(this);
     }
 
     /// <summary>

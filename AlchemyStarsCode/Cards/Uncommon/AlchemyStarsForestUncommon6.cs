@@ -46,7 +46,9 @@ public sealed class AlchemyStarsForestUncommon6 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.HarvestConsciousness)),
-        HoverTipFactory.FromPower<AlchemyStarsShikariGuardPower>()
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Calamity)),
+        HoverTipFactory.FromPower<AlchemyStarsShikariGuardPower>(),
+        HoverTipFactory.FromPower<AlchemyStarsCalamityPower>()
     ];
 
     public AlchemyStarsForestUncommon6()

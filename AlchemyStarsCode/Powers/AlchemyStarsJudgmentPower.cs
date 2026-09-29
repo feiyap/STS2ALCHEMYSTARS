@@ -14,12 +14,13 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 审判：受到雷属性伤害时自身 +1 层；到达 25 层时眩晕并移除所有审判；回合结束时 -1 层。
+/// 审判：受到雷属性伤害时 +1 层；到达 25 层时造成当前生命 33% 伤害并移除；回合结束 -1 层。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsJudgmentPower : AlchemyStarsPowerBase
 {
-    private const int StunThreshold = 25;
+    private const int TriggerThreshold = 25;
+    private const decimal CurrentHpDamagePercent = 0.33m;
 
     public override PowerType Type => PowerType.Debuff;
 
@@ -41,7 +42,7 @@ public sealed class AlchemyStarsJudgmentPower : AlchemyStarsPowerBase
             return;
 
         await PowerCmd.ModifyAmount(choiceContext, this, 1m, dealer, cardSource);
-        await TryTriggerStunThreshold(choiceContext, Owner);
+        await TryTriggerThreshold(choiceContext, Owner);
     }
 
     public override async Task AfterSideTurnEnd(
@@ -60,16 +61,47 @@ public sealed class AlchemyStarsJudgmentPower : AlchemyStarsPowerBase
         await PowerCmd.Decrement(this);
     }
 
-    public static async Task TryTriggerStunThreshold(
+    public static async Task TryTriggerThreshold(
         PlayerChoiceContext choiceContext,
         Creature target,
-        int threshold = StunThreshold)
+        int threshold = TriggerThreshold)
     {
         var judgment = target.GetPower<AlchemyStarsJudgmentPower>();
         if (judgment == null || judgment.Amount < threshold || target.IsDead)
             return;
 
-        await CreatureCmd.Stun(target);
+        FlashIfPossible(judgment);
+        var loss = target.CurrentHp * CurrentHpDamagePercent;
+        if (loss > 0m)
+        {
+            await CreatureCmd.Damage(
+                choiceContext,
+                target,
+                loss,
+                ValueProp.Unblockable | ValueProp.Unpowered,
+                null,
+                null);
+        }
+
         await PowerCmd.Remove(judgment);
+    }
+
+    /// <summary>兼容旧调用名。</summary>
+    public static Task TryTriggerStunThreshold(
+        PlayerChoiceContext choiceContext,
+        Creature target,
+        int threshold = TriggerThreshold) =>
+        TryTriggerThreshold(choiceContext, target, threshold);
+
+    private static void FlashIfPossible(AlchemyStarsJudgmentPower judgment)
+    {
+        try
+        {
+            judgment.Flash();
+        }
+        catch
+        {
+            // 忽略闪光失败
+        }
     }
 }

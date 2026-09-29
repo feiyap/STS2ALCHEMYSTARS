@@ -31,7 +31,7 @@ public sealed class AlchemyStarsForestUncommon7 : ModCardTemplate
     private const TargetType CardTarget = TargetType.AllEnemies;
     private const bool ShowInCardLibrary = true;
     private const int RequiredForestLightEnergy = 2;
-    private const decimal DetonatePercentPerStack = 0.02m;
+    private const decimal DetonatePercentPerStack = 0.01m;
     private const int SingleTargetMultiplier = 4;
 
     protected override bool IsPlayable =>
@@ -86,10 +86,18 @@ public sealed class AlchemyStarsForestUncommon7 : ModCardTemplate
         if (dealer != Owner.Creature || target.IsDead || target.Side == Owner.Creature.Side)
             return;
 
+        // 仅森属性「攻击牌」触发；避免非森伤害或残留伤害上下文误上结晶。
+        if (cardSource == null || cardSource.Type != CardType.Attack)
+            return;
+
         if (!props.IsPoweredAttack() || result.UnblockedDamage <= 0)
             return;
 
         if (LightMechanicDamageContext.CurrentElement != LightElement.Forest)
+            return;
+
+        if (!cardSource.Keywords.Contains(
+                ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest)))
             return;
 
         await PowerCmd.Apply<AlchemyStarsCrystallizationPower>(
@@ -153,6 +161,6 @@ public sealed class AlchemyStarsForestUncommon7 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Damage.UpgradeValueBy(3m);
+        DynamicVars.Damage.UpgradeValueBy(1m);
     }
 }

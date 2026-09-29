@@ -11,7 +11,8 @@ using STS2RitsuLib.Interop.AutoRegistration;
 namespace AlchemyStars.Relics.Ancients;
 
 /// <summary>
-/// 奇怪的糖果：拾起时选 1 张能力牌注入 Imbued；每场战斗开始失去 1 点能量。
+/// <summary>
+/// 怪味糖果：拾起时选任意未附魔牌注入 Imbued；每场战斗开始失去 1 点能量。
 /// </summary>
 [RegisterRelic(typeof(AlchemyStarsRelicPool))]
 public sealed class AlchemyStarsWeirdCandy : AlchemyStarsAncientRelicBase
@@ -28,11 +29,11 @@ public sealed class AlchemyStarsWeirdCandy : AlchemyStarsAncientRelicBase
             return;
 
         var prefs = new CardSelectorPrefs(CardSelectorPrefs.EnchantSelectionPrompt, 1);
-        // Imbued 原版仅允许技能；此处按设计强制对能力牌注能。
+        // 设计：任意卡注能（无附魔即可）。
         var selected = (await CardSelectCmd.FromDeckGeneric(
             Owner,
             prefs,
-            c => c.Type == CardType.Power && c.Enchantment == null)).FirstOrDefault();
+            c => c.Enchantment == null)).FirstOrDefault();
 
         if (selected == null)
             return;

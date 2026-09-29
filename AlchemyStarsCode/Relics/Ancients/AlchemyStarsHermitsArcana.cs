@@ -1,4 +1,3 @@
-using AlchemyStars.Cards;
 using AlchemyStars.Characters;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
@@ -6,19 +5,19 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Cards;
 using MegaCrit.Sts2.Core.Rooms;
 using STS2RitsuLib.Interop.AutoRegistration;
 
 namespace AlchemyStars.Relics.Ancients;
 
 /// <summary>
-/// 隐士奥秘：每回合首张攻击与首张能力费用为 0；拾起时加入诅咒「苦恼」。
+/// 隐士奥秘：每回合第 1 张攻击或能力牌费用为 0；拾起时加入诅咒「苦恼」。
 /// </summary>
 [RegisterRelic(typeof(AlchemyStarsRelicPool))]
 public sealed class AlchemyStarsHermitsArcana : AlchemyStarsAncientRelicBase
 {
-    private bool _attackFreedThisTurn;
-    private bool _powerFreedThisTurn;
+    private bool _freedThisTurn;
 
     public override bool HasUponPickupEffect => true;
 
@@ -27,7 +26,7 @@ public sealed class AlchemyStarsHermitsArcana : AlchemyStarsAncientRelicBase
         if (Owner == null)
             return;
 
-        await CardPileCmd.AddCurseToDeck<AlchemyStarsAngst>(Owner);
+        await CardPileCmd.AddCurseToDeck<Writhe>(Owner);
         Flash();
     }
 
@@ -38,10 +37,7 @@ public sealed class AlchemyStarsHermitsArcana : AlchemyStarsAncientRelicBase
         ICombatState combatState)
     {
         if (Owner != null && participants.Contains(Owner.Creature))
-        {
-            _attackFreedThisTurn = false;
-            _powerFreedThisTurn = false;
-        }
+            _freedThisTurn = false;
 
         return Task.CompletedTask;
     }
@@ -59,19 +55,14 @@ public sealed class AlchemyStarsHermitsArcana : AlchemyStarsAncientRelicBase
         if (pile is not (PileType.Hand or PileType.Play))
             return false;
 
-        if (card.Type == CardType.Attack && !_attackFreedThisTurn)
-        {
-            modifiedCost = 0m;
-            return true;
-        }
+        if (_freedThisTurn)
+            return false;
 
-        if (card.Type == CardType.Power && !_powerFreedThisTurn)
-        {
-            modifiedCost = 0m;
-            return true;
-        }
+        if (card.Type is not (CardType.Attack or CardType.Power))
+            return false;
 
-        return false;
+        modifiedCost = 0m;
+        return true;
     }
 
     public override Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
@@ -79,18 +70,15 @@ public sealed class AlchemyStarsHermitsArcana : AlchemyStarsAncientRelicBase
         if (Owner == null || cardPlay.Card.Owner != Owner)
             return Task.CompletedTask;
 
-        if (cardPlay.Card.Type == CardType.Attack)
-            _attackFreedThisTurn = true;
-        else if (cardPlay.Card.Type == CardType.Power)
-            _powerFreedThisTurn = true;
+        if (cardPlay.Card.Type is CardType.Attack or CardType.Power)
+            _freedThisTurn = true;
 
         return Task.CompletedTask;
     }
 
     public override Task AfterCombatEnd(CombatRoom _)
     {
-        _attackFreedThisTurn = false;
-        _powerFreedThisTurn = false;
+        _freedThisTurn = false;
         return Task.CompletedTask;
     }
 }

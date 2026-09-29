@@ -14,16 +14,15 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 反叛灼燃·莱因哈特：回合末对全体敌人造成已损失生命 70% 的火/雷伤害。
+/// <summary>
+/// 反叛灼燃·莱因哈特：回合末对全体敌人造成已损失生命比例火/雷伤害（层数=百分比）。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsRebellionBurningEchoPower : AlchemyStarsPowerBase
 {
-    public const decimal MissingHpDamageRatio = 0.70m;
-
     public override PowerType Type => PowerType.Buff;
 
-    public override PowerStackType StackType => PowerStackType.Single;
+    public override PowerStackType StackType => PowerStackType.Counter;
 
     public override async Task AfterSideTurnEnd(
         PlayerChoiceContext choiceContext,
@@ -40,6 +39,7 @@ public sealed class AlchemyStarsRebellionBurningEchoPower : AlchemyStarsPowerBas
             return;
         }
 
+        var ratio = Amount > 0m ? Amount / 100m : 0.70m;
         var enemies = Owner.CombatState!.HittableEnemies.ToList();
         foreach (var enemy in enemies)
         {
@@ -47,7 +47,7 @@ public sealed class AlchemyStarsRebellionBurningEchoPower : AlchemyStarsPowerBas
             if (missingHp <= 0m)
                 continue;
 
-            var damage = missingHp * MissingHpDamageRatio;
+            var damage = missingHp * ratio;
             using (LightMechanicDamageContext.UseFireAndThunder())
             {
                 await CreatureCmd.Damage(

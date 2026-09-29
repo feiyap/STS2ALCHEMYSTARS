@@ -1,5 +1,4 @@
 using System;
-using AlchemyStars.Cards;
 using AlchemyStars.Enchantments;
 using AlchemyStars.Relics.Events;
 using MegaCrit.Sts2.Core.Commands;
@@ -37,7 +36,7 @@ public sealed class AlchemyStarsGirlAndRuins : ModEventTemplate
 
     private async Task Dress()
     {
-        await CardPileCmd.AddCurseToDeck<AlchemyStarsAngst>(Owner!);
+        await CardPileCmd.AddCurseToDeck<Writhe>(Owner!);
         await AlchemyStarsEventHelpers.GainCharacterRelic(Owner!);
         SetEventFinished(PageDescription("DRESS"));
     }

@@ -5,8 +5,6 @@ using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
-using MegaCrit.Sts2.Core.Models.Powers;
-using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
 using AlchemyStars.Mechanics;
@@ -17,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 凌野之鹰·蕾切尔：侦察者；添加深色雷格并获得同量覆甲，可消耗雷光能随机取回弃牌堆雷牌。
+/// 凌野之鹰·蕾切尔：侦察者；添加深色雷格，可消耗雷光能随机取回弃牌堆雷牌。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
@@ -53,8 +51,7 @@ public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DarkCell)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Overload)),
-        HoverTipFactory.FromCard<AlchemyStarsGeneratedOverload>(),
-        HoverTipFactory.FromPower<PlatingPower>()
+        HoverTipFactory.FromCard<AlchemyStarsGeneratedOverload>()
     ];
 
     public AlchemyStarsThunderUncommon5()
@@ -66,21 +63,10 @@ public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
     {
         await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
 
-        if (await AlchemyStarsCardHelpers.TryConsumeOverloadFromHand(choiceContext, Owner))
+        if (await AlchemyStarsCardHelpers.TryConsumeOverloadAnywhere(choiceContext, Owner))
             await PlayerCmd.GainEnergy(OverloadEnergyGain, Owner);
 
         LightMechanic.TryAddDarkThunderCells(Owner, DynamicVars.Repeat.IntValue);
-
-        var plating = LightMechanic.CountThunderAttributeCells(Owner);
-        if (plating > 0)
-        {
-            await PowerCmd.Apply<PlatingPower>(
-                choiceContext,
-                Owner.Creature,
-                plating,
-                Owner.Creature,
-                this);
-        }
 
         if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
             return;

@@ -6,17 +6,21 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Rooms;
 using STS2RitsuLib.Interop.AutoRegistration;
 
 namespace AlchemyStars.Relics.Character;
 
 /// <summary>
-/// 十连召集：每场战斗第一回合抽 10 选 4，其余进弃牌堆。
+/// 十连召集：第一回合抽 10 选 4；每多抽 2 张可多留 1 张；固有牌不受影响。
 /// </summary>
 [RegisterRelic(typeof(AlchemyStarsRelicPool))]
 public sealed class AlchemyStarsTenPullSummon : AlchemyStarsCharacterRelicBase
 {
+    private const int BaseDraw = 10;
+    private const int BaseKeep = 4;
+
     private bool _pendingFirstTurn;
 
     public override RelicRarity Rarity => RelicRarity.Rare;
@@ -37,7 +41,7 @@ public sealed class AlchemyStarsTenPullSummon : AlchemyStarsCharacterRelicBase
     {
         if (player != Owner || !_pendingFirstTurn)
             return count;
-        return 10m;
+        return BaseDraw;
     }
 
     public override async Task AfterPlayerTurnStartLate(PlayerChoiceContext choiceContext, Player player)
@@ -47,19 +51,29 @@ public sealed class AlchemyStarsTenPullSummon : AlchemyStarsCharacterRelicBase
 
         _pendingFirstTurn = false;
         var hand = PileType.Hand.GetPile(Owner);
-        if (hand.Cards.Count <= 4)
+        var selectables = hand.Cards.Where(c => !IsInnateCard(c)).ToList();
+        if (selectables.Count <= BaseKeep)
+            return;
+
+        // 每超出基础 10 抽 2 张，可多选留 1 张。
+        var extraDraws = Math.Max(0, selectables.Count - BaseDraw);
+        var keepCount = Math.Min(selectables.Count, BaseKeep + extraDraws / 2);
+        if (keepCount >= selectables.Count)
             return;
 
         Flash();
-        var maxKeep = Math.Min(4, hand.Cards.Count);
-        var prefs = new CardSelectorPrefs(CardSelectorPrefs.DiscardSelectionPrompt, maxKeep, maxKeep);
+        var prefs = new CardSelectorPrefs(CardSelectorPrefs.DiscardSelectionPrompt, keepCount, keepCount);
         var keep = (await CardSelectCmd.FromCombatPile(
             choiceContext,
             hand,
             Owner,
-            prefs)).ToHashSet();
+            prefs,
+            c => !IsInnateCard(c))).ToHashSet();
 
-        foreach (var card in hand.Cards.Where(c => !keep.Contains(c)).ToList())
+        foreach (var card in selectables.Where(c => !keep.Contains(c)).ToList())
             await CardPileCmd.Add(card, PileType.Discard);
     }
+
+    private static bool IsInnateCard(CardModel card) =>
+        card.Keywords.Contains(CardKeyword.Innate);
 }

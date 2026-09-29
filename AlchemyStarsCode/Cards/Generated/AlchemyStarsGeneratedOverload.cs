@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading.Tasks;
 using AlchemyStars.Keywords;
 using MegaCrit.Sts2.Core.Commands;
@@ -16,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 超载：抽到时失去 1 点能量。衍生 Token，不会进入状态牌随机池。
+/// 超载：抽到时失去 1 点能量；升级后抽到时令手牌雷牌重放 1 次（不再失能）。
 /// </summary>
 [RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedOverload : ModCardTemplate
@@ -64,6 +63,18 @@ public sealed class AlchemyStarsGeneratedOverload : ModCardTemplate
             return;
 
         await Cmd.Wait(0.25f);
+
+        if (IsUpgraded)
+        {
+            AlchemyStarsCardHelpers.TryGrantThunderCardReplay(Owner);
+            return;
+        }
+
         await PlayerCmd.LoseEnergy(DynamicVars.Energy.IntValue, Owner);
+    }
+
+    protected override void OnUpgrade()
+    {
+        // 升级效果在抽到时触发（重放）。
     }
 }

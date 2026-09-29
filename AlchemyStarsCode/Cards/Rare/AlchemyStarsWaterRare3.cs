@@ -30,7 +30,8 @@ public sealed class AlchemyStarsWaterRare3 : ModCardTemplate
     private const int BaseTransformCount = 1;
     private const int TransformCountUpgradeBy = 1;
     private const int DrawCount = 1;
-    private const int DarkCellGain = 2;
+    private const int BaseDarkCellGain = 1;
+    private const int DarkCellGainUpgradeBy = 1;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -40,6 +41,7 @@ public sealed class AlchemyStarsWaterRare3 : ModCardTemplate
         new CardsVar(DrawCount),
         new PowerVar<IntangiblePower>(1m),
         new IntVar("Transform", BaseTransformCount),
+        new IntVar("DarkCells", BaseDarkCellGain),
         AlchemyStarsKeywordText.InlineTitleVar("MirrorBloom", AlchemyStarsKeywordIds.MirrorBloom),
         AlchemyStarsKeywordText.InlineTitleVar("WaterTitle", AlchemyStarsKeywordIds.Water)
     ];
@@ -54,7 +56,6 @@ public sealed class AlchemyStarsWaterRare3 : ModCardTemplate
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.MirrorBloom)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Water)),
-        
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.DarkCell)),
         HoverTipFactory.FromPower<IntangiblePower>(),
         HoverTipFactory.Static(StaticHoverTip.Transform)
@@ -79,13 +80,15 @@ public sealed class AlchemyStarsWaterRare3 : ModCardTemplate
         await TransformRandomWaterCardsInDrawPile(choiceContext);
         await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
 
-        for (var i = 0; i < DarkCellGain; i++)
+        var darkCells = DynamicVars["DarkCells"].IntValue;
+        for (var i = 0; i < darkCells; i++)
             LightMechanic.TryAddAttributeCell(Owner, LightElement.Water, AttributeCellKind.Dark);
     }
 
     protected override void OnUpgrade()
     {
         DynamicVars["Transform"].UpgradeValueBy(TransformCountUpgradeBy);
+        DynamicVars["DarkCells"].UpgradeValueBy(DarkCellGainUpgradeBy);
     }
 
     private async Task TransformRandomWaterCardsInDrawPile(PlayerChoiceContext choiceContext)

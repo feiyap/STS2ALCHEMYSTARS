@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 反叛灼燃之日升级：从下一回合开始，反叛灼燃牌在能量不足时可用同等生命支付。
+/// 反叛灼燃之日：从下一回合开始，反叛灼燃牌在能量不足时可用同等生命支付。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsRebellionHpPayPower : AlchemyStarsPowerBase

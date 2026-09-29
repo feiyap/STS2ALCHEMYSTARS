@@ -42,6 +42,7 @@ public sealed class AlchemyStarsForestUncommon11 : ModCardTemplate
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
+        CardKeyword.Exhaust,
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest),
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.LightSwordArmor)
     ];
@@ -49,6 +50,7 @@ public sealed class AlchemyStarsForestUncommon11 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Forest)),
+        HoverTipFactory.FromKeyword(CardKeyword.Exhaust),
         HoverTipFactory.Static(StaticHoverTip.SummonDynamic, DynamicVars.Summon)
     ];
 
@@ -85,5 +87,11 @@ public sealed class AlchemyStarsForestUncommon11 : ModCardTemplate
             // 与奥提斯相同：守护召唤物显示主人的格挡环。
             NCombatRoom.Instance?.GetCreatureNode(pet)?.TrackBlockStatus(ally);
         }
+    }
+
+    protected override void OnUpgrade()
+    {
+        // 升级后不再消耗。
+        RemoveKeyword(CardKeyword.Exhaust);
     }
 }

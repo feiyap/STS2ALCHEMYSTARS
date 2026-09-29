@@ -20,6 +20,15 @@ public sealed class AlchemyStarsZeta : ModAncientEventTemplate
 {
     public const string PortraitPath = $"{Entry.ResPath}/images/events/AlchemyStarsZeta.png";
 
+    /// <summary>对话、顶栏与跑局记录用的先古头像。</summary>
+    public const string SpeakerIconPath = $"{Entry.ResPath}/images/ancients/AlchemyStarsZetaIcon.png";
+
+    /// <summary>地图先古节点图标。描边已烘焙在贴图里。</summary>
+    public const string MapIconPath = $"{Entry.ResPath}/images/ancients/AlchemyStarsZetaMap.png";
+
+    /// <summary>轮廓层留空，避免引擎再用章节色盖住已烘焙的主题色描边。</summary>
+    private const string EmptyOutlinePath = $"{Entry.ResPath}/images/ancients/AlchemyStarsAncientEmptyOutline.png";
+
     public override Color ButtonColor => new(0.85f, 0.45f, 0.15f, 0.45f);
     public override Color DialogueColor => new("C46A2B");
 
@@ -29,10 +38,10 @@ public sealed class AlchemyStarsZeta : ModAncientEventTemplate
         StageProcedural: AncientEventStageProceduralVisualSetBuilder.Create()
             .Background(cues => cues.Single("loop", PortraitPath))
             .Build(),
-        MapIconPath: PortraitPath,
-        MapIconOutlinePath: PortraitPath,
-        RunHistoryIconPath: PortraitPath,
-        RunHistoryIconOutlinePath: PortraitPath);
+        MapIconPath: MapIconPath,
+        MapIconOutlinePath: EmptyOutlinePath,
+        RunHistoryIconPath: SpeakerIconPath,
+        RunHistoryIconOutlinePath: EmptyOutlinePath);
 
     private IReadOnlyList<EventOption> PoolA =>
     [

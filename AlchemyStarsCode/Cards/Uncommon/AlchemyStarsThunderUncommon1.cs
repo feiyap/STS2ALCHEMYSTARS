@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -16,7 +18,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 乌鸦信使·阿褐：获得飞行；若打出前已飞行，可耗 1 点雷光能自动打出并消耗 1 张手牌。
+/// 乌鸦信使·阿褐：获得飞行；若打出前已飞行，可耗 1 点雷光能自动打出并消耗 1 张手牌。基础消耗，升级移除消耗。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon1 : ModCardTemplate
@@ -38,13 +40,15 @@ public sealed class AlchemyStarsThunderUncommon1 : ModCardTemplate
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
-        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)
+        ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder),
+        CardKeyword.Exhaust
     ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        HoverTipFactory.FromPower<AlchemyStarsFlyingPower>()
+        HoverTipFactory.FromPower<AlchemyStarsFlyingPower>(),
+        HoverTipFactory.FromKeyword(CardKeyword.Exhaust)
     ];
 
     public AlchemyStarsThunderUncommon1()
@@ -91,6 +95,7 @@ public sealed class AlchemyStarsThunderUncommon1 : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        DynamicVars["AlchemyStarsFlyingPower"].UpgradeValueBy(1m);
+        // 升级：移除消耗，不再增加飞行层数。
+        RemoveKeyword(CardKeyword.Exhaust);
     }
 }

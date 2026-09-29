@@ -15,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 万应灵药·厘青：消耗火光能后对目标施加易伤与万应灵药。
+/// 万应灵药·厘清：获得火光能，对目标施加易伤与万应灵药。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireUncommon10 : ModCardTemplate
@@ -26,16 +26,12 @@ public sealed class AlchemyStarsFireUncommon10 : ModCardTemplate
     private const TargetType CardTarget = TargetType.AnyEnemy;
     private const bool ShowInCardLibrary = true;
 
-    protected override bool IsPlayable => LightMechanic.HasFireLightEnergy(Owner);
-
-    protected override bool ShouldGlowGoldInternal => IsPlayable;
-
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new PowerVar<VulnerablePower>(2m),
+        new PowerVar<VulnerablePower>(1m),
         new PowerVar<AlchemyStarsPanaceaPower>(8m),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)
     ];
@@ -48,7 +44,6 @@ public sealed class AlchemyStarsFireUncommon10 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
-        
         HoverTipFactory.FromPower<VulnerablePower>(),
         HoverTipFactory.FromPower<AlchemyStarsPanaceaPower>()
     ];
@@ -65,8 +60,7 @@ public sealed class AlchemyStarsFireUncommon10 : ModCardTemplate
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
         var target = cardPlay.Target;
 
-        if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Fire]))
-            return;
+        LightMechanic.TryGrantLightEnergy(Owner, LightElement.Fire);
 
         await PowerCmd.Apply<VulnerablePower>(
             choiceContext,

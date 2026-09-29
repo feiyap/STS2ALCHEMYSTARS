@@ -1,21 +1,28 @@
+using System.Linq;
 using AlchemyStars.Events;
 using Godot;
+using MegaCrit.Sts2.Core.Entities.Ancients;
 using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Localization;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes.Events;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
 using MegaCrit.Sts2.Core.Nodes.Screens;
+using MegaCrit.Sts2.Core.Random;
+using MegaCrit.Sts2.Core.Saves;
+using STS2RitsuLib.Content;
+using STS2RitsuLib.Localization;
 
 namespace AlchemyStars.Patches.Enlightener;
 
 /// <summary>
-/// 将事件房间标题与先古舞台切换为启迪者。
+/// 将事件房间标题、对话与先古舞台切换为启迪者。
 /// </summary>
 internal static class EnlightenerFollowUpVisuals
 {
     private const string PortraitNodeName = "AlchemyStarsEnlightenerPortrait";
 
-    internal static void Apply(string eventEntry)
+    internal static void Apply(string eventEntry, AncientEventModel? hostEvent = null)
     {
         try
         {
@@ -31,11 +38,61 @@ internal static class EnlightenerFollowUpVisuals
                 room.Layout.SetTitle(title.GetFormattedText());
 
             ApplyPortrait(room.Layout);
+
+            if (hostEvent?.Owner != null && room.Layout is NAncientEventLayout ancientLayout)
+                ApplyDialogue(ancientLayout, hostEvent);
         }
         catch (Exception ex)
         {
             Entry.Logger.Warn($"[Enlightener] 应用视觉失败: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// 涅奥续页宿主仍是 Neow，需手动灌入启迪者对话集。
+    /// </summary>
+    private static void ApplyDialogue(NAncientEventLayout layout, AncientEventModel hostEvent)
+    {
+        var owner = hostEvent.Owner;
+        if (owner?.Character == null)
+            return;
+
+        const string dialogueEntry = AlchemyStarsEnlightener.DialogueEntry;
+        var dialogueSet = AncientDialogueLocalization.BuildDialogueSetForModAncient(dialogueEntry);
+        // 仅注入当前角色对话（RitsuLib 无 GetModCharacters API）。
+        AncientDialogueLocalization.AppendCharacterDialogues(
+            dialogueSet,
+            dialogueEntry,
+            [owner.Character]);
+        dialogueSet.PopulateLocKeys(dialogueEntry);
+
+        // 启迪者不在地图先古池，Progress 可能无统计；缺省按第 0 次相遇播对话。
+        var stats = SaveManager.Instance.Progress.GetStatsForAncient(hostEvent.Id);
+        var charVisits = stats?.GetVisitsAs(owner.Character.Id) ?? 0;
+        var totalVisits = stats?.TotalVisits ?? 0;
+
+        var valid = dialogueSet
+            .GetValidDialogues(
+                owner.Character.Id,
+                charVisits,
+                totalVisits,
+                allowAnyCharacterDialogues: true)
+            .ToList();
+        if (valid.Count == 0)
+        {
+            Entry.Logger.Warn("[Enlightener] 未找到可播放的启迪者对话。");
+            return;
+        }
+
+        var picked = Rng.Chaotic.NextItem(valid);
+        if (picked == null || picked.Lines.Count == 0)
+            return;
+
+        foreach (var line in picked.Lines)
+            line.LineText?.Add("Act1Name", owner.RunState.Acts[0].Title);
+
+        layout.ClearDialogue();
+        layout.SetDialogue(picked.Lines);
     }
 
     private static void ApplyPortrait(NEventLayout layout)

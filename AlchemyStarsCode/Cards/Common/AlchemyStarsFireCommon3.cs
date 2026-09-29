@@ -6,7 +6,7 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models.Cards;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
-using AlchemyStars.Mechanics;
+using AlchemyStars.Powers;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Keywords;
 using STS2RitsuLib.Scaffolding.Content;
@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 急火追光·小不点：获得火光能、抽牌，小概率生成火棱镜格，并将灼烧放入手牌。
+/// 急火追光·小不点：抽牌；灼烧入手；本回合无视状态牌伤害。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireCommon3 : ModCardTemplate
@@ -24,7 +24,6 @@ public sealed class AlchemyStarsFireCommon3 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Common;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int PrismChancePercent = 25;
     private const int BurnGain = 1;
 
     public override CardAssetProfile AssetProfile => new(
@@ -44,8 +43,8 @@ public sealed class AlchemyStarsFireCommon3 : ModCardTemplate
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.PrismCell)),
-        HoverTipFactory.FromCard<Burn>()
+        HoverTipFactory.FromCard<Burn>(),
+        HoverTipFactory.FromPower<AlchemyStarsIgnoreStatusDamagePower>()
     ];
 
     public AlchemyStarsFireCommon3()
@@ -57,17 +56,20 @@ public sealed class AlchemyStarsFireCommon3 : ModCardTemplate
     {
         await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
 
-        LightMechanic.TryGrantLightEnergy(Owner, LightElement.Fire);
         await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
-
-        if (Owner.RunState.Rng.CombatTargets.NextInt(100) < PrismChancePercent)
-            LightMechanic.TryAddAttributeCell(Owner, LightElement.Fire, AttributeCellKind.Prism);
 
         await CardPileCmd.AddToCombatAndPreview<Burn>(
             Owner.Creature,
             PileType.Hand,
             BurnGain,
             null);
+
+        await PowerCmd.Apply<AlchemyStarsIgnoreStatusDamagePower>(
+            choiceContext,
+            Owner.Creature,
+            1m,
+            Owner.Creature,
+            this);
     }
 
     protected override void OnUpgrade()

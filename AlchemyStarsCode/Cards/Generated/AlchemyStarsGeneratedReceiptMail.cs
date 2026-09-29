@@ -19,7 +19,7 @@ namespace AlchemyStars.Cards;
 [RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsGeneratedReceiptMail : ModCardTemplate
 {
-    private const int BaseEnergyCost = 1;
+    private const int BaseEnergyCost = 0;
     private const CardType CardKind = CardType.Skill;
     private const CardRarity CardRarityValue = CardRarity.Token;
     private const TargetType CardTarget = TargetType.Self;
