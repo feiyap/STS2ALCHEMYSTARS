@@ -1,5 +1,5 @@
 {
-  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.aromaPrinciple": "[sine][blue]The hollow valley echoes—our journey has only just begun.[/blue][/sine]",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.aromaPrinciple": "[sine][blue]I must... bring everyone home...[/blue][/sine]",
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.banter.alive.endTurnPing": "Alright, let's keep the momentum going!",
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.banter.dead.endTurnPing": "I'll step back for now—not done yet.",
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.cardsModifierDescription": "Void Descendant cards can now appear in rewards and shops.",
@@ -8,7 +8,7 @@
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.description": "A void-born descendant from the Hollow Valley, living earnestly and cheerfully as they embark on an unknown journey alongside their companions.",
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.eventDeathPrevention": "The Void Descendant refuses to stop here.",
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.flavor": "The hollow valley echoes, urging them onward.",
-  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.goldMonologue": "With gold in hand, the road ahead feels a little more secure.",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.goldMonologue": "This gold can help cover things back home...",
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.possessiveAdjective": "their",
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.pronounObject": "them",
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.pronounPossessive": "theirs",

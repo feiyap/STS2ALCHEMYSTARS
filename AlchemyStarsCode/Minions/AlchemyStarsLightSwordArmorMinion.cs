@@ -4,62 +4,42 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes.Combat;
 using AlchemyStars.Powers;
 using MinionLib.Minion;
 using MinionLib.Powers;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
+using STS2RitsuLib.Scaffolding.Godot;
+using STS2RitsuLib.Scaffolding.Visuals.StateMachine;
 
 namespace AlchemyStars.Minions;
 
 /// <summary>
 /// 光之剑甲：奥提斯式召唤物，以前排守护者替主人承伤；消失时为卡牌召唤者生成森属性强化格。
-/// 视觉暂复用原版奥提斯 Spine（creature_visuals/osty）。
+/// 视觉使用 scenes/monsters/frogSpine.tscn。该骨骼目前只有 idle。
 /// </summary>
 [RegisterMonster]
 public sealed class AlchemyStarsLightSwordArmorMinion : AlchemyStarsModMinionTemplate
 {
     public const int DefaultHp = 10;
 
+    private const string VisualsScenePath = $"{Entry.ResPath}/scenes/monsters/frogSpine.tscn";
+
     public override int MinInitialHp => DefaultHp;
 
     public override int MaxInitialHp => DefaultHp;
 
-    /// <summary>复用原版奥提斯战斗视觉场景。</summary>
-    public override MonsterAssetProfile AssetProfile => ContentAssetProfiles.Monster("osty");
+    public override MonsterAssetProfile AssetProfile => new(VisualsScenePath: VisualsScenePath);
 
-    protected override CreatureAnimator? SetupCustomCreatureAnimator(MegaSprite controller)
-    {
-        // 与 Osty.GenerateAnimator 对齐，才能正确播放 idle / hurt / die / revive 等动画。
-        var idle = new AnimState("idle_loop", isLooping: true);
-        var cast = new AnimState("cast");
-        var attack = new AnimState("attack");
-        var poke = new AnimState("attack_poke");
-        var hurt = new AnimState("hurt");
-        var die = new AnimState("die");
-        var deadLoop = new AnimState("dead_loop", isLooping: true);
-        var revive = new AnimState("revive");
+    protected override NCreatureVisuals? TryCreateCreatureVisuals() =>
+        RitsuGodotNodeFactories.CreateFromScenePath<NCreatureVisuals>(VisualsScenePath);
 
-        idle.AddBranch("Hit", hurt);
-        cast.NextState = idle;
-        cast.AddBranch("Hit", hurt);
-        attack.NextState = idle;
-        attack.AddBranch("Hit", hurt);
-        poke.NextState = idle;
-        poke.AddBranch("Hit", hurt);
-        hurt.NextState = idle;
-        hurt.AddBranch("Hit", hurt);
-        die.NextState = deadLoop;
-        revive.NextState = idle;
-
-        var animator = new CreatureAnimator(idle, controller);
-        animator.AddAnyState("Attack", attack);
-        animator.AddAnyState("Cast", cast);
-        animator.AddAnyState("Dead", die);
-        animator.AddAnyState("attack_poke", poke);
-        animator.AddAnyState("Revive", revive);
-        return animator;
-    }
+    /// <summary>
+    /// frog 骨骼只有 idle。攻击、施法、受击和死亡都回到这段循环，避免去播不存在的奥提斯动画。
+    /// </summary>
+    protected override CreatureAnimator? SetupCustomCreatureAnimator(MegaSprite controller) =>
+        ModAnimStateMachines.Standard(controller, idleName: "idle");
 
     public override async Task OnSummon(
         PlayerChoiceContext choiceContext,

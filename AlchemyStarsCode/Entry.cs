@@ -60,6 +60,8 @@ public partial class Entry
         patcher.RegisterPatch<SmoothCompassEliteLabelPatch>();
         patcher.RegisterPatch<SmoothCompassEliteEncounterPatch>();
         patcher.RegisterPatch<LockOfObsessionShuffleIfNecessaryPatch>();
+        patcher.RegisterPatch<AncientDialogueEmptyFallbackPatch>();
+        patcher.RegisterPatch<KeAttackIntentTargetPatch>();
         RitsuLibFramework.ApplyRequiredPatcher(patcher, DisableMod);
 
         Logger.Info("AlchemyStars initialized.");

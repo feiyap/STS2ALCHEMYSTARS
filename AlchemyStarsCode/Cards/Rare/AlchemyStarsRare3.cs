@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
@@ -19,12 +20,12 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 心之怪盗团：万色攻击；追击/总攻击自动打出；大罪穿甲弹无视防御并斩杀偷金。
+/// 心之怪盗团：万色攻击；牌自身监听破盾/受击以触发追击与总攻击；大罪穿甲弹无视防御并斩杀偷金。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsRare3 : ModCardTemplate
 {
-    private const int BaseEnergyCost = 1;
+    private const int BaseEnergyCost = 7;
     private const CardType CardKind = CardType.Attack;
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.AnyEnemy;
@@ -72,6 +73,30 @@ public sealed class AlchemyStarsRare3 : ModCardTemplate
     {
     }
 
+    /// <summary>
+    /// 战斗堆中实时监听破盾/受击，触发追击与总攻击（无需额外能力图标）。
+    /// 多副本时仅由第一张本卡响应，避免重复触发。
+    /// </summary>
+    public override async Task AfterDamageReceived(
+        PlayerChoiceContext choiceContext,
+        Creature target,
+        DamageResult result,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource)
+    {
+        if (!IsPrimaryWatchInstance())
+            return;
+
+        await AlchemyStarsPhantomThievesTracker.AfterDamageReceived(
+            choiceContext,
+            target,
+            result,
+            props,
+            dealer,
+            cardSource);
+    }
+
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
@@ -95,8 +120,11 @@ public sealed class AlchemyStarsRare3 : ModCardTemplate
             LightElement.Prismatic,
             cardPlay);
 
-        if (!target.IsDead && target.MaxHp > 0m && target.CurrentHp / target.MaxHp < ExecuteHpPercent)
-            await CreatureCmd.Kill(target);
+        // CurrentHp/MaxHp 为 int，不可直接相除；与弥加德等共用阈值判定。
+        await AlchemyStarsCardHelpers.TryExecuteBelowHpThreshold(
+            choiceContext,
+            target,
+            ExecuteHpPercent);
 
         if (target.IsDead)
             await PlayerCmd.GainGold(ExecuteGold, Owner);
@@ -119,18 +147,7 @@ public sealed class AlchemyStarsRare3 : ModCardTemplate
         if (CombatManager.Instance.IsOverOrEnding)
             return;
 
-        var piles = requireInHand
-            ? new[] { PileType.Hand }
-            : new[] { PileType.Hand, PileType.Draw, PileType.Discard, PileType.Exhaust };
-
-        AlchemyStarsRare3? card = null;
-        foreach (var pileType in piles)
-        {
-            card = pileType.GetPile(owner).Cards.OfType<AlchemyStarsRare3>().FirstOrDefault();
-            if (card != null)
-                break;
-        }
-
+        var card = FindInCombatPiles(owner, requireInHand);
         if (card == null || target.IsDead)
             return;
 
@@ -138,5 +155,30 @@ public sealed class AlchemyStarsRare3 : ModCardTemplate
             await CardPileCmd.Add(card, PileType.Hand);
 
         await CardCmd.AutoPlay(choiceContext, card, target);
+    }
+
+    /// <summary>
+    /// 战斗堆中第一张本卡负责监听，避免多副本重复触发。
+    /// </summary>
+    private bool IsPrimaryWatchInstance()
+    {
+        var primary = FindInCombatPiles(Owner, requireInHand: false);
+        return primary != null && ReferenceEquals(primary, this);
+    }
+
+    private static AlchemyStarsRare3? FindInCombatPiles(Player owner, bool requireInHand)
+    {
+        var piles = requireInHand
+            ? new[] { PileType.Hand }
+            : new[] { PileType.Hand, PileType.Draw, PileType.Discard, PileType.Exhaust };
+
+        foreach (var pileType in piles)
+        {
+            var card = pileType.GetPile(owner).Cards.OfType<AlchemyStarsRare3>().FirstOrDefault();
+            if (card != null)
+                return card;
+        }
+
+        return null;
     }
 }

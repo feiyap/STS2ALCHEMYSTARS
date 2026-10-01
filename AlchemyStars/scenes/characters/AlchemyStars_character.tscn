@@ -18,18 +18,18 @@ scale = Vector2(0.2, 0.2)
 unique_name_in_owner = true
 layout_mode = 3
 anchors_preset = 0
-offset_left = -120.0
-offset_top = -381.0
-offset_right = 84.0
-offset_bottom = 7.0
+offset_left = -107.0
+offset_top = -384.0
+offset_right = 97.0
+offset_bottom = 4.0
 
 [node name="IntentPos" type="Marker2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(10, -290)
+position = Vector2(27, -317)
 
 [node name="CenterPos" type="Marker2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(24, -299)
+position = Vector2(25, -310)
 
 [node name="TalkPos" type="Marker2D" parent="."]
 unique_name_in_owner = true

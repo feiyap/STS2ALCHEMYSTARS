@@ -129,7 +129,7 @@ public sealed class AlchemyStarsKarenBrightSoul : ModCardTemplate
 
     protected override void OnUpgrade()
     {
-        EnergyCost.UpgradeBy(-1);
+        // 强化后仍为 1 费，仅提升伤害。
         DynamicVars.Damage.UpgradeValueBy(1m);
     }
 

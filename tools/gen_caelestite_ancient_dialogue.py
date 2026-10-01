@@ -352,15 +352,16 @@ def build_dialogues() -> tuple[dict, dict]:
                 for aid in ids:
                     zhs[f"{aid}.talk.{CHAR}.{dialogue_index}-visit"] = str(vo)
                     eng[f"{aid}.talk.{CHAR}.{dialogue_index}-visit"] = str(vo)
-            # William 第3套：默认会把 index2→visit4，必须强制 2
+            # 威廉第3套：默认会把 index2→visit4，必须强制 2（独立第三遇）。
+            # 可重复套则从 visit3 起可用，避免 charVisits==3 时空集导致 SetupLayout NRE。
             if name == "威廉" and meeting == "3":
                 for aid in ids:
                     zhs[f"{aid}.talk.{CHAR}.2-visit"] = "2"
                     eng[f"{aid}.talk.{CHAR}.2-visit"] = "2"
             if name == "威廉" and meeting == "N":
                 for aid in ids:
-                    zhs[f"{aid}.talk.{CHAR}.3-visit"] = "4"
-                    eng[f"{aid}.talk.{CHAR}.3-visit"] = "4"
+                    zhs[f"{aid}.talk.{CHAR}.3-visit"] = "3"
+                    eng[f"{aid}.talk.{CHAR}.3-visit"] = "3"
 
     return zhs, eng
 

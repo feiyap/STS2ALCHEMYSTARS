@@ -10,7 +10,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.RestSite;
 
 /// <summary>
-/// 镜湖之水：火堆回忆被遗忘的牌（回忆后必升级）。
+/// 镜湖之水：休息处回忆任意张被遗忘的牌（回忆后必升级）。
 /// </summary>
 public sealed class AlchemyStarsMirrorLakeRecallRestSiteOption : ModRestSiteOptionTemplate
 {
@@ -37,7 +37,7 @@ public sealed class AlchemyStarsMirrorLakeRecallRestSiteOption : ModRestSiteOpti
 
     public override async Task<bool> OnSelect()
     {
-        return await _relic.RecallOneAsync(new BlockingPlayerChoiceContext());
+        return await _relic.RecallAsync(new BlockingPlayerChoiceContext());
     }
 
     public static bool TryAddOption(

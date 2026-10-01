@@ -3,7 +3,9 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
@@ -11,7 +13,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 收割意识：每层按伤害的 10% 额外施加灾厄。
+/// 收割意识：每层按伤害的 10% 额外施加原版灾厄。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsHarvestConsciousnessPower : AlchemyStarsPowerBase
@@ -19,6 +21,9 @@ public sealed class AlchemyStarsHarvestConsciousnessPower : AlchemyStarsPowerBas
     public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Counter;
+
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
+        [HoverTipFactory.FromPower<DoomPower>()];
 
     public override async Task AfterDamageReceived(
         PlayerChoiceContext choiceContext,
@@ -43,7 +48,7 @@ public sealed class AlchemyStarsHarvestConsciousnessPower : AlchemyStarsPowerBas
             return;
 
         Flash();
-        await PowerCmd.Apply<AlchemyStarsCalamityPower>(
+        await PowerCmd.Apply<DoomPower>(
             choiceContext,
             target,
             calamity,

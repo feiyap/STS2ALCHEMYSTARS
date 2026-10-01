@@ -14,19 +14,14 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 卡莲：回合结束时按转色栏水属性格数量获得格挡。
+/// 白夜守护者：回合结束时按转色栏水属性格数量获得格挡。层数即每个水属性格提供的格挡，可叠加。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsKarenGuardPower : AlchemyStarsPowerBase
 {
     public override PowerType Type => PowerType.Buff;
 
-    public override PowerStackType StackType => PowerStackType.Single;
-
-    protected override IEnumerable<DynamicVar> CanonicalVars =>
-    [
-        new BlockVar(4m, ValueProp.Move)
-    ];
+    public override PowerStackType StackType => PowerStackType.Counter;
 
     public override async Task AfterSideTurnEnd(
         PlayerChoiceContext choiceContext,
@@ -44,7 +39,7 @@ public sealed class AlchemyStarsKarenGuardPower : AlchemyStarsPowerBase
         }
 
         var waterCells = LightMechanic.CountEffectiveWaterCells(player);
-        var block = waterCells * DynamicVars.Block.BaseValue;
+        var block = waterCells * Amount;
         if (block > 0)
             await CreatureCmd.GainBlock(Owner, new BlockVar(block, ValueProp.Move), null);
 

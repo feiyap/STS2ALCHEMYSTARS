@@ -981,6 +981,30 @@ public static class LightMechanic
     }
 
     /// <summary>
+    /// 统计水属性格数量；深色格计为 2，万色格计为 1。
+    /// </summary>
+    public static int CountWaterAttributeCellsWeighted(Player player)
+    {
+        var state = GetActiveState(player);
+        if (state == null)
+            return 0;
+
+        var total = 0;
+        foreach (var cell in state.AttributeCells.Items)
+        {
+            if (cell.Element is not (LightElement.Water or LightElement.Prismatic))
+                continue;
+
+            // 万色格不享受深色格双倍权重。
+            total += cell.Kind == AttributeCellKind.Dark && cell.Element != LightElement.Prismatic
+                ? 2
+                : 1;
+        }
+
+        return total;
+    }
+
+    /// <summary>
     /// 转色栏中火或水（含万色）的有效格数；深色格权重为 2。
     /// </summary>
     public static int CountFireAndWaterAttributeCells(Player player)
@@ -1783,7 +1807,13 @@ public static class LightMechanic
             {
                 var count = state.GetEffectiveCount(current);
                 if (count > 0)
-                    multiplier *= 1m + count * 0.04m;
+                {
+                    var perCell = 0.04m;
+                    if (current == LightElement.Water && LightMechanicDamageContext.IsWaterBonusDoubled)
+                        perCell = 0.08m;
+
+                    multiplier *= 1m + count * perCell;
+                }
             }
         }
 

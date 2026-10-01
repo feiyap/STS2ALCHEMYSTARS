@@ -17,7 +17,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 金泽之星·伊伦汀：多人模式稀有牌；与队友平分生命，胜利后各得金币并按已损失生命治疗。卡图按先古样式展示。
+/// 金泽之星·伊伦汀：多人模式稀有牌；与队友平分生命，胜利后自己与目标各得金币并按已损失生命治疗。卡图按先古样式展示。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon11 : ModCardTemplate, IAncientCardArtStyle
@@ -91,6 +91,15 @@ public sealed class AlchemyStarsThunderUncommon11 : ModCardTemplate, IAncientCar
             self,
             this);
         power?.ConfigureLostHpHealPercent(DynamicVars["HealPercent"].BaseValue / 100m);
+
+        // 目标队友也挂一份，胜利时仅自己与目标获得金币与回血。
+        var allyPower = await PowerCmd.Apply<AlchemyStarsGoldenScaleStarPower>(
+            choiceContext,
+            ally,
+            1m,
+            self,
+            this);
+        allyPower?.ConfigureLostHpHealPercent(DynamicVars["HealPercent"].BaseValue / 100m);
     }
 
     protected override void OnUpgrade()

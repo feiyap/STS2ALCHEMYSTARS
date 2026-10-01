@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 柳叶冰刃·渡：获得水光能并对目标施加虚弱；可再消耗水光能，按水属性格数施加中毒。
+/// 柳叶冰刃·渡：获得水光能并对目标施加虚弱；可再消耗水光能，按水属性格数施加中毒（深色格计为 2）。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsWaterCommon8 : ModCardTemplate
@@ -87,7 +87,7 @@ public sealed class AlchemyStarsWaterCommon8 : ModCardTemplate
         if (consumed <= 0)
             return;
 
-        var poison = LightMechanic.CountWaterAttributeCells(Owner) * consumed;
+        var poison = LightMechanic.CountWaterAttributeCellsWeighted(Owner) * consumed;
         if (poison <= 0)
             return;
 

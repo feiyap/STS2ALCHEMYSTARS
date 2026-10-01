@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://b4uowh4r4qnfo"
+path="res://.godot/imported/jijianzuo_spine_idle.atlas-22112a683d1445b54057f96341b8e528.spatlas"
+
+[deps]
+
+source_file="res://AlchemyStars/scenes/spine/jijianzuo_spine_idle.atlas"
+dest_files=["res://.godot/imported/jijianzuo_spine_idle.atlas-22112a683d1445b54057f96341b8e528.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"

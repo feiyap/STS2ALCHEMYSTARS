@@ -22,6 +22,11 @@ public sealed class AlchemyStarsJudgmentPower : AlchemyStarsPowerBase
     private const int TriggerThreshold = 25;
     private const decimal CurrentHpDamagePercent = 0.33m;
 
+    /// <summary>
+    /// 防止在雷伤上下文中结算斩杀伤时再次叠层并连环触发。
+    /// </summary>
+    private static bool _resolvingThreshold;
+
     public override PowerType Type => PowerType.Debuff;
 
     public override PowerStackType StackType => PowerStackType.Counter;
@@ -34,6 +39,9 @@ public sealed class AlchemyStarsJudgmentPower : AlchemyStarsPowerBase
         Creature? dealer,
         CardModel? cardSource)
     {
+        if (_resolvingThreshold)
+            return;
+
         if (target != Owner || result.TotalDamage <= 0)
             return;
 
@@ -66,24 +74,37 @@ public sealed class AlchemyStarsJudgmentPower : AlchemyStarsPowerBase
         Creature target,
         int threshold = TriggerThreshold)
     {
+        if (_resolvingThreshold)
+            return;
+
         var judgment = target.GetPower<AlchemyStarsJudgmentPower>();
         if (judgment == null || judgment.Amount < threshold || target.IsDead)
             return;
 
-        FlashIfPossible(judgment);
-        var loss = target.CurrentHp * CurrentHpDamagePercent;
-        if (loss > 0m)
+        _resolvingThreshold = true;
+        try
         {
-            await CreatureCmd.Damage(
-                choiceContext,
-                target,
-                loss,
-                ValueProp.Unblockable | ValueProp.Unpowered,
-                null,
-                null);
-        }
+            FlashIfPossible(judgment);
 
-        await PowerCmd.Remove(judgment);
+            // 先移除再结算斩杀伤，避免仍处在雷伤上下文时再次叠层触发审判。
+            var loss = target.CurrentHp * CurrentHpDamagePercent;
+            await PowerCmd.Remove(judgment);
+
+            if (loss > 0m && !target.IsDead)
+            {
+                await CreatureCmd.Damage(
+                    choiceContext,
+                    target,
+                    loss,
+                    ValueProp.Unblockable | ValueProp.Unpowered,
+                    null,
+                    null);
+            }
+        }
+        finally
+        {
+            _resolvingThreshold = false;
+        }
     }
 
     /// <summary>兼容旧调用名。</summary>

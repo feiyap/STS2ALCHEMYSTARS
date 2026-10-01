@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://etdaon45ogx0"
+path="res://.godot/imported/frog.skel-2369c49ceb8eed27006905a49a1b43ab.spskel"
+
+[deps]
+
+source_file="res://AlchemyStars/scenes/spine/frog.skel"
+dest_files=["res://.godot/imported/frog.skel-2369c49ceb8eed27006905a49a1b43ab.spskel"]
+
+[params]
+

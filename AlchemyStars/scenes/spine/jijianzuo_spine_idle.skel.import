@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://tl2o5iuf4ynj"
+path="res://.godot/imported/jijianzuo_spine_idle.skel-a150aa012d84b9a6b4f0f5749f0ad994.spskel"
+
+[deps]
+
+source_file="res://AlchemyStars/scenes/spine/jijianzuo_spine_idle.skel"
+dest_files=["res://.godot/imported/jijianzuo_spine_idle.skel-a150aa012d84b9a6b4f0f5749f0ad994.spskel"]
+
+[params]
+

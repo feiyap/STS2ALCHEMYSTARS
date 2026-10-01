@@ -1,10 +1,11 @@
 [gd_scene load_steps=2 format=3 uid="uid://c3o4v5kg3mn0t"]
 
-[ext_resource type="Texture2D" uid="uid://csokpobxfc2gy" path="res://AlchemyStars/scenes/characters/AlchemyStars_merchant.png" id="1_epm1u"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://mwxf6yflxetq" path="res://AlchemyStars/scenes/spine/AlchemyStarsSpine.res" id="1_epm1u"]
 
-[node name="AlchemyStarsCharacterMerchant" type="Node2D"]
-
-[node name="Visuals" type="Sprite2D" parent="."]
-position = Vector2(-31, -243)
-scale = Vector2(-1, 1)
-texture = ExtResource("1_epm1u")
+[node name="AlchemyStarsCharacterMerchant" type="SpineSprite"]
+skeleton_data_res = ExtResource("1_epm1u")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = false
+preview_time = 0.0
+scale = Vector2(-0.5, 0.5)

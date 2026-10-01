@@ -36,7 +36,6 @@ public static class AlchemyStarsKeywordIds
     public const string EmeraldMark = "ALCHEMY_STARS_KEYWORD_EMERALD_MARK";
     public const string PaperWound = "ALCHEMY_STARS_KEYWORD_PAPER_WOUND";
     public const string HarvestConsciousness = "ALCHEMY_STARS_KEYWORD_HARVEST_CONSCIOUSNESS";
-    public const string Calamity = "ALCHEMY_STARS_KEYWORD_CALAMITY";
     public const string Lock = "ALCHEMY_STARS_KEYWORD_LOCK";
     public const string TimelessSeal = "ALCHEMY_STARS_KEYWORD_TIMELESS_SEAL";
     public const string AuroraMoment = "ALCHEMY_STARS_KEYWORD_AURORA_MOMENT";
@@ -98,5 +97,14 @@ public static class AlchemyStarsKeywordIds
     public const string MobiusCombo = "ALCHEMY_STARS_KEYWORD_MOBIUS_COMBO";
     public const string ForgivingOmniscience = "ALCHEMY_STARS_KEYWORD_FORGIVING_OMNISCIENCE";
     public const string BloodMoonBanquet = "ALCHEMY_STARS_KEYWORD_BLOOD_MOON_BANQUET";
+
+    // 威廉回忆事件奖励牌
+    public const string MyriadSpectacle = "ALCHEMY_STARS_KEYWORD_MYRIAD_SPECTACLE";
+    public const string NitrogenRain = "ALCHEMY_STARS_KEYWORD_NITROGEN_RAIN";
+    public const string Mirage = "ALCHEMY_STARS_KEYWORD_MIRAGE";
+    public const string MechMaster = "ALCHEMY_STARS_KEYWORD_MECH_MASTER";
+    public const string MechMark = "ALCHEMY_STARS_KEYWORD_MECH_MARK";
+    public const string BraveTigerRoar = "ALCHEMY_STARS_KEYWORD_BRAVE_TIGER_ROAR";
+    public const string Endure = "ALCHEMY_STARS_KEYWORD_ENDURE";
 }
 

@@ -1,13 +1,9 @@
 using System.Collections.Generic;
-using System.Linq;
 using AlchemyStars.Cards;
-using AlchemyStars.Powers;
 using MegaCrit.Sts2.Core.Combat;
-using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
-using MegaCrit.Sts2.Core.GameActions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Rooms;
@@ -46,17 +42,6 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
             LightMechanicCombatState.Reset(player);
             LightMechanic.InitializeForCombat(player);
             AlchemyStarsForestState.ResetCombatTracking(player);
-
-            if (player.Deck.Cards.OfType<AlchemyStarsRare3>().Any() &&
-                player.Creature.GetPower<AlchemyStarsPhantomThievesWatchPower>() == null)
-            {
-                await PowerCmd.Apply<AlchemyStarsPhantomThievesWatchPower>(
-                    new ThrowingPlayerChoiceContext(),
-                    player.Creature,
-                    1m,
-                    player.Creature,
-                    null);
-            }
         }
     }
 

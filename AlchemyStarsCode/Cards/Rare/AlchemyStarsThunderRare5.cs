@@ -17,8 +17,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// <summary>
-/// 帝国之雷·索尔拉德：耗雷光能；先上 99 帝国雷霆再造成 7 伤 1/2 次。
+/// 主宰之阳·索尔拉德：耗雷光能；先上 99 帝国雷霆，再造成 7 伤 1/2 次，每次攻击消耗 1 层并扣 7% 最大生命。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderRare5 : ModCardTemplate
@@ -99,8 +98,6 @@ public sealed class AlchemyStarsThunderRare5 : ModCardTemplate
         CardPlay cardPlay)
     {
         var hitCount = DynamicVars.Repeat.IntValue;
-        if (enemy.GetPowerAmount<AlchemyStarsImperialThunderPower>() > 0)
-            hitCount += 1;
 
         for (var i = 0; i < hitCount; i++)
         {

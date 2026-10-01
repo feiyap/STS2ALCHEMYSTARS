@@ -62,7 +62,7 @@ public sealed class AlchemyStarsKaren : ModCardTemplate
         await PowerCmd.Apply<AlchemyStarsKarenGuardPower>(
             choiceContext,
             Owner.Creature,
-            1,
+            DynamicVars["KarenBlock"].BaseValue,
             Owner.Creature,
             this);
     }

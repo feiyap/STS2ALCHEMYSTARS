@@ -27,7 +27,7 @@ public sealed class AlchemyStarsFireUncommon6 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Uncommon;
     private const TargetType CardTarget = TargetType.RandomEnemy;
     private const bool ShowInCardLibrary = true;
-    private const int HitCount = 5;
+    private const int HitCount = 4;
     private const decimal DamageBonusPerStatus = 0.05m;
     private const decimal LostHpBonusRate = 0.15m;
 
@@ -36,7 +36,7 @@ public sealed class AlchemyStarsFireUncommon6 : ModCardTemplate
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(3m, ValueProp.Move),
+        new DamageVar(2m, ValueProp.Move),
         new RepeatVar(HitCount),
         AlchemyStarsKeywordText.InlineTitleVar("DragonBreathRoar", AlchemyStarsKeywordIds.DragonBreathRoar),
         AlchemyStarsKeywordText.InlineTitleVar("FireTitle", AlchemyStarsKeywordIds.Fire)

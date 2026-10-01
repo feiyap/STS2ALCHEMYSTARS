@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AlchemyStars.Cards;
 using AlchemyStars.Mechanics;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
@@ -17,7 +16,9 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 工备：回合结束时每层造成 1 点雷属性伤害并获得同额格挡；每 3 层获�?1 点雷属性光能�?/// </summary>
+/// 工备：回合结束时每层造成 1 点雷属性伤害并获得同额格挡；每 3 层获 1 点雷属性光能。
+/// 与炸弹相同，每次施加为独立实例，可同时存在多份工备。
+/// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsWorkshopPrepPower : AlchemyStarsPowerBase
 {
@@ -26,6 +27,11 @@ public sealed class AlchemyStarsWorkshopPrepPower : AlchemyStarsPowerBase
     public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Counter;
+
+    /// <summary>
+    /// 每次打出能力卡获得工备时新建独立实例（同炸弹）。
+    /// </summary>
+    public override PowerInstanceType InstanceType => PowerInstanceType.Instanced;
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {

@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://bj7ieh2d0j0j6"
+path="res://.godot/imported/frog.atlas-72499ea7b47ceb000068c822a2ec6ceb.spatlas"
+
+[deps]
+
+source_file="res://AlchemyStars/scenes/spine/frog.atlas"
+dest_files=["res://.godot/imported/frog.atlas-72499ea7b47ceb000068c822a2ec6ceb.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"

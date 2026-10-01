@@ -15,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 本回合无视状态牌造成的伤害（玩家回合结束时移除）。
+/// 偶像时间：本回合无视状态牌造成的伤害（玩家回合结束时移除）。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsIgnoreStatusDamagePower : AlchemyStarsPowerBase

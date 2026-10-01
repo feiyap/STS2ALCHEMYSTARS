@@ -10,7 +10,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace AlchemyStars.Mechanics;
 
 /// <summary>
-/// 心之怪盗团：追踪单回合受击次数，以及眩晕/破盾触发追击。
+/// 心之怪盗团：追踪单回合受击次数，以及破盾触发追击（由卡牌自身 AfterDamageReceived 调用）。
 /// </summary>
 public static class AlchemyStarsPhantomThievesTracker
 {

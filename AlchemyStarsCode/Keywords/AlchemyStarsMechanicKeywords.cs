@@ -176,8 +176,6 @@ namespace AlchemyStars.Keywords;
 
 [RegisterOwnedCardKeyword("harvest_consciousness")]
 
-[RegisterOwnedCardKeyword("calamity")]
-
 [RegisterOwnedCardKeyword("northern_realm")]
 
 [RegisterOwnedCardKeyword(
@@ -300,6 +298,28 @@ namespace AlchemyStars.Keywords;
 [RegisterOwnedCardKeyword(
     "blood_moon_banquet",
     CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword(
+    "myriad_spectacle",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword(
+    "nitrogen_rain",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword("mirage")]
+
+[RegisterOwnedCardKeyword(
+    "mech_master",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword("mech_mark")]
+
+[RegisterOwnedCardKeyword(
+    "brave_tiger_roar",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword("endure")]
 
 public sealed class AlchemyStarsMechanicKeywords;
 

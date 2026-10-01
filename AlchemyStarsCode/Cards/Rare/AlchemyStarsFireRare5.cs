@@ -16,7 +16,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 左轮之徒·约拿：子弹数等于消耗牌堆数量；每发伤害为基础×(1+子弹数)。
+/// 左轮之徒·约拿：午时已到——子弹数随消耗牌堆增加；打出 (1+子弹数) 次，每次 1/2 点伤害。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireRare5 : ModCardTemplate
@@ -48,14 +48,12 @@ public sealed class AlchemyStarsFireRare5 : ModCardTemplate
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
-        CardKeyword.Exhaust,
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire),
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.HighNoon)
     ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        HoverTipFactory.FromKeyword(CardKeyword.Exhaust),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Fire)),
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.HighNoon))
     ];
@@ -91,10 +89,11 @@ public sealed class AlchemyStarsFireRare5 : ModCardTemplate
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
         var bullets = GetBulletCount();
-        // 1/2×(1+子弹数量)：每发 = 基础伤害 × (1+子弹数)
-        var perShot = DynamicVars.Damage.BaseValue * (1 + bullets);
+        // 总伤害 = 1/2 × (1+子弹数)：打出 (1+子弹数) 次，每次造成基础伤害。
+        var hitCount = 1 + bullets;
+        var perShot = DynamicVars.Damage.BaseValue;
 
-        for (var i = 0; i < bullets; i++)
+        for (var i = 0; i < hitCount; i++)
         {
             if (cardPlay.Target.IsDead)
                 break;

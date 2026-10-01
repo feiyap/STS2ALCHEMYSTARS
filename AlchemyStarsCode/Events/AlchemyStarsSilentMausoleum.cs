@@ -1,5 +1,6 @@
 using System;
 using AlchemyStars.Cards;
+using AlchemyStars.Encounters;
 using AlchemyStars.Enchantments;
 using AlchemyStars.Relics.Events;
 using MegaCrit.Sts2.Core.Commands;
@@ -23,6 +24,7 @@ namespace AlchemyStars.Events;
 
 /// <summary>
 /// 白夜极光事件：寂静之陵。
+/// 暂时从事件池隐藏：祭剑座仍在测试，下个版本再开放。
 /// </summary>
 [RegisterSharedEvent]
 public sealed class AlchemyStarsSilentMausoleum : ModEventTemplate
@@ -31,8 +33,7 @@ public sealed class AlchemyStarsSilentMausoleum : ModEventTemplate
 
     public override bool IsShared => true;
 
-    public override bool IsAllowed(IRunState runState) =>
-        (AlchemyStarsEventHelpers.IsAct3(runState));
+    public override bool IsAllowed(IRunState runState) => false;
 
     public override EventAssetProfile AssetProfile => new(
         InitialPortraitPath: $"{Entry.ResPath}/images/events/AlchemyStarsSilentMausoleum.png");
@@ -57,18 +58,13 @@ public sealed class AlchemyStarsSilentMausoleum : ModEventTemplate
         SetEventFinished(PageDescription("BOSS"));
     }
 
-    private async Task Boss()
+    private Task Boss()
     {
-        var elite = AlchemyStarsEventHelpers.PickRandomElite(Owner!);
-        if (elite == null)
-        {
-            await RelicCmd.Obtain<AlchemyStarsStarCrest>(Owner!);
-            SetEventFinished(PageDescription("BOSS"));
-            return;
-        }
-        // 祭剑座 Boss 未实装前，暂以精英战 + 星辰纹章占位。
         _pendingStarCrest = true;
-        EnterCombatWithoutExitingEvent(elite, Array.Empty<Reward>(), shouldResumeAfterCombat: true);
+        EnterCombatWithoutExitingEvent<AlchemyStarsSwordAltarEncounter>(
+            Array.Empty<Reward>(),
+            shouldResumeAfterCombat: true);
+        return Task.CompletedTask;
     }
     private async Task Seals()
     {

@@ -1,7 +1,9 @@
-res://AlchemyStars/scenes/characters/AlchemyStars_character.tscn::716b63f3c65627321f93525acf5dccd3::1790411754::res://.godot/exported/133200997/export-08e23ef1b27536ad9ca1dc5fae7bf9a3-AlchemyStars_character.scn
+res://AlchemyStars/scenes/characters/AlchemyStars_character.tscn::962b4660ae87f1c796260208838881f7::1790701314::res://.godot/exported/133200997/export-08e23ef1b27536ad9ca1dc5fae7bf9a3-AlchemyStars_character.scn
 res://AlchemyStars/scenes/characters/AlchemyStars_character_select_bg.tscn::d98ef9600ecde0355bb50cf388dcb33e::1786192606::res://.godot/exported/133200997/export-57adcc099e6c3be6ccf5db1c41a3e9d5-AlchemyStars_character_select_bg.scn
 res://AlchemyStars/scenes/characters/AlchemyStars_energy_counter.tscn::b585c3596712eb6e64f6e450e80c9118::1789206552::res://.godot/exported/133200997/export-4ebe288e072d85f3e90230aa819977b0-AlchemyStars_energy_counter.scn
-res://AlchemyStars/scenes/characters/AlchemyStars_merchant.tscn::65e16182eac853d4082031d0e65796b0::1786845463::res://.godot/exported/133200997/export-9f3e082287efc089689622451a78f8ac-AlchemyStars_merchant.scn
-res://AlchemyStars/scenes/characters/AlchemyStars_rest_site.tscn::cf9c52ab595998751a8d7c9af43137a7::1786845455::res://.godot/exported/133200997/export-5c84c8d8f3bef750b718b2763807df47-AlchemyStars_rest_site.scn
+res://AlchemyStars/scenes/characters/AlchemyStars_merchant.tscn::a0a4f0b9afe1272896a2bc2c4a52845b::1790811411::res://.godot/exported/133200997/export-9f3e082287efc089689622451a78f8ac-AlchemyStars_merchant.scn
+res://AlchemyStars/scenes/characters/AlchemyStars_rest_site.tscn::515267d31759977fb10086b0392d16e7::1790811411::res://.godot/exported/133200997/export-5c84c8d8f3bef750b718b2763807df47-AlchemyStars_rest_site.scn
 res://AlchemyStars/images/characters/AlchemyStars_icon.tscn::14b43da652d5c1b1565bc6ac6cd1297b::1789059524::res://.godot/exported/133200997/export-6b425653260f4641eb4fd41d9df0cfcc-AlchemyStars_icon.scn
 res://AlchemyStars/scenes/minions/AlchemyStarsLightSwordArmor.tscn::fd0a6c8ff237dd955028884b640c5e25::1790515161::res://.godot/exported/133200997/export-c9c1a43f8b0868dab7521f77f7d39e5b-AlchemyStarsLightSwordArmor.scn
+res://AlchemyStars/scenes/monsters/AlchemyStarsSwordAltar.tscn::84ad42c63b2500cb69c93d7235c9266e::1790811411::res://.godot/exported/133200997/export-a12ac750290fa4746b6bee3917f2e71f-AlchemyStarsSwordAltar.scn
+res://AlchemyStars/scenes/monsters/frogSpine.tscn::6b8c321d31d41ede0bc7756bbeb72f54::1790788191::res://.godot/exported/133200997/export-1651bee91f8ea0d7c82c49c3ff8738f0-frogSpine.scn

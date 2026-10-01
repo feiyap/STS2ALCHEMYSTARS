@@ -8,8 +8,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Powers;
 
 /// <summary>
-/// 灿星天秤：胜利时全体玩家各得金币，并按已损失生命百分比治疗。
-/// 必须用 AfterCombatEnd：引擎会在 AfterCombatVictory 前清掉能力。
+/// 灿星天秤：胜利时，能力持有者获得金币，并按已损失生命百分比治疗。
+/// 卡牌会给自己与目标各挂一份本能力。必须用 AfterCombatEnd：引擎会在 AfterCombatVictory 前清掉能力。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsGoldenScaleStarPower : AlchemyStarsPowerBase
@@ -29,18 +29,17 @@ public sealed class AlchemyStarsGoldenScaleStarPower : AlchemyStarsPowerBase
 
     public override async Task AfterCombatEnd(CombatRoom room)
     {
+        var player = Owner.Player;
+        if (player == null)
+            return;
+
         Flash();
+        await PlayerCmd.GainGold(VictoryGold, player);
 
-        foreach (var player in room.CombatState.Players)
-        {
-            await PlayerCmd.GainGold(VictoryGold, player);
+        var heal = (Owner.MaxHp - Owner.CurrentHp) * _lostHpHealPercent;
+        if (heal <= 0m)
+            return;
 
-            var creature = player.Creature;
-            var heal = (creature.MaxHp - creature.CurrentHp) * _lostHpHealPercent;
-            if (heal <= 0m)
-                continue;
-
-            await CreatureCmd.Heal(creature, heal);
-        }
+        await CreatureCmd.Heal(Owner, heal);
     }
 }

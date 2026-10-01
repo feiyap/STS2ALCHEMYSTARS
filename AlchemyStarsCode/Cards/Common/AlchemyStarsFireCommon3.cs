@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 急火追光·小不点：抽牌；灼烧入手；本回合无视状态牌伤害。
+/// 急火追光·小不点：抽牌；灼烧入手；本回合获得偶像时间。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsFireCommon3 : ModCardTemplate

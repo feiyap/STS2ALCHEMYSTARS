@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Enchantments;
 using MegaCrit.Sts2.Core.Random;
 using MegaCrit.Sts2.Core.Runs;
 
@@ -14,7 +15,7 @@ namespace AlchemyStars.Mechanics;
 /// </summary>
 internal static class AttributeCardTracking
 {
-    public const float WeightBonusPerPickup = 0.15f;
+    public const float WeightBonusPerPickup = 0.30f;
 
     public static LightElement? TryGetCardAttribute(CardModel card)
     {
@@ -137,11 +138,7 @@ internal static class AttributeCardTracking
             if (picked == null)
                 continue;
 
-            var wasUpgraded = current.IsUpgraded;
-            var newCard = player.RunState.CreateCard(picked, player);
-            if (wasUpgraded && newCard.IsUpgradable)
-                CardCmd.Upgrade(newCard);
-
+            var newCard = CreateReplacementPreservingModifiers(player, picked, current);
             used.Remove(current.CanonicalInstance.Id);
             used.Add(picked.Id);
             reward.ModifyCard(newCard, modifyingRelic);
@@ -149,5 +146,30 @@ internal static class AttributeCardTracking
         }
 
         return modified;
+    }
+
+    /// <summary>
+    /// 替换奖励卡时保留升级与附魔（如华美发束的华美），避免 Late 重抽冲掉先前遗物效果。
+    /// </summary>
+    public static CardModel CreateReplacementPreservingModifiers(
+        Player player,
+        CardModel template,
+        CardModel previous)
+    {
+        var newCard = player.RunState.CreateCard(template, player);
+        if (previous.IsUpgraded && newCard.IsUpgradable)
+            CardCmd.Upgrade(newCard);
+
+        TransferEnchantment(previous, newCard);
+        return newCard;
+    }
+
+    private static void TransferEnchantment(CardModel from, CardModel to)
+    {
+        if (from.Enchantment == null || to.Enchantment != null)
+            return;
+
+        var enchantment = (EnchantmentModel)from.Enchantment.MutableClone();
+        CardCmd.Enchant(enchantment, to, enchantment.Amount);
     }
 }

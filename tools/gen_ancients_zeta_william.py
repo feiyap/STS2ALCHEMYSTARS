@@ -594,7 +594,8 @@ def write_localization() -> None:
         f"{WILLIAM_ID}.talk.{CHAR_KEY}.3-2.ancient": "那还用说？年轻人，出发吧。",
         f"{WILLIAM_ID}.talk.{CHAR_KEY}.3-2.next": "继续",
         f"{WILLIAM_ID}.talk.{CHAR_KEY}.3-3.ancient": "我吗？不必担心。\n我和「霜夜绅士」会顺流踏上回归之旅。",
-        f"{WILLIAM_ID}.talk.{CHAR_KEY}.3-visit": "4",
+        # 可重复套从 visit3 起，避免 visit 空洞导致事件房 NRE。
+        f"{WILLIAM_ID}.talk.{CHAR_KEY}.3-visit": "3",
 
         # ANY — Zeta
         f"{ZETA_ID}.talk.ANY.0-0.ancient": "欢迎来到本勇者的宫殿！",
@@ -614,6 +615,7 @@ def write_localization() -> None:
         f"{ZETA_ID}.talk.ANY.2-1.ancient": "要不说说你的故事吧！",
         f"{ZETA_ID}.talk.ANY.2-1.next": "继续",
         f"{ZETA_ID}.talk.ANY.2-2.ancient": "本勇者用战利品来交换！",
+        f"{ZETA_ID}.talk.ANY.2-visit": "2",
 
         # ANY — William
         f"{WILLIAM_ID}.talk.ANY.0-0.ancient": "一位华丽的年轻人坐在宫殿中央的地上……\n他的周围摆满了书籍。",
@@ -631,6 +633,7 @@ def write_localization() -> None:
         f"{WILLIAM_ID}.talk.ANY.2-0r.ancient": "关于你曾经说过的故事……\n那多少启发了我。",
         f"{WILLIAM_ID}.talk.ANY.2-0.next": "继续",
         f"{WILLIAM_ID}.talk.ANY.2-1.ancient": "这些就当谢礼吧。",
+        f"{WILLIAM_ID}.talk.ANY.2-visit": "2",
     }
 
     eng = {
@@ -653,6 +656,7 @@ def write_localization() -> None:
         f"{ZETA_ID}.talk.ANY.2-1.ancient": "How about telling me your story!",
         f"{ZETA_ID}.talk.ANY.2-1.next": "Continue",
         f"{ZETA_ID}.talk.ANY.2-2.ancient": "This hero trades with spoils!",
+        f"{ZETA_ID}.talk.ANY.2-visit": "2",
         f"{WILLIAM_ID}.talk.ANY.0-0.ancient": "A splendid youth sits on the palace floor...\nsurrounded by books.",
         f"{WILLIAM_ID}.talk.ANY.0-0.next": "Continue",
         f"{WILLIAM_ID}.talk.ANY.0-1.ancient": "Sit. Tea?",
@@ -666,6 +670,7 @@ def write_localization() -> None:
         f"{WILLIAM_ID}.talk.ANY.2-0r.ancient": "About the story you once told...\nit inspired me somewhat.",
         f"{WILLIAM_ID}.talk.ANY.2-0.next": "Continue",
         f"{WILLIAM_ID}.talk.ANY.2-1.ancient": "Take these as thanks.",
+        f"{WILLIAM_ID}.talk.ANY.2-visit": "2",
         # Mirror CN character lines in ENG for playability
         f"{ZETA_ID}.talk.{CHAR_KEY}.0-0.ancient": "Caelestites?! Why you?!\nWhere is this?\nHas Hero Zeta finally arrived in a world that needs saving?!",
         f"{ZETA_ID}.talk.{CHAR_KEY}.0-0.next": "Continue",
@@ -707,7 +712,8 @@ def write_localization() -> None:
         f"{WILLIAM_ID}.talk.{CHAR_KEY}.3-2.ancient": "Need you ask? Go, young one.",
         f"{WILLIAM_ID}.talk.{CHAR_KEY}.3-2.next": "Continue",
         f"{WILLIAM_ID}.talk.{CHAR_KEY}.3-3.ancient": "Me? Don't worry.\nFrostnight Gentleman and I will ride the current home.",
-        f"{WILLIAM_ID}.talk.{CHAR_KEY}.3-visit": "4",
+        # 可重复套从 visit3 起，避免 visit 空洞导致事件房 NRE。
+        f"{WILLIAM_ID}.talk.{CHAR_KEY}.3-visit": "3",
     }
 
     # page descriptions for relic options are auto from relic title/desc via FromRelic

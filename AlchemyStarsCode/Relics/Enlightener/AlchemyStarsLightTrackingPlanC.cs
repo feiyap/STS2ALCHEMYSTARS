@@ -12,7 +12,7 @@ using STS2RitsuLib.Interop.AutoRegistration;
 namespace AlchemyStars.Relics.Enlightener;
 
 /// <summary>
-/// 光能追踪方案 C：每拾取属性卡，该属性在奖励/商店中的出现权重 +15%。
+/// 光能追踪方案 C：每拾取属性卡，该属性在奖励/商店中的出现权重 +30%。
 /// </summary>
 [RegisterRelic(typeof(AlchemyStarsRelicPool))]
 public sealed class AlchemyStarsLightTrackingPlanC : AlchemyStarsEnlightenerRelicBase
@@ -170,11 +170,7 @@ public sealed class AlchemyStarsLightTrackingPlanC : AlchemyStarsEnlightenerReli
         if (picked == null || picked.Id == current.CanonicalInstance.Id)
             return false;
 
-        var wasUpgraded = current.IsUpgraded;
-        var newCard = player.RunState.CreateCard(picked, player);
-        if (wasUpgraded && newCard.IsUpgradable)
-            CardCmd.Upgrade(newCard);
-
+        var newCard = AttributeCardTracking.CreateReplacementPreservingModifiers(player, picked, current);
         result.ModifyCard(newCard, this);
         return true;
     }

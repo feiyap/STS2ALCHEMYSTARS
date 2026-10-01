@@ -1,0 +1,5 @@
+{
+  "ALCHEMY_STARS_ENCOUNTER_ALCHEMY_STARS_SWORD_ALTAR_ENCOUNTER.title": "Sword Altar",
+  "ALCHEMY_STARS_ENCOUNTER_ALCHEMY_STARS_SWORD_ALTAR_ENCOUNTER.loss": "{character} was executed by [gold]{encounter}[/gold].",
+  "ALCHEMY_STARS_ENCOUNTER_ALCHEMY_STARS_SWORD_ALTAR_ENCOUNTER.customRewardDescription": "Defeat the Sword Altar to obtain the Star Crest."
+}

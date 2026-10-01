@@ -1,5 +1,5 @@
 {
-  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.aromaPrinciple": "[sine][blue]空谷回响，旅途才刚开始。[/blue][/sine]",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.aromaPrinciple": "[sine][blue]我必须……要带着大家回去……[/blue][/sine]",
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.banter.alive.endTurnPing": "好，下一回合也要加油！",
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.banter.dead.endTurnPing": "先退一步，还没结束呢。",
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.cardsModifierDescription": "空裔的卡牌现在会出现在奖励和商店中。",
@@ -8,7 +8,7 @@
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.description": "来自空谷的空之末裔，努力并元气地生活着，与伙伴一起踏上未知的旅途。",
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.eventDeathPrevention": "空裔绝不会在此止步。",
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.flavor": "空谷的回响，催促着向前。",
-  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.goldMonologue": "有金币在手，和伙伴的旅途就多了几分底气。",
+  "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.goldMonologue": "这些钱可以带回去填补家用……",
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.possessiveAdjective": "他的",
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.pronounObject": "他",
   "ALCHEMY_STARS_CHARACTER_ALCHEMY_STARS_CHARACTER.pronounPossessive": "他的",

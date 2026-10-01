@@ -16,7 +16,7 @@ using STS2RitsuLib.Interop.AutoRegistration;
 namespace AlchemyStars.Relics.Character;
 
 /// <summary>
-/// 镜湖之水：击败精英时可遗忘一张牌；火堆可回忆并强化。
+/// 镜湖之水：击败精英时可遗忘一张牌；休息处可回忆任意张并强化。
 /// </summary>
 [RegisterRelic(typeof(AlchemyStarsRelicPool))]
 public sealed class AlchemyStarsMirrorLakeWater : AlchemyStarsCharacterRelicBase
@@ -72,9 +72,9 @@ public sealed class AlchemyStarsMirrorLakeWater : AlchemyStarsCharacterRelicBase
     }
 
     /// <summary>
-    /// 回忆一张被遗忘的牌：加入牌组并升级。
+    /// 回忆任意张被遗忘的牌：加入牌组并升级。
     /// </summary>
-    public async Task<bool> RecallOneAsync(PlayerChoiceContext choiceContext)
+    public async Task<bool> RecallAsync(PlayerChoiceContext choiceContext)
     {
         if (Owner == null || ForgottenCards.Count == 0)
             return false;
@@ -83,29 +83,46 @@ public sealed class AlchemyStarsMirrorLakeWater : AlchemyStarsCharacterRelicBase
             .Select(CardModel.FromSerializable)
             .ToList();
 
-        var prefs = new CardSelectorPrefs(CardSelectorPrefs.UpgradeSelectionPrompt, 1);
+        var prefs = new CardSelectorPrefs(CardSelectorPrefs.UpgradeSelectionPrompt, 1, previews.Count)
+        {
+            Cancelable = true,
+        };
         var picked = (await CardSelectCmd.FromSimpleGrid(
             choiceContext,
             previews,
             Owner,
-            prefs)).FirstOrDefault();
-        if (picked == null)
+            prefs)).ToList();
+        if (picked.Count == 0)
             return false;
 
-        var index = previews.IndexOf(picked);
-        if (index < 0 || index >= ForgottenCards.Count)
+        var selectedIndices = new HashSet<int>();
+        foreach (var card in picked)
+        {
+            var index = previews.IndexOf(card);
+            if (index >= 0)
+                selectedIndices.Add(index);
+        }
+
+        if (selectedIndices.Count == 0)
             return false;
 
-        var save = ForgottenCards[index];
-        var list = ForgottenCards.ToList();
-        list.RemoveAt(index);
-        ForgottenCards = list;
+        var remaining = new List<SerializableCard>();
+        for (var i = 0; i < ForgottenCards.Count; i++)
+        {
+            if (!selectedIndices.Contains(i))
+            {
+                remaining.Add(ForgottenCards[i]);
+                continue;
+            }
 
-        var card = CardModel.FromSerializable(save);
-        if (card.IsUpgradable)
-            card.UpgradeInternal();
+            var card = CardModel.FromSerializable(ForgottenCards[i]);
+            if (card.IsUpgradable)
+                card.UpgradeInternal();
 
-        CardCmd.PreviewCardPileAdd(await CardPileCmd.Add(card, PileType.Deck));
+            CardCmd.PreviewCardPileAdd(await CardPileCmd.Add(card, PileType.Deck));
+        }
+
+        ForgottenCards = remaining;
         Flash();
         return true;
     }

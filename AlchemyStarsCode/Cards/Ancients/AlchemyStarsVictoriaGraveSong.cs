@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Keywords;
@@ -19,7 +20,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 维多利亚·墓歌：X 费先古火攻击；伤害 = 倍率 × X × 火格，宽恕的全知与血月狂宴增幅，未格挡伤生成火深色格。
+/// 维多利亚·墓歌：X 费先古火攻击；基伤 1/升级 2 可吃附魔，再 × 费用 × 火格。
 /// </summary>
 [RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsVictoriaGraveSong : ModCardTemplate
@@ -38,6 +39,8 @@ public sealed class AlchemyStarsVictoriaGraveSong : ModCardTemplate
     protected override bool HasEnergyCostX => true;
 
     public override bool CanBeGeneratedInCombat => false;
+
+    public override bool CanBeGeneratedByModifiers => false;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/AlchemyStarsVictoriaGraveSong.png");
@@ -82,10 +85,10 @@ public sealed class AlchemyStarsVictoriaGraveSong : ModCardTemplate
             return;
 
         var fireCells = LightMechanic.CountFireAttributeCells(Owner);
-        // 伤害 = (1/2) × 消耗费用 × 火属性格子数量。
-        var damage = DynamicVars.Damage.BaseValue * x * fireCells;
+        // 基伤（1/升级 2）先吃活力、锋利等附魔，再 × 费用 × 火格。
+        var baseMul = ApplyEnchantmentToBase(DynamicVars.Damage.BaseValue, DynamicVars.Damage.Props);
+        var damage = baseMul * x * fireCells;
 
-        // 宽恕的全知：按目标已损失生命百分比增幅。
         var target = cardPlay.Target;
         if (target.MaxHp > 0m)
         {
@@ -94,7 +97,6 @@ public sealed class AlchemyStarsVictoriaGraveSong : ModCardTemplate
                 damage *= 1m + lostRatio;
         }
 
-        // 血月狂宴：消耗全部灼燃，每层 +20%。
         var ignition = Owner.Creature.GetPower<AlchemyStarsIgnitionPower>();
         var ignitionStacks = ignition?.Amount ?? 0m;
         if (ignitionStacks > 0m && ignition != null)
@@ -103,36 +105,72 @@ public sealed class AlchemyStarsVictoriaGraveSong : ModCardTemplate
             await PowerCmd.Remove(ignition);
         }
 
-        // 升级：拥有 4 个火深色格时最终伤害翻倍。
         if (IsUpgraded && LightMechanic.CountFireDarkCells(Owner) >= UpgradeDarkCellDoubleThreshold)
             damage *= 2m;
 
         if (damage <= 0m)
             return;
 
-        decimal unblocked;
-        using (LightMechanicDamageContext.Use(LightElement.Fire))
+        var unblocked = 0m;
+        await WithEnchantmentDetached(async () =>
         {
-            var attack = DamageCmd.Attack(damage)
-                .FromCard(this, cardPlay)
-                .Targeting(target);
-            await attack.Execute(choiceContext);
-            unblocked = attack.Results
-                .SelectMany(result => result)
-                .Sum(result => (decimal)result.UnblockedDamage);
-        }
+            using (LightMechanicDamageContext.Use(LightElement.Fire))
+            {
+                var attack = DamageCmd.Attack(damage)
+                    .FromCard(this, cardPlay)
+                    .Targeting(target);
+                await attack.Execute(choiceContext);
+                unblocked = attack.Results
+                    .SelectMany(result => result)
+                    .Sum(result => (decimal)result.UnblockedDamage);
+            }
 
-        await LightMechanic.ApplyElementalHitEffects(
-            choiceContext,
-            Owner,
-            target,
-            LightElement.Fire,
-            this);
+            await LightMechanic.ApplyElementalHitEffects(
+                choiceContext,
+                Owner,
+                target,
+                LightElement.Fire,
+                this);
+        });
 
         if (unblocked > 0m)
         {
             for (var i = 0; i < DarkCellsOnUnblocked; i++)
                 LightMechanic.TryAddAttributeCell(Owner, LightElement.Fire, AttributeCellKind.Dark);
+        }
+    }
+
+    private decimal ApplyEnchantmentToBase(decimal baseDamage, ValueProp props)
+    {
+        var enchantment = Enchantment;
+        if (enchantment == null)
+            return baseDamage;
+
+        var value = baseDamage;
+        value += enchantment.EnchantDamageAdditive(value, props);
+        value *= enchantment.EnchantDamageMultiplicative(value, props);
+        return Math.Max(0m, value);
+    }
+
+    private async Task WithEnchantmentDetached(Func<Task> action)
+    {
+        var enchantment = Enchantment;
+        if (enchantment == null)
+        {
+            await action();
+            return;
+        }
+
+        var amount = enchantment.Amount;
+        var clone = (EnchantmentModel)enchantment.MutableClone();
+        ClearEnchantmentInternal();
+        try
+        {
+            await action();
+        }
+        finally
+        {
+            EnchantInternal(clone, amount);
         }
     }
 
