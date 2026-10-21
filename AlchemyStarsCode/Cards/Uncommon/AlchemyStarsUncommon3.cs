@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using AlchemyStars.Characters;
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -31,10 +33,26 @@ public sealed class AlchemyStarsUncommon3 : ModCardTemplate
     {
         await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
 
-        var discardPile = PileType.Discard.GetPile(Owner);
-        var fromDiscard = Owner.RunState.Rng.CombatCardSelection.NextItem(discardPile.Cards);
+        // 乱战等自动打出会嵌套牌堆动画。快照弃牌堆并跳过演出，避免把正在打出的牌自己捞回来把补间卡死。
+        var candidates = new List<CardModel>();
+        foreach (var card in PileType.Discard.GetPile(Owner).Cards)
+        {
+            if (ReferenceEquals(card, this) || card.Pile?.Type != PileType.Discard)
+                continue;
+
+            candidates.Add(card);
+        }
+
+        var fromDiscard = Owner.RunState.Rng.CombatCardSelection.NextItem(candidates);
         if (fromDiscard != null)
-            await CardPileCmd.Add(fromDiscard, PileType.Hand);
+        {
+            await CardPileCmd.Add(
+                fromDiscard,
+                PileType.Hand,
+                CardPilePosition.Bottom,
+                null,
+                cardPlay.IsAutoPlay);
+        }
 
         if (IsUpgraded)
             await CardPileCmd.Draw(choiceContext, 1m, Owner);

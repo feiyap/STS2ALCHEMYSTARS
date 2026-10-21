@@ -321,6 +321,44 @@ namespace AlchemyStars.Keywords;
 
 [RegisterOwnedCardKeyword("endure")]
 
+[RegisterOwnedCardKeyword(
+    "forgotten",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword(
+    "pioneering_resolve",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword(
+    "returning_meteor",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword(
+    "fate_anger",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword(
+    "silent_hunter",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword(
+    "requiem_roar",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword(
+    "rhyme_lake",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword(
+    "guard_watch",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword(
+    "frost_heart",
+    CardDescriptionPlacement = ModKeywordCardDescriptionPlacement.BeforeCardDescription)]
+
+[RegisterOwnedCardKeyword("crit")]
+
 public sealed class AlchemyStarsMechanicKeywords;
 
 

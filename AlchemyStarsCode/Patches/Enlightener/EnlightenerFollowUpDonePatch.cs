@@ -6,6 +6,7 @@ using HarmonyLib;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Events;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Events;
@@ -110,11 +111,13 @@ public sealed class EnlightenerFollowUpDonePatch : IPatchMethod
         var relic = ModelDb.Relic<T>().ToMutable();
         relic.Owner = owner;
         var textKey = $"{eventEntry}.pages.INITIAL.options.{relic.Id.Entry}";
-        return EventOption.FromRelic(relic, hostEvent, async () =>
+        var option = EventOption.FromRelic(relic, hostEvent, async () =>
         {
             await RelicCmd.Obtain(relic, owner);
             FinishHostEvent(hostEvent, eventEntry);
         }, textKey);
+        option.HoverTips = HoverTipFactory.FromRelic(relic);
+        return option;
     }
 
     private static void FinishHostEvent(AncientEventModel hostEvent, string eventEntry)

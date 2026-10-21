@@ -46,7 +46,8 @@ public sealed class AlchemyStarsMightPower : AlchemyStarsSwordAltarPowerBase
         CombatSide side,
         IEnumerable<Creature> participants)
     {
-        if (!participants.Contains(Owner))
+        // 玩家身上的旧印威能是另一种能力。这里只给定祭剑座自己上力量。
+        if (!Owner.IsEnemy || !participants.Contains(Owner))
             return;
 
         if (_skipNextTurn)

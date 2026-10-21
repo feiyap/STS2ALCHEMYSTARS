@@ -4,6 +4,8 @@ using AlchemyStars.Characters;
 using AlchemyStars.Relics.Ancients;
 using Godot;
 using MegaCrit.Sts2.Core.Events;
+using MegaCrit.Sts2.Core.HoverTips;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Acts;
 using MegaCrit.Sts2.Core.Runs;
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -46,33 +48,41 @@ public sealed class AlchemyStarsWilliam : ModAncientEventTemplate
 
     private IReadOnlyList<EventOption> PoolA =>
     [
-        CreateModRelicOption<AlchemyStarsHermitsArcana>(),
-        CreateModRelicOption<AlchemyStarsDropOfTruth>(),
-        CreateModRelicOption<AlchemyStarsHermitsRite>(),
-        CreateModRelicOption<AlchemyStarsLockOfObsession>(),
+        Relic<AlchemyStarsHermitsArcana>(),
+        Relic<AlchemyStarsDropOfTruth>(),
+        Relic<AlchemyStarsHermitsRite>(),
+        Relic<AlchemyStarsLockOfObsession>(),
     ];
 
     private IReadOnlyList<EventOption> PoolB =>
     [
-        CreateModRelicOption<AlchemyStarsHermitsTome>(),
-        CreateModRelicOption<AlchemyStarsKeyOfManyDoors>(),
-        CreateModRelicOption<AlchemyStarsFalseResurrection>(),
+        Relic<AlchemyStarsHermitsTome>(),
+        Relic<AlchemyStarsKeyOfManyDoors>(),
+        Relic<AlchemyStarsFalseResurrection>(),
     ];
 
     private IReadOnlyList<EventOption> PoolC =>
     [
-        CreateModRelicOption<AlchemyStarsEyeOfFate>(),
-        CreateModRelicOption<AlchemyStarsHermitsVault>(),
-        CreateModRelicOption<AlchemyStarsValueOfSoul>(),
+        Relic<AlchemyStarsEyeOfFate>(),
+        Relic<AlchemyStarsHermitsVault>(),
+        Relic<AlchemyStarsValueOfSoul>(),
     ];
 
     private IReadOnlyList<EventOption> PoolD =>
     [
-        CreateModRelicOption<AlchemyStarsIsolatorsAppraisal>(),
-        CreateModRelicOption<AlchemyStarsTruthLordsBlessing>(),
-        CreateModRelicOption<AlchemyStarsNudgeTheFlow>(),
-        CreateModRelicOption<AlchemyStarsMobiusOfSelf>(),
+        Relic<AlchemyStarsIsolatorsAppraisal>(),
+        Relic<AlchemyStarsTruthLordsBlessing>(),
+        Relic<AlchemyStarsNudgeTheFlow>(),
+        Relic<AlchemyStarsMobiusOfSelf>(),
     ];
+
+    /// <summary>先古遗物选项：按钮保留遗物图标，悬停同时显示遗物效果。</summary>
+    private EventOption Relic<T>() where T : RelicModel
+    {
+        var option = CreateModRelicOption<T>();
+        option.HoverTips = HoverTipFactory.FromRelic<T>();
+        return option;
+    }
 
     public override IEnumerable<EventOption> AllPossibleOptions =>
         PoolA.Concat(PoolB).Concat(PoolC).Concat(PoolD);

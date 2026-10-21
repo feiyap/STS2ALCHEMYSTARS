@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// ��Ծ���ۡ����ޣ��������ף������� 2 �׹��ܴ�������Ʋ�������á�
+/// 岁跃金鳞·辰霓：如意雷；抽牌并将抽到的牌本回合费用变为 0，获得缓冲。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderRare2 : ModCardTemplate
@@ -24,12 +24,7 @@ public sealed class AlchemyStarsThunderRare2 : ModCardTemplate
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.Self;
     private const bool ShowInCardLibrary = true;
-    private const int RequiredThunderLightEnergy = 2;
     private const int DrawCount = 3;
-
-    protected override bool IsPlayable => LightMechanic.HasThunderLightEnergyCount(Owner, RequiredThunderLightEnergy);
-
-    protected override bool ShouldGlowGoldInternal => IsPlayable;
 
     public override CardAssetProfile AssetProfile => new(
         PortraitPath: $"{Entry.ResPath}/images/cards/{GetType().Name}.png");
@@ -70,10 +65,6 @@ public sealed class AlchemyStarsThunderRare2 : ModCardTemplate
         await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
 
         LightMechanic.TryConvertAllCellsAuspiciousThunder(Owner);
-
-        LightMechanic.TryConsumeLightEnergy(
-            Owner,
-            [LightElement.Thunder, LightElement.Thunder]);
 
         var drawn = await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
         foreach (var card in drawn)

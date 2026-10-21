@@ -17,7 +17,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 钧雷灼刃·雷文顿：弃 2 张后随机 3 段雷伤；三次全命中同一敌人则击晕。
+/// 钧雷灼刃·雷文顿：弃 2 张后随机 3 段 8/10 雷伤；三次全命中同一敌人则击晕。不消耗。
 /// </summary>
 [RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsRektone : ModCardTemplate
@@ -49,14 +49,12 @@ public sealed class AlchemyStarsRektone : ModCardTemplate
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
     [
-        CardKeyword.Exhaust,
         ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)
     ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips =>
     [
-        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder)),
-        HoverTipFactory.FromKeyword(CardKeyword.Exhaust)
+        HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Thunder))
     ];
 
     public AlchemyStarsRektone()

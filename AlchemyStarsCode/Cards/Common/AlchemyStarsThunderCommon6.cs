@@ -14,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 雷光闪击·艾莉法：非雷格转为雷格，获得 6/8 格挡；可消耗雷光能抽 1/2 张。
+/// 雷光闪击·艾莉法：非雷格转为雷格，获得格挡，并获得 1/2 点雷光能。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderCommon6 : ModCardTemplate
@@ -33,7 +33,7 @@ public sealed class AlchemyStarsThunderCommon6 : ModCardTemplate
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new BlockVar(6m, ValueProp.Move),
-        new CardsVar(1),
+        new IntVar("ThunderGain", 1),
         AlchemyStarsKeywordText.InlineTitleVar("ThunderTitle", AlchemyStarsKeywordIds.Thunder)
     ];
 
@@ -60,13 +60,15 @@ public sealed class AlchemyStarsThunderCommon6 : ModCardTemplate
 
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
 
-        if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
-            await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
+        LightMechanic.TryGrantLightEnergyMany(
+            Owner,
+            LightElement.Thunder,
+            DynamicVars["ThunderGain"].IntValue);
     }
 
     protected override void OnUpgrade()
     {
         DynamicVars.Block.UpgradeValueBy(2m);
-        DynamicVars.Cards.UpgradeValueBy(1m);
+        DynamicVars["ThunderGain"].UpgradeValueBy(1m);
     }
 }

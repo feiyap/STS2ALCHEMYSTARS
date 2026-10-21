@@ -97,6 +97,7 @@ public sealed class AlchemyStarsKarenBrightSoul : ModCardTemplate
 
         var hitCount = LightMechanic.CountFireAndWaterLightEnergy(Owner);
         var hitDamage = DynamicVars.Damage.BaseValue;
+        await CardPlayAttackGroup.EnsureAsync(choiceContext, cardPlay);
 
         for (var i = 0; i < hitCount; i++)
         {

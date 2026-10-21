@@ -58,7 +58,7 @@ public sealed class AlchemyStarsForestUncommon6 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
 
         var harvest = 0m;
         if (LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Forest]))

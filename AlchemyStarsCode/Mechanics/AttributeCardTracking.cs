@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Enchantments;
+using MegaCrit.Sts2.Core.Models.Relics;
 using MegaCrit.Sts2.Core.Random;
 using MegaCrit.Sts2.Core.Runs;
 
@@ -115,9 +116,12 @@ internal static class AttributeCardTracking
             if (PassesAttributeLock(current, lockedMask))
                 continue;
 
+            // 吃不完的糖追加的是能力牌。重抽若只看稀有度和属性，会把它换成攻击或技能。
+            var preserveType = IsLastingCandyExtra(reward);
             var candidates = pool
                 .Where(card =>
                     card.Rarity == current.Rarity &&
+                    (!preserveType || card.Type == current.Type) &&
                     PassesAttributeLock(card, lockedMask) &&
                     !used.Contains(card.Id))
                 .ToList();
@@ -127,6 +131,7 @@ internal static class AttributeCardTracking
                 candidates = pool
                     .Where(card =>
                         card.Rarity == current.Rarity &&
+                        (!preserveType || card.Type == current.Type) &&
                         PassesAttributeLock(card, lockedMask))
                     .ToList();
             }
@@ -147,6 +152,12 @@ internal static class AttributeCardTracking
 
         return modified;
     }
+
+    /// <summary>
+    /// 吃不完的糖把额外能力牌塞进同一份奖励后，光能追踪的 Late 重抽仍会看到它。
+    /// </summary>
+    public static bool IsLastingCandyExtra(CardCreationResult result) =>
+        result.ModifyingRelics.Any(relic => relic is LastingCandy);
 
     /// <summary>
     /// 替换奖励卡时保留升级与附魔（如华美发束的华美），避免 Late 重抽冲掉先前遗物效果。

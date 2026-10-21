@@ -33,7 +33,8 @@ public sealed class AlchemyStarsZetaCandyJar : AlchemyStarsAncientRelicBase
             return;
 
         Flash();
-        await DrinkRandomSelfPotion(new ThrowingPlayerChoiceContext());
+        // 攻击/技能/能力药水会打开选牌界面；Throwing 上下文会直接抛错，导致喝下后没有效果。
+        await DrinkRandomSelfPotion(new BlockingPlayerChoiceContext());
     }
 
     public override Task AfterCombatEnd(CombatRoom _) => Task.CompletedTask;
@@ -48,17 +49,33 @@ public sealed class AlchemyStarsZetaCandyJar : AlchemyStarsAncientRelicBase
             return;
 
         var potion = canonical.ToMutable();
-        var procure = await PotionCmd.TryToProcure(potion, Owner);
-        if (!procure.success)
-            return;
-
-        if (!potion.IsValidTarget(Owner.Creature))
+        // 药水必须先进入栏位才能喝下。栏位已满时临时加一格，喝完再收回。
+        var expandedSlot = false;
+        if (!Owner.HasOpenPotionSlots)
         {
-            await PotionCmd.Discard(potion);
-            return;
+            await PlayerCmd.GainMaxPotionCount(1, Owner);
+            expandedSlot = true;
         }
 
-        await potion.OnUseWrapper(choiceContext, Owner.Creature);
+        try
+        {
+            var procure = await PotionCmd.TryToProcure(potion, Owner);
+            if (!procure.success)
+                return;
+
+            if (!potion.IsValidTarget(Owner.Creature))
+            {
+                await PotionCmd.Discard(potion);
+                return;
+            }
+
+            await potion.OnUseWrapper(choiceContext, Owner.Creature);
+        }
+        finally
+        {
+            if (expandedSlot)
+                await PlayerCmd.LoseMaxPotionCount(1, Owner);
+        }
     }
 
     private PotionModel? PickRandomSelfDrinkablePotion(Rng rng)

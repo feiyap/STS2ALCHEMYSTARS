@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using AlchemyStars.Characters;
 using AlchemyStars.RestSite;
@@ -9,6 +10,7 @@ using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Entities.RestSite;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -79,47 +81,61 @@ public sealed class AlchemyStarsMirrorLakeWater : AlchemyStarsCharacterRelicBase
         if (Owner == null || ForgottenCards.Count == 0)
             return false;
 
-        var previews = ForgottenCards
-            .Select(CardModel.FromSerializable)
+        // FromSerializable 不会绑定 Owner。未进 RunState 的牌无法加入牌组，回忆会失败，遗物就只剩删牌。
+        var loaded = ForgottenCards
+            .Select(save => Owner.RunState.LoadCard(save, Owner))
             .ToList();
 
-        var prefs = new CardSelectorPrefs(CardSelectorPrefs.UpgradeSelectionPrompt, 1, previews.Count)
+        var prefs = new CardSelectorPrefs(CardSelectorPrefs.UpgradeSelectionPrompt, 1, loaded.Count)
         {
             Cancelable = true,
         };
-        var picked = (await CardSelectCmd.FromSimpleGrid(
-            choiceContext,
-            previews,
-            Owner,
-            prefs)).ToList();
-        if (picked.Count == 0)
-            return false;
 
-        var selectedIndices = new HashSet<int>();
-        foreach (var card in picked)
+        List<CardModel> picked;
+        try
         {
-            var index = previews.IndexOf(card);
-            if (index >= 0)
-                selectedIndices.Add(index);
+            picked = (await CardSelectCmd.FromSimpleGrid(
+                choiceContext,
+                loaded,
+                Owner,
+                prefs)).ToList();
+        }
+        catch (OperationCanceledException)
+        {
+            // 选牌界面关闭时任务会被取消。把临时载入的牌移出当局，遗忘列表保持不变。
+            foreach (var card in loaded)
+                Owner.RunState.RemoveCard(card);
+            return false;
+        }
+        catch
+        {
+            foreach (var card in loaded)
+                Owner.RunState.RemoveCard(card);
+            throw;
         }
 
-        if (selectedIndices.Count == 0)
-            return false;
-
-        var remaining = new List<SerializableCard>();
-        for (var i = 0; i < ForgottenCards.Count; i++)
+        if (picked.Count == 0)
         {
-            if (!selectedIndices.Contains(i))
+            foreach (var card in loaded)
+                Owner.RunState.RemoveCard(card);
+            return false;
+        }
+
+        var pickedSet = new HashSet<CardModel>(picked, ReferenceEqualityComparer.Instance);
+        var remaining = new List<SerializableCard>();
+        for (var i = 0; i < loaded.Count; i++)
+        {
+            var card = loaded[i];
+            if (!pickedSet.Contains(card))
             {
                 remaining.Add(ForgottenCards[i]);
+                Owner.RunState.RemoveCard(card);
                 continue;
             }
 
-            var card = CardModel.FromSerializable(ForgottenCards[i]);
-            if (card.IsUpgradable)
-                card.UpgradeInternal();
-
             CardCmd.PreviewCardPileAdd(await CardPileCmd.Add(card, PileType.Deck));
+            if (card.IsUpgradable)
+                CardCmd.Upgrade(card, CardPreviewStyle.MessyLayout);
         }
 
         ForgottenCards = remaining;

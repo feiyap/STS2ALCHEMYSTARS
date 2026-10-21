@@ -31,7 +31,7 @@ namespace AlchemyStars.Monsters;
 
 /// <summary>
 /// 祭剑座：寂静之陵的事件 Boss。一阶段八动循环，半血锁血转阶段，二阶段循环意图 2–7。
-/// 语音先不播放。
+/// 转阶段与部分二阶段意图会播放语音。
 /// </summary>
 [RegisterMonster]
 public sealed class AlchemyStarsSwordAltar : ModMonsterTemplate
@@ -40,22 +40,18 @@ public sealed class AlchemyStarsSwordAltar : ModMonsterTemplate
     {
         None,
         Roar,
-        Unseal,
     }
 
     private bool _transitionQueued;
     private bool _transitionDone;
     private bool _permanentNeutral;
-    private bool _gainMightOnHit;
-    private bool _maxHpRestored;
+    private bool _pioneerCleared;
     private bool _grantUnyieldingOnNextPlayerTurn;
-    private bool _roarBroken;
     private ChargeKind _charge;
     private int _blockSnapshot;
     private int _unyieldingPendingHeal;
     private int _unyieldingTempStrength;
     private int _hardToKillTurnsLeft;
-    private readonly Dictionary<Player, int> _originalMaxHp = new();
 
     private MoveState? _fateAngerMove;
     private MoveState? _unyieldingStun;
@@ -82,6 +78,14 @@ public sealed class AlchemyStarsSwordAltar : ModMonsterTemplate
     protected override CreatureAnimator? SetupCustomCreatureAnimator(MegaSprite controller) =>
         ModAnimStateMachines.Standard(controller, idleName: "Story_norm");
 
+    public override Task BeforeCombatStart()
+    {
+        if (!IsCanonical)
+            AlchemyStarsSwordAltarMusic.Start();
+
+        return Task.CompletedTask;
+    }
+
     private bool IsTough => AscensionHelper.HasAscension(AscensionLevel.ToughEnemies);
 
     private bool IsDeadly => AscensionHelper.HasAscension(AscensionLevel.DeadlyEnemies);
@@ -98,9 +102,34 @@ public sealed class AlchemyStarsSwordAltar : ModMonsterTemplate
 
     private int ZeroHitCount => IsDeadly ? 5 : 4;
 
-    private int UnsealCounterHits => (IsDeadly ? 6 : 4) * PlayerCount;
+    /// <summary>解封：月光层数，以及意图 7 的单次伤害。不随 N9 提高。</summary>
+    private int MoonUnsealAmount => 4 * PlayerCount;
 
     private int Strength => Creature.GetPowerAmount<StrengthPower>();
+
+    public override async Task AfterDeath(
+        PlayerChoiceContext choiceContext,
+        Creature creature,
+        bool wasRemovalPrevented,
+        float deathAnimLength)
+    {
+        if (creature != Creature || wasRemovalPrevented)
+            return;
+
+        var players = Creature.CombatState?.Players;
+        if (players == null)
+            return;
+
+        foreach (var player in players.ToList())
+        {
+            var pioneer = player.Creature.GetPower<AlchemyStarsPioneerPower>();
+            if (pioneer == null)
+                continue;
+
+            await pioneer.RefundNow();
+            await PowerCmd.Remove(pioneer);
+        }
+    }
 
     public override async Task AfterAddedToRoom()
     {
@@ -131,20 +160,15 @@ public sealed class AlchemyStarsSwordAltar : ModMonsterTemplate
 
         AssertMutable();
         _blockSnapshot = Creature.Block;
-        // 回忆的「受击加威能」只持续到下一轮敌方回合开始。武装发生在招式里，晚于本次清空。
-        _gainMightOnHit = false;
 
         if (_charge == ChargeKind.Roar && Creature.Block <= 0 && _roarStun != null)
-        {
-            _roarBroken = true;
             SetMoveImmediate(_roarStun, true);
-        }
 
         if (_hardToKillTurnsLeft > 0)
         {
             _hardToKillTurnsLeft--;
             if (_hardToKillTurnsLeft <= 0)
-                await PowerCmd.Remove<HardToKillPower>(Creature);
+                await PowerCmd.Remove<AlchemyStarsAltarUnyieldingPower>(Creature);
         }
 
         if (combatState.RoundNumber % 4 == 0)
@@ -162,16 +186,10 @@ public sealed class AlchemyStarsSwordAltar : ModMonsterTemplate
         if (target != Creature)
             return;
 
-        var attackHit = props.IsPoweredAttack() && dealer?.IsPlayer == true;
-        if (attackHit)
-            await OnPlayerAttackHit(choiceContext, result);
-
-        if (_charge == ChargeKind.Roar && Creature.Block <= 0 && _roarStun != null)
+        if (_charge == ChargeKind.Roar && Creature.Block <= 0 && _roarStun != null &&
+            Creature.CombatState?.CurrentSide == CombatSide.Player)
         {
-            AssertMutable();
-            _roarBroken = true;
-            if (Creature.CombatState?.CurrentSide == CombatSide.Player)
-                SetMoveImmediate(_roarStun, true);
+            SetMoveImmediate(_roarStun, true);
         }
 
         if (!_transitionDone && Creature.CurrentHp <= Creature.MaxHp / 2)
@@ -201,19 +219,31 @@ public sealed class AlchemyStarsSwordAltar : ModMonsterTemplate
         _fateAngerMove = Move("FATE_ANGER", FateAngerMove, new BuffIntent(), new DefendIntent());
         var pioneer = Move("PIONEER", PioneerMove, new DebuffIntent(true), new BuffIntent());
         var muted = Move("MUTED", MutedMove, new DebuffIntent());
-        var phase2Strike = Move("PHASE2_STRIKE", Phase2StrikeMove, new SingleAttackIntent(() => (decimal)Phase2StrikeDamage), new DebuffIntent());
+        var phase2Strike = Move(
+            "PHASE2_STRIKE",
+            Phase2StrikeMove,
+            new SingleAttackIntent(() => (decimal)Phase2StrikeDamage),
+            new AlchemyStarsFrailIntent());
         var phase2Flurry = Move("PHASE2_FLURRY", Phase2FlurryMove, new MultiAttackIntent(0, () => ZeroHitCount), new DefendIntent());
         var memory = Move("MEMORY", MemoryMove, new DefendIntent());
-        var phase2Weak = Move("PHASE2_WEAK", Phase2WeakMove, new MultiAttackIntent(0, () => ZeroHitCount), new DebuffIntent());
-        var roar = Move("DARKEST_ROAR", DarkestRoarMove, new DefendIntent(), new BuffIntent());
-        var roarRelease = Move("DARKEST_ROAR_RELEASE", DarkestRoarReleaseMove, new MultiAttackIntent(Phase2StrikeDamage, 2));
-        _roarStun = Move("DARKEST_ROAR_STUN", DarkestRoarStunMove, new StunIntent());
-        var unseal = Move("MOON_UNSEAL", MoonUnsealMove, new BuffIntent());
-        var unsealRelease = Move(
+        var phase2Weak = Move(
+            "PHASE2_WEAK",
+            Phase2WeakMove,
+            new MultiAttackIntent(0, () => ZeroHitCount),
+            new DebuffIntent(),
+            new DefendIntent(),
+            new BuffIntent());
+        var moonStrike = Move(
+            "DARKEST_ROAR",
+            Phase2MoonStrikeMove,
+            new MultiAttackIntent(Phase2StrikeDamage, 2),
+            new BuffIntent());
+        _roarStun = Move("DARKEST_ROAR_STUN", DarkestRoarStunMove, new StunIntent(), new BuffIntent());
+        var unsealAttack = Move(
             "MOON_UNSEAL_RELEASE",
-            MoonUnsealReleaseMove,
-            new MultiAttackIntent(0, () => UnsealCounterHits));
-        _unsealBreak = Move("MOON_UNSEAL_BREAK", MoonUnsealBreakMove, new BuffIntent());
+            Phase2UnsealAttackMove,
+            new SingleAttackIntent(() => (decimal)MoonUnsealAmount));
+        _unsealBreak = Move("MOON_UNSEAL_BREAK", UnsealStunMove, new StunIntent());
 
         var brand = Move(
             "BRAND",
@@ -261,12 +291,10 @@ public sealed class AlchemyStarsSwordAltar : ModMonsterTemplate
         phase2Strike.FollowUpState = phase2Flurry;
         phase2Flurry.FollowUpState = memory;
         memory.FollowUpState = phase2Weak;
-        phase2Weak.FollowUpState = roar;
-        roar.FollowUpState = roarRelease;
-        roarRelease.FollowUpState = unseal;
-        _roarStun.FollowUpState = unseal;
-        unseal.FollowUpState = unsealRelease;
-        unsealRelease.FollowUpState = phase2Strike;
+        phase2Weak.FollowUpState = moonStrike;
+        moonStrike.FollowUpState = unsealAttack;
+        _roarStun.FollowUpState = unsealAttack;
+        unsealAttack.FollowUpState = phase2Strike;
         _unsealBreak.FollowUpState = phase2Strike;
 
         brand.FollowUpState = Gate("GATE_THUNDER", thunder);
@@ -362,7 +390,7 @@ public sealed class AlchemyStarsSwordAltar : ModMonsterTemplate
 
     private async Task FateAngerMove(IReadOnlyList<Creature> targets)
     {
-        // 语音以后补：20、「寂静猎兵」本该是一个被我掩埋的称号，它寓意着许多东西……英雄，牺牲，背叛，还有……希望。
+        AlchemyStarsSwordAltarVoice.Play(Creature, "20");
         AssertMutable();
         await CreatureCmd.GainBlock(Creature, 444m, ValueProp.Move, null);
         await LockNeutral();
@@ -384,13 +412,9 @@ public sealed class AlchemyStarsSwordAltar : ModMonsterTemplate
         foreach (var player in LivingPlayers())
         {
             var creature = player.Creature;
-            _originalMaxHp[player] = creature.MaxHp;
-            var halved = System.Math.Max(1, creature.MaxHp / 2);
-            var lose = creature.MaxHp - halved;
-            if (lose > 0)
-                await CreatureCmd.LoseMaxHp(Ctx(), creature, lose, false);
-
             await PowerCmd.Remove<AlchemyStarsSwordAltarBrandPower>(creature);
+            await PowerCmd.Remove<AlchemyStarsPioneerPower>(creature);
+            await ApplyPower<AlchemyStarsPioneerPower>(creature, 1m);
             await ApplyPower<VulnerablePower>(creature, 99m);
         }
 
@@ -399,7 +423,7 @@ public sealed class AlchemyStarsSwordAltar : ModMonsterTemplate
 
     private async Task MutedMove(IReadOnlyList<Creature> targets)
     {
-        // 语音以后补：34、晦暗星光，爆发吧
+        AlchemyStarsSwordAltarVoice.Play(Creature, "34");
         if (!Creature.HasPower<AlchemyStarsMutedSoundPower>())
             await ApplyPower<AlchemyStarsMutedSoundPower>(Creature, 1m);
     }
@@ -407,7 +431,7 @@ public sealed class AlchemyStarsSwordAltar : ModMonsterTemplate
     private async Task Phase2StrikeMove(IReadOnlyList<Creature> targets)
     {
         await AttackAll(Phase2StrikeDamage, 1);
-        await DebuffAll<VulnerablePower>(2m);
+        await DebuffAll<FrailPower>(2m);
     }
 
     private async Task Phase2FlurryMove(IReadOnlyList<Creature> targets)
@@ -418,108 +442,93 @@ public sealed class AlchemyStarsSwordAltar : ModMonsterTemplate
 
     private async Task MemoryMove(IReadOnlyList<Creature> targets)
     {
-        // 语音以后补：37、见敌必杀
+        AlchemyStarsSwordAltarVoice.Play(Creature, "37");
         AssertMutable();
         await GainBlock(50 * PlayerCount, strengthAlreadyIncluded: false);
-        _gainMightOnHit = true;
     }
 
     private async Task Phase2WeakMove(IReadOnlyList<Creature> targets)
     {
+        AssertMutable();
         await AttackAll(0, ZeroHitCount);
         await DebuffAll<WeakPower>(2m);
-    }
-
-    private async Task DarkestRoarMove(IReadOnlyList<Creature> targets)
-    {
-        AssertMutable();
-        await GainBlock((4 + Strength) * PlayerCount, strengthAlreadyIncluded: true);
+        await GainBlock(4 * PlayerCount, strengthAlreadyIncluded: false);
         _charge = ChargeKind.Roar;
-        _roarBroken = false;
-        if (!Creature.HasPower<AlchemyStarsDarkestRoarPower>())
-            await ApplyPower<AlchemyStarsDarkestRoarPower>(Creature, 1m);
+        await PowerCmd.Remove<AlchemyStarsDarkEmperorPower>(Creature);
+        await ApplyPower<AlchemyStarsDarkEmperorPower>(Creature, 1m);
     }
 
-    private async Task DarkestRoarReleaseMove(IReadOnlyList<Creature> targets)
+    private async Task Phase2MoonStrikeMove(IReadOnlyList<Creature> targets)
     {
-        var broken = _roarBroken;
-        ClearCharge();
-        await PowerCmd.Remove<AlchemyStarsDarkestRoarPower>(Creature);
-        if (broken)
-            return;
-
+        await ClearDarkEmperor();
         await AttackAll(Phase2StrikeDamage, 2);
+        await GrantHardToKillAndMoonUnseal();
     }
 
     private async Task DarkestRoarStunMove(IReadOnlyList<Creature> targets)
     {
-        ClearCharge();
-        await PowerCmd.Remove<AlchemyStarsDarkestRoarPower>(Creature);
+        await ClearDarkEmperor();
+        await GrantHardToKillAndMoonUnseal();
     }
 
-    private async Task MoonUnsealMove(IReadOnlyList<Creature> targets)
+    /// <summary>格挡被打破只取消攻击，不屈和解封：月光照常获得。</summary>
+    private async Task GrantHardToKillAndMoonUnseal()
     {
-        // 语音以后补：22、我们是正义的守望者。
         AssertMutable();
-        var cap = PlayerCount > 1 ? 30 : 20;
-        await PowerCmd.Remove<HardToKillPower>(Creature);
-        await ApplyPower<HardToKillPower>(Creature, cap);
+        await PowerCmd.Remove<AlchemyStarsAltarUnyieldingPower>(Creature);
+        await ApplyPower<AlchemyStarsAltarUnyieldingPower>(Creature, IsDeadly ? 30 : 20);
         _hardToKillTurnsLeft = 3;
 
         await PowerCmd.Remove<AlchemyStarsMoonUnsealPower>(Creature);
-        await ApplyPower<AlchemyStarsMoonUnsealPower>(Creature, (IsTough ? 6 : 4) * PlayerCount);
-        _charge = ChargeKind.Unseal;
+        await ApplyPower<AlchemyStarsMoonUnsealPower>(Creature, MoonUnsealAmount);
     }
 
-    private async Task MoonUnsealReleaseMove(IReadOnlyList<Creature> targets)
+    private async Task Phase2UnsealAttackMove(IReadOnlyList<Creature> targets)
     {
-        var shield = Creature.GetPower<AlchemyStarsMoonUnsealPower>();
-        var broken = shield != null && shield.HitsTaken >= (int)shield.Amount;
-        ClearCharge();
-        await PowerCmd.Remove<AlchemyStarsMoonUnsealPower>(Creature);
-        if (broken)
+        AlchemyStarsSwordAltarVoice.Play(Creature, "22");
+        if (Creature.HasPower<AlchemyStarsMoonUnsealPower>())
         {
-            await RestorePlayersFromUnseal(firstBreak: !_maxHpRestored);
-            return;
-        }
-
-        var moon = Creature.GetPower<AlchemyStarsBlindMoonPower>();
-        if (moon != null)
-        {
-            await PowerCmd.ModifyAmount(Ctx(), moon, 50m, Creature, null);
-            moon.MarkUnsealed();
-        }
-
-        await AttackAll(0, UnsealCounterHits);
-    }
-
-    private async Task MoonUnsealBreakMove(IReadOnlyList<Creature> targets)
-    {
-        ClearCharge();
-        await PowerCmd.Remove<AlchemyStarsMoonUnsealPower>(Creature);
-        await RestorePlayersFromUnseal(firstBreak: !_maxHpRestored);
-    }
-
-    private async Task OnPlayerAttackHit(PlayerChoiceContext choiceContext, DamageResult result)
-    {
-        AssertMutable();
-        if (_charge == ChargeKind.Unseal)
-        {
-            var shield = Creature.GetPower<AlchemyStarsMoonUnsealPower>();
-            if (shield != null)
+            await PowerCmd.Remove<AlchemyStarsMoonUnsealPower>(Creature);
+            var moon = Creature.GetPower<AlchemyStarsBlindMoonPower>();
+            if (moon != null)
             {
-                shield.RegisterHit();
-                if (shield.HitsTaken >= (int)shield.Amount &&
-                    _unsealBreak != null &&
-                    Creature.CombatState?.CurrentSide == CombatSide.Player)
-                {
-                    SetMoveImmediate(_unsealBreak, true);
-                }
+                await PowerCmd.ModifyAmount(Ctx(), moon, 50m, Creature, null);
+                moon.MarkUnsealed();
             }
         }
 
-        if (_gainMightOnHit)
-            await ApplyPower<AlchemyStarsMightPower>(Creature, 1m);
+        await AttackAll(MoonUnsealAmount, 1);
+    }
+
+    private Task UnsealStunMove(IReadOnlyList<Creature> targets) => Task.CompletedTask;
+
+    /// <summary>解封：月光被打空。首次移除开辟者，然后全体回复 20% 最大生命并眩晕。</summary>
+    public async Task OnMoonUnsealBroken()
+    {
+        AssertMutable();
+        var first = !_pioneerCleared;
+        _pioneerCleared = true;
+        if (_unsealBreak != null && Creature.CombatState?.CurrentSide == CombatSide.Player)
+            SetMoveImmediate(_unsealBreak, true);
+
+        foreach (var player in LivingPlayers())
+        {
+            var creature = player.Creature;
+            if (first)
+                await PowerCmd.Remove<AlchemyStarsPioneerPower>(creature);
+
+            var heal = creature.MaxHp * 0.2m;
+            if (heal > 0)
+                await CreatureCmd.Heal(creature, heal);
+        }
+    }
+
+    private async Task ClearDarkEmperor()
+    {
+        if (_charge == ChargeKind.Roar)
+            ClearCharge();
+
+        await PowerCmd.Remove<AlchemyStarsDarkEmperorPower>(Creature);
     }
 
     private void QueueTransition()
@@ -531,24 +540,6 @@ public sealed class AlchemyStarsSwordAltar : ModMonsterTemplate
         _transitionQueued = true;
         if (Creature.CombatState?.CurrentSide == CombatSide.Player)
             SetMoveImmediate(_fateAngerMove, true);
-    }
-
-    private async Task RestorePlayersFromUnseal(bool firstBreak)
-    {
-        AssertMutable();
-        if (firstBreak)
-            _maxHpRestored = true;
-
-        foreach (var player in LivingPlayers())
-        {
-            var creature = player.Creature;
-            if (firstBreak && _originalMaxHp.TryGetValue(player, out var original))
-                await CreatureCmd.SetMaxHp(creature, original);
-
-            var heal = creature.MaxHp * 0.2m;
-            if (heal > 0)
-                await CreatureCmd.Heal(creature, heal);
-        }
     }
 
     private async Task DebuffAll<T>(decimal amount) where T : PowerModel
@@ -710,7 +701,6 @@ public sealed class AlchemyStarsSwordAltar : ModMonsterTemplate
     {
         AssertMutable();
         _charge = ChargeKind.None;
-        _roarBroken = false;
     }
 
     private IEnumerable<Player> LivingPlayers()

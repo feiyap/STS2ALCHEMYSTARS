@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
+using AlchemyStars.Mechanics;
 using AlchemyStars.Powers;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Keywords;
@@ -73,6 +74,7 @@ public sealed class AlchemyStarsThunderRare7 : ModCardTemplate
         if (hitCount <= 0)
             return;
 
+        await CardPlayAttackGroup.EnsureAsync(choiceContext, cardPlay);
         foreach (var enemy in CombatState!.HittableEnemies.ToList())
         {
             for (var i = 0; i < hitCount; i++)

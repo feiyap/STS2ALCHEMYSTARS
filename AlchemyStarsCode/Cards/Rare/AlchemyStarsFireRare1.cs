@@ -55,7 +55,7 @@ public sealed class AlchemyStarsFireRare1 : ModCardTemplate
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
+        await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
 
         await PowerCmd.Apply<AlchemyStarsBloomingBegoniaPower>(
             choiceContext,

@@ -69,6 +69,9 @@ public sealed class AlchemyStarsThunderCommon8 : ModCardTemplate
                 .Sum(result => (decimal)result.TotalDamage);
         }
 
+        // 自定义攻击不走 DealElementalAttackDamage，需在每次打出（含重放）当时记一次雷伤。
+        LightMechanic.RecordThunderDamageDealt(Owner);
+
         await LightMechanic.ApplyElementalHitEffects(
             choiceContext,
             Owner,

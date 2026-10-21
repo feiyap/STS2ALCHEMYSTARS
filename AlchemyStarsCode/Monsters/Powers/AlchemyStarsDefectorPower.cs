@@ -38,6 +38,9 @@ public sealed class AlchemyStarsDefectorPower : AlchemyStarsSwordAltarPowerBase
         CardModel? cardSource,
         CardPlay? cardPlay)
     {
+        if (LightMechanicDamageContext.SkipRepeatedAttackMultipliers)
+            return 1m;
+
         var altar = Altar;
         if (altar == null || target == null)
             return 1m;

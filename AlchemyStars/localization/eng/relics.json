@@ -23,7 +23,7 @@
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LAW_STRING.description": "Unblocked attack damage from Vice or Vice·Empty Pupil applies [blue]1[/blue] [gold]Vulnerable[/gold].",
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LAW_STRING.flavor": "This is not the memory I wanted... Vice...",
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_STAR_CREST.title": "Star Crest",
-  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_STAR_CREST.description": "From turn 2 each combat, add [blue]1[/blue] random Old Seal card to hand each turn. After [blue]4[/blue], add Silent Hunter·Altar Sword instead, then this Relic sleeps for the rest of combat.",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_STAR_CREST.description": "From turn 2 each combat, add [blue]1[/blue] Old Seal card that has not appeared yet this cycle. After all [blue]4[/blue], add Silent Hunter: Sword Altar instead, then this Relic sleeps for the rest of combat.",
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_STAR_CREST.flavor": "The story ends.\nAfter the darkness passed, people no longer needed \"Stars\" to light the way.\n\"May you live freely.\"",
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_MIRROR_LAKE_WATER.title": "Mirror Lake Water",
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_MIRROR_LAKE_WATER.description": "Whenever you defeat an Elite, you may forget a card. At a Rest Site, [gold]Recall[/gold] any number of forgotten cards. Recalled cards are upgraded.",

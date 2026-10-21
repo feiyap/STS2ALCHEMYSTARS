@@ -32,6 +32,8 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
             return;
         }
 
+        await CardPlayAttackGroup.FinishAsync();
+
         foreach (var player in runState.Players)
         {
             AlchemyStarsRebellionBurningHelper.ResetTurnTracking(player);
@@ -93,6 +95,9 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
         CardModel? cardSource,
         CardPlay? cardPlay)
     {
+        if (LightMechanicDamageContext.SuppressOutgoingMultiplier)
+            return 1m;
+
         if (dealer?.Player == null || !LightMechanic.IsMechanicActive(dealer.Player))
             return 1m;
 
@@ -160,6 +165,8 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
 
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        // 先结束这一次打出的攻击分组，再处理后续效果，避免活力被下一段攻击继续吃到。
+        await CardPlayAttackGroup.FinishIfMatchAsync(cardPlay);
         await AlchemyStarsRebellionBurningHelper.TryEchoAfterPlay(choiceContext, cardPlay);
     }
 
@@ -173,10 +180,13 @@ public sealed class AlchemyStarsLightMechanicService : HookedSingletonModel
             return Task.CompletedTask;
 
         var player = creature.Player;
-        if (player == null || !LightMechanic.ShouldEnableMechanic(player))
-            return Task.CompletedTask;
+        if (player == null)
+            return CardPlayAttackGroup.FinishIfOwnerDiedAsync(creature);
+
+        if (!LightMechanic.ShouldEnableMechanic(player))
+            return CardPlayAttackGroup.FinishIfOwnerDiedAsync(creature);
 
         LightMechanic.ClearOnDeath(player);
-        return Task.CompletedTask;
+        return CardPlayAttackGroup.FinishIfOwnerDiedAsync(creature);
     }
 }

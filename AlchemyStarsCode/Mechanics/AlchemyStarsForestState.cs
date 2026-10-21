@@ -62,7 +62,13 @@ public static class AlchemyStarsForestState
             TeaPartyCooldown[player]--;
     }
 
-    public static int GetKushkutaCombatDamageBonus(Player player) => KushkutaCombatDamageBonus[player];
+    public static int GetKushkutaCombatDamageBonus(Player player)
+    {
+        if (player == null)
+            return 0;
+
+        return KushkutaCombatDamageBonus[player];
+    }
 
     public static void IncrementKushkutaCombatDamageBonus(Player player, int amount = 1) =>
         KushkutaCombatDamageBonus[player] += amount;

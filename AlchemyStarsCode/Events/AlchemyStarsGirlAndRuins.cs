@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Events;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Acts;
@@ -29,7 +30,8 @@ public sealed class AlchemyStarsGirlAndRuins : ModEventTemplate
 
     protected override IReadOnlyList<EventOption> GenerateInitialOptions() =>
     [
-        new EventOption(this, Dress, InitialOptionKey("DRESS")),
+        new EventOption(this, Dress, InitialOptionKey("DRESS"),
+            HoverTipFactory.FromCardWithCardHoverTips<Writhe>()),
         new EventOption(this, Adventure, InitialOptionKey("ADVENTURE")),
         new EventOption(this, Farewell, InitialOptionKey("FAREWELL"))
     ];

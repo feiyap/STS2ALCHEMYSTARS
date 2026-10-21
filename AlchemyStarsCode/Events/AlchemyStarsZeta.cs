@@ -3,6 +3,8 @@ using System.Linq;
 using AlchemyStars.Relics.Ancients;
 using Godot;
 using MegaCrit.Sts2.Core.Events;
+using MegaCrit.Sts2.Core.HoverTips;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Acts;
 using MegaCrit.Sts2.Core.Runs;
 using STS2RitsuLib.Interop.AutoRegistration;
@@ -45,25 +47,33 @@ public sealed class AlchemyStarsZeta : ModAncientEventTemplate
 
     private IReadOnlyList<EventOption> PoolA =>
     [
-        CreateModRelicOption<AlchemyStarsLogisticsLicense>(),
-        CreateModRelicOption<AlchemyStarsDemonEye>(),
-        CreateModRelicOption<AlchemyStarsWeirdCandy>(),
+        Relic<AlchemyStarsLogisticsLicense>(),
+        Relic<AlchemyStarsDemonEye>(),
+        Relic<AlchemyStarsWeirdCandy>(),
     ];
 
     private IReadOnlyList<EventOption> PoolB =>
     [
-        CreateModRelicOption<AlchemyStarsZetaCandyJar>(),
-        CreateModRelicOption<AlchemyStarsOddGameCard>(),
-        CreateModRelicOption<AlchemyStarsSweetMicrophone>(),
+        Relic<AlchemyStarsZetaCandyJar>(),
+        Relic<AlchemyStarsOddGameCard>(),
+        Relic<AlchemyStarsSweetMicrophone>(),
     ];
 
     private IReadOnlyList<EventOption> PoolC =>
     [
-        CreateModRelicOption<AlchemyStarsRoysRules>(),
-        CreateModRelicOption<AlchemyStarsRoysReward>(),
-        CreateModRelicOption<AlchemyStarsSmoothCompass>(),
-        CreateModRelicOption<AlchemyStarsRallyTrophy>(),
+        Relic<AlchemyStarsRoysRules>(),
+        Relic<AlchemyStarsRoysReward>(),
+        Relic<AlchemyStarsSmoothCompass>(),
+        Relic<AlchemyStarsRallyTrophy>(),
     ];
+
+    /// <summary>先古遗物选项：按钮保留遗物图标，悬停同时显示遗物效果。</summary>
+    private EventOption Relic<T>() where T : RelicModel
+    {
+        var option = CreateModRelicOption<T>();
+        option.HoverTips = HoverTipFactory.FromRelic<T>();
+        return option;
+    }
 
     public override IEnumerable<EventOption> AllPossibleOptions =>
         PoolA.Concat(PoolB).Concat(PoolC);

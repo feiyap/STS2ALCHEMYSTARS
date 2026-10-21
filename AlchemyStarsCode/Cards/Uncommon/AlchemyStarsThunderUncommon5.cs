@@ -15,7 +15,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 凌野之鹰·蕾切尔：侦察者；添加深色雷格，可消耗雷光能随机取回弃牌堆雷牌。
+/// 凌野之鹰·蕾切尔：侦察者；添加深色雷格，并随机取回弃牌堆雷牌。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
@@ -67,9 +67,6 @@ public sealed class AlchemyStarsThunderUncommon5 : ModCardTemplate
             await PlayerCmd.GainEnergy(OverloadEnergyGain, Owner);
 
         LightMechanic.TryAddDarkThunderCells(Owner, DynamicVars.Repeat.IntValue);
-
-        if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
-            return;
 
         var thunderCards = PileType.Discard.GetPile(Owner).Cards
             .Where(AlchemyStarsCardHelpers.HasThunderKeyword)

@@ -1,3 +1,4 @@
+using HarmonyLib;
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -12,6 +13,8 @@ using MegaCrit.Sts2.Core.Models.Acts;
 using MegaCrit.Sts2.Core.Models.Enchantments;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Vfx;
+using MegaCrit.Sts2.Core.Random;
+using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Runs;
 
 namespace AlchemyStars.Events;
@@ -197,13 +200,66 @@ public static class AlchemyStarsEventHelpers
         await Task.CompletedTask;
     }
 
-    public static EncounterModel? PickRandomElite(Player player)
+    /// <summary>
+    /// 从当前章节抽取一场精英。必须使用共享 <paramref name="rng"/>，
+    /// 否则联机时每个玩家的奖励随机数不同，会进入不同战斗并卡在同步。
+    /// </summary>
+    public static EncounterModel? PickRandomElite(Player player, Rng rng)
     {
-        var elites = player.RunState.Act.AllEliteEncounters.ToList();
+        var elites = CollectCanonicalElites(player);
         if (elites.Count == 0)
             return null;
-        var picked = player.PlayerRng.Rewards.NextItem(elites);
-        return picked?.ToMutable();
+
+        return elites[rng.NextInt(elites.Count)].ToMutable();
+    }
+
+    private static List<EncounterModel> CollectCanonicalElites(Player player)
+    {
+        var result = new List<EncounterModel>();
+        var seen = new HashSet<ModelId>();
+
+        void AddRange(IEnumerable<EncounterModel>? source)
+        {
+            if (source == null)
+                return;
+
+            foreach (var encounter in source)
+            {
+                if (encounter == null || encounter.RoomType != RoomType.Elite)
+                    continue;
+
+                var canonical = encounter.IsMutable ? encounter.CanonicalInstance : encounter;
+                if (canonical == null || !seen.Add(canonical.Id))
+                    continue;
+
+                result.Add(canonical);
+            }
+        }
+
+        try
+        {
+            AddRange(player.RunState.Act.AllEliteEncounters);
+        }
+        catch (Exception ex)
+        {
+            AlchemyStars.Entry.Logger.Error($"[Event] 读取章节精英列表失败: {ex}");
+        }
+
+        if (result.Count > 0)
+            return result;
+
+        // 章节列表异常时，退回本局已经排好的精英队列。
+        try
+        {
+            var rooms = AccessTools.Field(typeof(ActModel), "_rooms")?.GetValue(player.RunState.Act) as RoomSet;
+            AddRange(rooms?.eliteEncounters);
+        }
+        catch (Exception ex)
+        {
+            AlchemyStars.Entry.Logger.Error($"[Event] 读取本局精英队列失败: {ex}");
+        }
+
+        return result;
     }
 
     public static bool IsAct1(IRunState run) => run.Act is Overgrowth or Underdocks;

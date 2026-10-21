@@ -23,7 +23,7 @@
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LAW_STRING.description": "「薇丝」与「薇丝·空瞳」的攻击若未被敌人格挡，每次造成伤害都对目标施加 [blue]1[/blue] 层[gold]易伤[/gold]。",
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_LAW_STRING.flavor": "这不是我想回忆的事……薇丝……",
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_STAR_CREST.title": "星辰纹章",
-  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_STAR_CREST.description": "从每场战斗的第二回合开始，每回合都会在手牌中生成 [blue]1[/blue] 张随机旧印卡，直到生成 [blue]4[/blue] 张后改为生成寂静猎兵·祭剑座，随后本场战斗沉睡。",
+  "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_STAR_CREST.description": "从每场战斗的第二回合开始，每回合在手牌中生成 [blue]1[/blue] 张本轮尚未出现过的旧印卡。四种旧印都生成过一次后，改为生成寂静猎兵·祭剑座，随后本场战斗沉睡。",
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_STAR_CREST.flavor": "故事结束了。\n黑暗过去之后，人们不再需要「星辰」来照亮前方。\n「愿你们能够自由地活下去」",
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_MIRROR_LAKE_WATER.title": "镜湖之水",
   "ALCHEMY_STARS_RELIC_ALCHEMY_STARS_MIRROR_LAKE_WATER.description": "每当击败精英时，可以选择遗忘一张牌。在休息处可[gold]回忆[/gold]任意张被遗忘的卡牌，被回忆的卡将被强化。",

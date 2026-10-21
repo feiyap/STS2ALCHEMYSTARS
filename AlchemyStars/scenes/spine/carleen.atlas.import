@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://bl3a8blpjeym6"
+path="res://.godot/imported/carleen.atlas-4eae5c54ceb969fd9f3d02b2bee90524.spatlas"
+
+[deps]
+
+source_file="res://AlchemyStars/scenes/spine/carleen.atlas"
+dest_files=["res://.godot/imported/carleen.atlas-4eae5c54ceb969fd9f3d02b2bee90524.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"

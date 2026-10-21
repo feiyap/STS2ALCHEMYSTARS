@@ -19,12 +19,12 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 勇士之锋·克：仅可打攻击意图敌人；承受半额即时/半额回合末；倍火返还并吸血。
+/// 勇士之锋·克：耗能 1。仅可打攻击意图敌人；承受半额即时/半额回合末；2/3 倍火返还并吸血。
 /// </summary>
 [RegisterCard(typeof(TokenCardPool))]
 public sealed class AlchemyStarsKe : ModCardTemplate
 {
-    private const int BaseEnergyCost = 2;
+    private const int BaseEnergyCost = 1;
     private const CardType CardKind = CardType.Attack;
     private const CardRarity CardRarityValue = CardRarity.Rare;
     private const TargetType CardTarget = TargetType.AnyEnemy;

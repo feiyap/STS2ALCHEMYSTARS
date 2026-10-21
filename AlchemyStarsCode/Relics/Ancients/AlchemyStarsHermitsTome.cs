@@ -1,4 +1,5 @@
 using AlchemyStars.Characters;
+using AlchemyStars.Enchantments;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Rewards;
@@ -91,8 +92,12 @@ public sealed class AlchemyStarsHermitsTome : AlchemyStarsAncientRelicBase
             if (card.IsUpgradable)
                 CardCmd.Upgrade(card);
 
-            // 尽量将基础费用永久改为 0。
-            card.EnergyCost.SetCustomBaseCost(0);
+            // 费用写在附魔上，读档时 OnEnchant 会再次把基础费用设为 0。
+            // SetCustomBaseCost 本身不会进存档，重启后会回到卡牌原费用。
+            if (!card.EnergyCost.CostsX && card.Enchantment == null)
+                CardCmd.Enchant<AlchemyStarsHermitsTomeEnchantment>(card, 1m);
+            else if (!card.EnergyCost.CostsX)
+                card.EnergyCost.SetCustomBaseCost(0);
         }
 
         return true;

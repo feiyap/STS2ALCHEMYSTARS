@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Events;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Acts;
@@ -43,7 +44,8 @@ public sealed class AlchemyStarsLongzhouFeast : ModEventTemplate
 
     protected override IReadOnlyList<EventOption> GenerateInitialOptions() =>
     [
-        new EventOption(this, Proxy, InitialOptionKey("PROXY")),
+        new EventOption(this, Proxy, InitialOptionKey("PROXY"),
+            HoverTipFactory.FromEnchantment<AlchemyStarsReplayEnchantment>()),
         new EventOption(this, Self, InitialOptionKey("SELF")),
         new EventOption(this, Jiu, InitialOptionKey("JIU"))
     ];
@@ -61,7 +63,7 @@ public sealed class AlchemyStarsLongzhouFeast : ModEventTemplate
     }
     private async Task Self()
     {
-        var elite = AlchemyStarsEventHelpers.PickRandomElite(Owner!);
+        var elite = AlchemyStarsEventHelpers.PickRandomElite(Owner!, Rng);
         if (elite == null)
         {
             await AlchemyStarsEventHelpers.GainRandomRelic(Owner!, RelicRarity.Uncommon);

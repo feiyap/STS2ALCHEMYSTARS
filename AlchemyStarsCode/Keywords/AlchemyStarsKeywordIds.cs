@@ -106,5 +106,17 @@ public static class AlchemyStarsKeywordIds
     public const string MechMark = "ALCHEMY_STARS_KEYWORD_MECH_MARK";
     public const string BraveTigerRoar = "ALCHEMY_STARS_KEYWORD_BRAVE_TIGER_ROAR";
     public const string Endure = "ALCHEMY_STARS_KEYWORD_ENDURE";
+
+    // 旧印
+    public const string Forgotten = "ALCHEMY_STARS_KEYWORD_FORGOTTEN";
+    public const string PioneeringResolve = "ALCHEMY_STARS_KEYWORD_PIONEERING_RESOLVE";
+    public const string ReturningMeteor = "ALCHEMY_STARS_KEYWORD_RETURNING_METEOR";
+    public const string FateAnger = "ALCHEMY_STARS_KEYWORD_FATE_ANGER";
+    public const string SilentHunter = "ALCHEMY_STARS_KEYWORD_SILENT_HUNTER";
+    public const string RequiemRoar = "ALCHEMY_STARS_KEYWORD_REQUIEM_ROAR";
+    public const string RhymeLake = "ALCHEMY_STARS_KEYWORD_RHYME_LAKE";
+    public const string GuardWatch = "ALCHEMY_STARS_KEYWORD_GUARD_WATCH";
+    public const string FrostHeart = "ALCHEMY_STARS_KEYWORD_FROST_HEART";
+    public const string Crit = "ALCHEMY_STARS_KEYWORD_CRIT";
 }
 

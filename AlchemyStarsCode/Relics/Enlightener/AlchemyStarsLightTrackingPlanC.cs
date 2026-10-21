@@ -106,7 +106,7 @@ public sealed class AlchemyStarsLightTrackingPlanC : AlchemyStarsEnlightenerReli
         foreach (var reward in cardRewards)
         {
             var filtered = candidates.Where(card => !blacklist.Contains(card.Id)).ToList();
-            if (RerollCard(reward, filtered, player, rng, matchType: false))
+            if (RerollCard(reward, filtered, player, rng, AttributeCardTracking.IsLastingCandyExtra(reward)))
             {
                 blacklist.Add(reward.Card.CanonicalInstance.Id);
                 modified = true;

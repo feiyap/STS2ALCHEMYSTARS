@@ -85,6 +85,11 @@
         <MakeDir Directories="$(ModOutputDir)" />
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModOutputDir)" />
         <Copy SourceFiles="$(MSBuildProjectDirectory)\$(MSBuildProjectName).json" DestinationFolder="$(ModOutputDir)" />
+        <ItemGroup>
+            <SwordAltarVoice Include="$(MSBuildProjectDirectory)\AlchemyStars\audio\sword_altar\**\*.wav" />
+            <SwordAltarVoice Include="$(MSBuildProjectDirectory)\AlchemyStars\audio\sword_altar\**\*.mp3" />
+        </ItemGroup>
+        <Copy SourceFiles="@(SwordAltarVoice)" DestinationFiles="@(SwordAltarVoice->'$(ModOutputDir)audio\sword_altar\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
     </Target>
 
     <Target Name="ExportPCK" AfterTargets="Build" Condition="'$(RunPckExport)' == 'true' and '$(STS2_SKIP_PCK_EXPORT)' != '1'">

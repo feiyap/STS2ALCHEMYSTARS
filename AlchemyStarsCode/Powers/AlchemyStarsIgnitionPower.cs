@@ -15,7 +15,7 @@ namespace AlchemyStars.Powers;
 
 /// <summary>
 /// 灼燃：增强下次火属性伤害 20%（灼灼海棠下额外 +20%），并消耗 1 层。
-/// 同一张牌的多段伤害只消耗 1 层，避免约拿等多段攻击一次烧光。
+/// 同一张牌的群体和多段火伤共用这一层，打出结束后再扣，避免只加成第一下。
 /// </summary>
 [RegisterPower]
 public sealed class AlchemyStarsIgnitionPower : AlchemyStarsPowerBase
@@ -23,7 +23,7 @@ public sealed class AlchemyStarsIgnitionPower : AlchemyStarsPowerBase
     public const decimal BaseBonusRate = 0.2m;
     public const decimal BegoniaExtraRate = 0.2m;
 
-    private CardModel? _consumedForCard;
+    private CardModel? _pendingCard;
 
     public override PowerType Type => PowerType.Buff;
 
@@ -52,19 +52,28 @@ public sealed class AlchemyStarsIgnitionPower : AlchemyStarsPowerBase
         if (element is not (LightElement.Fire or LightElement.Prismatic))
             return;
 
-        // 同一卡牌来源的多段火伤只消耗一层。
-        if (cardSource != null && ReferenceEquals(cardSource, _consumedForCard))
+        // 同一张牌的群体/多段火伤先不扣层，否则第一下结算完后面的目标就吃不到增伤。
+        if (cardSource != null)
+        {
+            if (ReferenceEquals(cardSource, _pendingCard))
+                return;
+
+            _pendingCard = cardSource;
+            Flash();
             return;
+        }
 
         Flash();
-        _consumedForCard = cardSource;
         await PowerCmd.Decrement(this);
     }
 
-    public override Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        if (cardPlay.Card.Owner?.Creature == Owner)
-            _consumedForCard = null;
-        return Task.CompletedTask;
+        if (cardPlay.Card.Owner?.Creature != Owner || _pendingCard == null)
+            return;
+
+        _pendingCard = null;
+        if (Amount > 0)
+            await PowerCmd.Decrement(this);
     }
 }

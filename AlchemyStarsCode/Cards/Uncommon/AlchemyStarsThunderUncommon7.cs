@@ -6,7 +6,6 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
-using AlchemyStars.Mechanics;
 using AlchemyStars.Powers;
 using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Keywords;
@@ -15,7 +14,7 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 奇巧机蜂·罗伊：获得格挡；消耗雷光能召唤闪电机蜂（机蜂自身回合抽牌）。
+/// 奇巧机蜂·罗伊：获得格挡，并召唤闪电机蜂（机蜂自身回合获得雷光能）。
 /// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon7 : ModCardTemplate
@@ -60,9 +59,6 @@ public sealed class AlchemyStarsThunderUncommon7 : ModCardTemplate
         await AlchemyStarsCardHelpers.TriggerSkillCastAnim(this);
 
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
-
-        if (!LightMechanic.TryConsumeLightEnergy(Owner, [LightElement.Thunder]))
-            return;
 
         await PowerCmd.Apply<AlchemyStarsLightningBeePower>(
             choiceContext,

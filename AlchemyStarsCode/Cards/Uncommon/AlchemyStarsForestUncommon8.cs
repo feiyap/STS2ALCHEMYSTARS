@@ -104,7 +104,9 @@ public sealed class AlchemyStarsForestUncommon8 : ModCardTemplate
     {
         DynamicVars.Damage.UpgradeValueBy(RetainDamageUpgradeBy);
         DynamicVars["Increase"].UpgradeValueBy(PlayBonusUpgradeBy);
-        SyncDamageDisplay();
+        // 读档时升级发生在卡牌获得 Owner 之前。此时同步战斗伤害会因空玩家抛错，整局无法加载。
+        if (Owner?.PlayerCombatState != null)
+            SyncDamageDisplay();
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)

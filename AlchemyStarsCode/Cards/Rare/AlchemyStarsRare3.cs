@@ -147,14 +147,21 @@ public sealed class AlchemyStarsRare3 : ModCardTemplate
         if (CombatManager.Instance.IsOverOrEnding)
             return;
 
-        var card = FindInCombatPiles(owner, requireInHand);
-        if (card == null || target.IsDead)
-            return;
+        // 先记下全部符合条件的副本。打出时牌会离开原牌堆，不能边找边打。
+        var cards = FindAllInCombatPiles(owner, requireInHand);
+        foreach (var card in cards)
+        {
+            if (target.IsDead)
+                break;
 
-        if (card.Pile?.Type != PileType.Hand)
-            await CardPileCmd.Add(card, PileType.Hand);
+            if (card.Pile == null || card.Pile.Type == PileType.Play)
+                continue;
 
-        await CardCmd.AutoPlay(choiceContext, card, target);
+            if (card.Pile.Type != PileType.Hand)
+                await CardPileCmd.Add(card, PileType.Hand);
+
+            await CardCmd.AutoPlay(choiceContext, card, target);
+        }
     }
 
     /// <summary>
@@ -166,19 +173,19 @@ public sealed class AlchemyStarsRare3 : ModCardTemplate
         return primary != null && ReferenceEquals(primary, this);
     }
 
-    private static AlchemyStarsRare3? FindInCombatPiles(Player owner, bool requireInHand)
+    private static AlchemyStarsRare3? FindInCombatPiles(Player owner, bool requireInHand) =>
+        FindAllInCombatPiles(owner, requireInHand).FirstOrDefault();
+
+    private static List<AlchemyStarsRare3> FindAllInCombatPiles(Player owner, bool requireInHand)
     {
         var piles = requireInHand
             ? new[] { PileType.Hand }
             : new[] { PileType.Hand, PileType.Draw, PileType.Discard, PileType.Exhaust };
 
+        var cards = new List<AlchemyStarsRare3>();
         foreach (var pileType in piles)
-        {
-            var card = pileType.GetPile(owner).Cards.OfType<AlchemyStarsRare3>().FirstOrDefault();
-            if (card != null)
-                return card;
-        }
+            cards.AddRange(pileType.GetPile(owner).Cards.OfType<AlchemyStarsRare3>());
 
-        return null;
+        return cards;
     }
 }

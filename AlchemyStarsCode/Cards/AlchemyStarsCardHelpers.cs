@@ -3,6 +3,7 @@ using AlchemyStars.Characters;
 using AlchemyStars.Keywords;
 using AlchemyStars.Mechanics;
 using AlchemyStars.Powers;
+using AlchemyStars.Monsters.Powers;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Combat.History.Entries;
 using MegaCrit.Sts2.Core.Commands;
@@ -15,6 +16,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.ValueProps;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Encounters;
+using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using MegaCrit.Sts2.Core.Models.Monsters;
 using MegaCrit.Sts2.Core.Models.Powers;
 using STS2RitsuLib.Keywords;
@@ -77,6 +79,21 @@ internal static class AlchemyStarsCardHelpers
 
     public static CardModel? FindOverloadInHand(Player owner) =>
         owner.PlayerCombatState?.Hand.Cards.FirstOrDefault(card => card is AlchemyStarsGeneratedOverload);
+
+    /// <summary>
+    /// 把生成牌放进抽牌堆，并立刻刷新左下角数量。
+    /// 直接加入抽牌堆不会走飞牌动画，牌堆计数要等 CardAddFinished 才会加。
+    /// </summary>
+    public static async Task AddGeneratedCardToDrawPile(CardModel card, Player owner)
+    {
+        var result = await CardPileCmd.AddGeneratedCardToCombat(
+            card,
+            PileType.Draw,
+            owner,
+            CardPilePosition.Random);
+        PileType.Draw.GetPile(owner).InvokeCardAddFinished();
+        CardCmd.PreviewCardPileAdd(result, style: CardPreviewStyle.MessyLayout);
+    }
 
     /// <summary>
     /// 消耗任意战斗牌堆中的超载；强化超载额外令手牌雷属性牌重放。
@@ -242,6 +259,9 @@ internal static class AlchemyStarsCardHelpers
 
         if (target.HasPower<HardToKillPower>())
             await PowerCmd.Remove<HardToKillPower>(target);
+
+        if (target.HasPower<AlchemyStarsAltarUnyieldingPower>())
+            await PowerCmd.Remove<AlchemyStarsAltarUnyieldingPower>(target);
     }
 
     public static async Task IncrementStackableBuffs(
@@ -361,8 +381,9 @@ internal static class AlchemyStarsCardHelpers
     }
 
     /// <summary>
-    /// 技能牌施法动画。空裔按属性播放对应 Spine；其他角色播放默认 Cast。
+    /// 打出动画。空裔技能牌按属性播放 skill_*_2，能力牌播放 Cast，攻击牌播放 Attack。
     /// 森 skill_green，雷 skill_yellow，水 skill_blue，火 skill_red，无属性或同时带多种属性 skill_color。
+    /// 拖动技能牌时播 skill_1，再循环 skill_2_loop。
     /// </summary>
     public static Task TriggerSkillCastAnim(CardModel card)
     {
@@ -370,28 +391,46 @@ internal static class AlchemyStarsCardHelpers
         if (owner?.Creature == null || owner.Creature.IsDead || owner.Character == null)
             return Task.CompletedTask;
 
-        var trigger = owner.Character is AlchemyStarsCharacter
-            ? ResolveAlchemyStarsSkillAnim(card)
-            : "Cast";
-        return CreatureCmd.TriggerAnim(owner.Creature, trigger, owner.Character.CastAnimDelay);
+        var trigger = owner.Character is AlchemyStarsCharacter && card.Type == CardType.Skill
+            ? ResolveSkillAnim(card, forPlay: true)
+            : card.Type == CardType.Attack ? "Attack" : "Cast";
+        var delay = card.Type == CardType.Attack
+            ? owner.Character.AttackAnimDelay
+            : owner.Character.CastAnimDelay;
+        return CreatureCmd.TriggerAnim(owner.Creature, trigger, delay);
     }
 
-    private static string ResolveAlchemyStarsSkillAnim(CardModel card)
+    /// <summary>
+    /// 空裔技能触发名。forPlay 为 false 时是拖动前摇 skill_1，为 true 时是属性打出段 skill_*_2。
+    /// </summary>
+    public static string ResolveSkillAnim(CardModel card, bool forPlay)
+    {
+        if (!forPlay)
+            return "skill_1";
+
+        return ResolveSkillPrefix(card) + "_2";
+    }
+
+    /// <summary>
+    /// 拖动技能牌时的循环段。前摇播完后从第 0 帧接上。
+    /// </summary>
+    public static string ResolveSkillLoopAnim() => "skill_2_loop";
+
+    private static string ResolveSkillPrefix(CardModel card)
     {
         var forest = HasForestKeyword(card);
         var thunder = HasThunderKeyword(card);
         var water = HasWaterKeyword(card);
         var fire = HasFireKeyword(card);
         var count = (forest ? 1 : 0) + (thunder ? 1 : 0) + (water ? 1 : 0) + (fire ? 1 : 0);
-        if (count != 1)
-            return "skill_color";
-        if (forest)
-            return "skill_green";
-        if (thunder)
-            return "skill_yellow";
-        if (water)
-            return "skill_blue";
-        return "skill_red";
+        return count switch
+        {
+            1 when forest => "skill_green",
+            1 when thunder => "skill_yellow",
+            1 when water => "skill_blue",
+            1 when fire => "skill_red",
+            _ => "skill_color"
+        };
     }
 }
 

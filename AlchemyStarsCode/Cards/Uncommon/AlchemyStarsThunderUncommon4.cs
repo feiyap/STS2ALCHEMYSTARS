@@ -17,7 +17,8 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace AlchemyStars.Cards;
 
 /// <summary>
-/// 巡航阵列·雷霆：军团长；需消耗雷光能打出；清除防御并造成伤害，打出后塞入超载�?/// </summary>
+/// 巡航阵列·雷霆：军团长；需消耗雷光能打出；清除格挡、滑溜、缓冲与人工制品并造成伤害，打出后塞入超载。
+/// </summary>
 [RegisterCard(typeof(AlchemyStarsCardPool))]
 public sealed class AlchemyStarsThunderUncommon4 : ModCardTemplate
 {
@@ -59,6 +60,7 @@ public sealed class AlchemyStarsThunderUncommon4 : ModCardTemplate
         HoverTipFactory.FromKeyword(ModKeywordRegistry.GetCardKeyword(AlchemyStarsKeywordIds.Overload)),
         HoverTipFactory.FromCard<AlchemyStarsGeneratedOverload>(),
         HoverTipFactory.FromPower<StrengthPower>(),
+        HoverTipFactory.FromPower<ArtifactPower>(),
         HoverTipFactory.FromPower<SlipperyPower>(),
         HoverTipFactory.FromPower<BufferPower>()
     ];
@@ -88,11 +90,11 @@ public sealed class AlchemyStarsThunderUncommon4 : ModCardTemplate
             LightElement.Thunder,
             cardPlay);
 
-        // 升级后生成强化超载（被侦察者/正义不灭消耗时仍会重放雷属性牌）。
+        // 升级后生成强化超载：抽到时改为令手牌雷属性牌重放，而不是失去能量。
         var overload = CombatState!.CreateCard<AlchemyStarsGeneratedOverload>(Owner);
         if (IsUpgraded)
             CardCmd.Upgrade(overload);
 
-        await CardPileCmd.AddGeneratedCardToCombat(overload, PileType.Draw, Owner);
+        await AlchemyStarsCardHelpers.AddGeneratedCardToDrawPile(overload, Owner);
     }
 }

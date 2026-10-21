@@ -18,6 +18,11 @@ public sealed class LightMechanicCombatState
     public bool RainbowActive { get; set; }
     public bool RainbowDoubled { get; set; }
 
+    /// <summary>
+    /// 祭剑座强制进入的虹光。回合结束结算后清除，期间不因格子不足而退出。
+    /// </summary>
+    public bool RainbowForced { get; set; }
+
     /// <summary>本回合已造成的雷属性伤害次数（用于启明之光等卡牌）。</summary>
     public int ThunderDamageDealtThisTurn { get; set; }
 
@@ -53,6 +58,7 @@ public sealed class LightMechanicCombatState
         AttributeCells.SetMaxSlots(slotLimit);
         RainbowActive = false;
         RainbowDoubled = false;
+        RainbowForced = false;
     }
 
     public void Clear()
@@ -61,6 +67,7 @@ public sealed class LightMechanicCombatState
         AttributeCells.Clear();
         RainbowActive = false;
         RainbowDoubled = false;
+        RainbowForced = false;
         ThunderDamageDealtThisTurn = 0;
         HasLastConsumedLightElement = false;
         LastConsumedLightElement = default;
@@ -244,6 +251,13 @@ public sealed class LightMechanicCombatState
 
     public void UpdateRainbowState()
     {
+        if (RainbowForced)
+        {
+            RainbowActive = true;
+            RainbowDoubled = HasRainbowDoubleCondition();
+            return;
+        }
+
         if (!HasAllBaseElements())
         {
             RainbowActive = false;

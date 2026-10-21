@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Events;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Acts;
@@ -27,7 +28,8 @@ namespace AlchemyStars.Events;
 [RegisterSharedEvent]
 public sealed class AlchemyStarsTowerCity : ModEventTemplate
 {
-    public override bool IsShared => true;
+    // 仍进入全角色事件池，但每位玩家各自选择，不进行多人投票。
+    public override bool IsShared => false;
 
     public override bool IsAllowed(IRunState runState) =>
         ((AlchemyStarsEventHelpers.IsAct2(runState) || AlchemyStarsEventHelpers.IsAct3(runState)));
@@ -37,9 +39,14 @@ public sealed class AlchemyStarsTowerCity : ModEventTemplate
 
     protected override IReadOnlyList<EventOption> GenerateInitialOptions() =>
     [
-        new EventOption(this, Fear, InitialOptionKey("FEAR")),
-        new EventOption(this, Doubt, InitialOptionKey("DOUBT")),
-        new EventOption(this, Deny, InitialOptionKey("DENY"))
+        new EventOption(this, Fear, InitialOptionKey("FEAR"),
+            HoverTipFactory.FromCardWithCardHoverTips<Regret>()
+                .Concat(HoverTipFactory.FromRelic<AlchemyStarsLawString>())),
+        new EventOption(this, Doubt, InitialOptionKey("DOUBT"),
+            HoverTipFactory.FromCardWithCardHoverTips<Doubt>()),
+        new EventOption(this, Deny, InitialOptionKey("DENY"),
+            HoverTipFactory.FromEnchantment<PerfectFit>()
+                .Concat(HoverTipFactory.FromCardWithCardHoverTips<Guilty>()))
     ];
 
     private async Task Fear()

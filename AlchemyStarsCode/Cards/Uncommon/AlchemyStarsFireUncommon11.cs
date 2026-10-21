@@ -95,7 +95,7 @@ public sealed class AlchemyStarsFireUncommon11 : ModCardTemplate
         {
             if (IsUpgraded)
                 CardCmd.Upgrade(card);
-            await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Draw, Owner);
+            await AlchemyStarsCardHelpers.AddGeneratedCardToDrawPile(card, Owner);
         }
     }
 

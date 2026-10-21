@@ -89,7 +89,12 @@ public sealed class AlchemyStarsCharacter : ModCharacterTemplate<AlchemyStarsCar
     public override float AttackAnimDelay => 0f;
     public override float CastAnimDelay => 0f;
 
-    // 在默认施法之外，为四种属性技能和无属性技能注册 Spine 动画。
+    // 骨骼动画名与 sljt 对齐：
+    // idle_loop / attack / cast / hurt / die / relaxed_loop 给战斗状态机。
+    // 篝火按章节直接播 overgrowth_loop、hive_loop、glory_loop，不经过这里。
+    // 拖动技能牌播 skill_1，再循环 skill_2_loop。打出技能牌播对应属性的 skill_*_2。
+    // 攻击牌走 attack，能力牌走 cast。
+    // 循环不挂在起手的 NextState 上，避免被随机拨到中途。
     protected override CreatureAnimator? SetupCustomCreatureAnimator(MegaSprite controller)
     {
         var animator = ModAnimStateMachines.Standard(
@@ -102,10 +107,20 @@ public sealed class AlchemyStarsCharacter : ModCharacterTemplate<AlchemyStarsCar
             relaxedName: "relaxed_loop");
 
         var idle = new AnimState("idle_loop", isLooping: true);
-        foreach (var animName in new[] { "skill_blue", "skill_color", "skill_green", "skill_red", "skill_yellow" })
+        animator.AddAnyState("skill_1", new AnimState("skill_1"));
+        animator.AddAnyState("skill_2_loop", new AnimState("skill_2_loop", isLooping: true));
+
+        foreach (var prefix in new[]
         {
-            var state = new AnimState(animName) { NextState = idle };
-            animator.AddAnyState(animName, state);
+            "skill_blue",
+            "skill_color",
+            "skill_green",
+            "skill_red",
+            "skill_yellow"
+        })
+        {
+            animator.AddAnyState(prefix + "_1", new AnimState(prefix + "_1") { NextState = idle });
+            animator.AddAnyState(prefix + "_2", new AnimState(prefix + "_2") { NextState = idle });
         }
 
         return animator;

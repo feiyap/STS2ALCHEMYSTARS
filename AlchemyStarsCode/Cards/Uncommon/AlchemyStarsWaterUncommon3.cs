@@ -69,6 +69,7 @@ public sealed class AlchemyStarsWaterUncommon3 : ModCardTemplate
         ConsumeOneWaterLightEnergyAsDarkCell(Owner);
 
         var baseDamage = DynamicVars.Damage.BaseValue;
+        await CardPlayAttackGroup.EnsureAsync(choiceContext, cardPlay);
         foreach (var enemy in CombatState!.HittableEnemies.ToList())
         {
             decimal actualDamage;

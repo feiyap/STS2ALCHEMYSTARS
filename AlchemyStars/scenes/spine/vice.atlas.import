@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://ddb7e7pcs7pql"
+path="res://.godot/imported/vice.atlas-ca4948b67cac2ec2bc1c9324d0450fef.spatlas"
+
+[deps]
+
+source_file="res://AlchemyStars/scenes/spine/vice.atlas"
+dest_files=["res://.godot/imported/vice.atlas-ca4948b67cac2ec2bc1c9324d0450fef.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"

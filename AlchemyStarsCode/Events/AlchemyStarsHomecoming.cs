@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Events;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Acts;
@@ -31,7 +32,8 @@ public sealed class AlchemyStarsHomecoming : ModEventTemplate
 
     protected override IReadOnlyList<EventOption> GenerateInitialOptions() =>
     [
-        new EventOption(this, Help, InitialOptionKey("HELP")),
+        new EventOption(this, Help, InitialOptionKey("HELP"),
+            HoverTipFactory.FromEnchantment<Sown>()),
         new EventOption(this, Leisure, InitialOptionKey("LEISURE")),
         new EventOption(this, Forget, InitialOptionKey("FORGET"))
     ];

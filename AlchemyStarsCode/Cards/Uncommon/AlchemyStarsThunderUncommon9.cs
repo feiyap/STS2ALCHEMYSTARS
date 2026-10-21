@@ -86,6 +86,8 @@ public sealed class AlchemyStarsThunderUncommon9 : ModCardTemplate
                 .Sum(result => (decimal)result.TotalDamage);
         }
 
+        LightMechanic.RecordThunderDamageDealt(Owner);
+
         await LightMechanic.ApplyElementalHitEffects(
             choiceContext,
             Owner,

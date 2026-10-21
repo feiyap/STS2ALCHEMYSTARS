@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Events;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Acts;
@@ -23,8 +24,7 @@ using MegaCrit.Sts2.Core.Entities.Players;
 namespace AlchemyStars.Events;
 
 /// <summary>
-/// 白夜极光事件：寂静之陵。
-/// 暂时从事件池隐藏：祭剑座仍在测试，下个版本再开放。
+/// 白夜极光事件：寂静之陵。第 3 幕事件池可见。
 /// </summary>
 [RegisterSharedEvent]
 public sealed class AlchemyStarsSilentMausoleum : ModEventTemplate
@@ -33,17 +33,25 @@ public sealed class AlchemyStarsSilentMausoleum : ModEventTemplate
 
     public override bool IsShared => true;
 
-    public override bool IsAllowed(IRunState runState) => false;
+    public override bool IsAllowed(IRunState runState) =>
+        AlchemyStarsEventHelpers.IsAct3(runState);
 
     public override EventAssetProfile AssetProfile => new(
         InitialPortraitPath: $"{Entry.ResPath}/images/events/AlchemyStarsSilentMausoleum.png");
 
     protected override IReadOnlyList<EventOption> GenerateInitialOptions() =>
     [
-        new EventOption(this, Boss, InitialOptionKey("BOSS")),
-        new EventOption(this, Seals, InitialOptionKey("SEALS")),
-        new EventOption(this, Free, InitialOptionKey("FREE")),
-        new EventOption(this, Story, InitialOptionKey("STORY"))
+        new EventOption(this, Boss, InitialOptionKey("BOSS"),
+            HoverTipFactory.FromRelic<AlchemyStarsStarCrest>()),
+        new EventOption(this, Seals, InitialOptionKey("SEALS"),
+            HoverTipFactory.FromCardWithCardHoverTips<AlchemyStarsOldSealFrost>(upgrade: true)
+                .Concat(HoverTipFactory.FromCardWithCardHoverTips<AlchemyStarsOldSealGuard>(upgrade: true))
+                .Concat(HoverTipFactory.FromCardWithCardHoverTips<AlchemyStarsOldSealRhyme>(upgrade: true))
+                .Concat(HoverTipFactory.FromCardWithCardHoverTips<AlchemyStarsOldSealRequiem>(upgrade: true))),
+        new EventOption(this, Free, InitialOptionKey("FREE"),
+            HoverTipFactory.FromEnchantment<RoyallyApproved>()),
+        new EventOption(this, Story, InitialOptionKey("STORY"),
+            HoverTipFactory.FromEnchantment<SoulsPower>())
     ];
 
     public override async Task Resume(AbstractRoom room)

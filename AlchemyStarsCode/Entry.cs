@@ -2,6 +2,7 @@ using System.Reflection;
 using AlchemyStars.Cards;
 using AlchemyStars.Mechanics;
 using AlchemyStars.Patches;
+using AlchemyStars.Settings;
 using AlchemyStars.Patches.Enlightener;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Modding;
@@ -41,6 +42,7 @@ public partial class Entry
         // 注册战斗左侧的光能 / 转色栏 UI。
         LightMechanicUiBootstrap.Register();
         AlchemyStarsCardArtSettingsStore.Register();
+        AlchemyStarsModSettingsStore.Register();
 
         var patcher = RitsuLibFramework.CreatePatcher(ModId, "core");
         patcher.RegisterPatch<ArchaicToothTransformRemainingStartersPatch>();
@@ -61,7 +63,11 @@ public partial class Entry
         patcher.RegisterPatch<SmoothCompassEliteEncounterPatch>();
         patcher.RegisterPatch<LockOfObsessionShuffleIfNecessaryPatch>();
         patcher.RegisterPatch<AncientDialogueEmptyFallbackPatch>();
+        patcher.RegisterPatch<AncientMapIconColorPatch>();
         patcher.RegisterPatch<KeAttackIntentTargetPatch>();
+        patcher.RegisterPatch<SkillSequenceDragPatch>();
+        patcher.RegisterPatch<SkillSequenceDragCancelPatch>();
+        patcher.RegisterPatch<RestSiteCompanionSpinePatch>();
         RitsuLibFramework.ApplyRequiredPatcher(patcher, DisableMod);
 
         Logger.Info("AlchemyStars initialized.");

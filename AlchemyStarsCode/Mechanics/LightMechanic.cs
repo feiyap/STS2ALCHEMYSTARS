@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.ValueProps;
 using AlchemyStars.Powers;
+using AlchemyStars.Monsters.Powers;
 
 namespace AlchemyStars.Mechanics;
 
@@ -653,6 +654,20 @@ public static class LightMechanic
         return consumed.Count;
     }
 
+    /// <summary>
+    /// 直接进入虹光，直到本回合结束结算。不要求转色栏已经凑齐四色。
+    /// </summary>
+    public static void ForceRainbow(Player player)
+    {
+        var state = GetActiveState(player);
+        if (state == null)
+            return;
+
+        state.RainbowForced = true;
+        state.UpdateRainbowState();
+        LightMechanicUiBootstrap.RefreshForPlayer(player);
+    }
+
     public static int CountWaterDarkCells(Player player)
     {
         var state = GetActiveState(player);
@@ -1032,7 +1047,7 @@ public static class LightMechanic
     /// 光能机制当前是否对玩家生效（空裔角色或持有遗物，且存活）。
     /// </summary>
     public static bool IsMechanicActive(Player player) =>
-        ShouldEnableMechanic(player) && player.Creature is { IsDead: false };
+        player != null && ShouldEnableMechanic(player) && player.Creature is { IsDead: false };
 
     /// <summary>
     /// 死亡后静默清空光能与转色栏；不触发属性格移除相关效果。
@@ -1625,14 +1640,20 @@ public static class LightMechanic
         decimal baseDamage,
         LightElement element,
         CardPlay? cardPlay = null,
-        bool playAttackerAnim = true)
+        bool playAttackerAnim = true,
+        bool unpowered = false)
     {
+        if (card != null)
+            await CardPlayAttackGroup.EnsureAsync(choiceContext, cardPlay);
+
         using (LightMechanicDamageContext.Use(element))
         {
             if (card != null)
             {
                 var attack = DamageCmd.Attack(baseDamage)
                     .FromCard(card, playAttackerAnim ? cardPlay : null);
+                if (unpowered)
+                    attack = attack.Unpowered();
                 if (!playAttackerAnim)
                     attack = attack.WithNoAttackerAnim();
                 await attack
@@ -1668,6 +1689,9 @@ public static class LightMechanic
         decimal baseDamage,
         CardPlay? cardPlay = null)
     {
+        if (card != null)
+            await CardPlayAttackGroup.EnsureAsync(choiceContext, cardPlay);
+
         using (LightMechanicDamageContext.UseFireAndThunder())
         {
             if (card != null)
@@ -1706,6 +1730,9 @@ public static class LightMechanic
         CardPlay? cardPlay = null)
     {
         await ClearPenetratingDefenses(choiceContext, target);
+
+        if (card != null)
+            await CardPlayAttackGroup.EnsureAsync(choiceContext, cardPlay);
 
         using (LightMechanicDamageContext.Use(element))
         {
@@ -1857,6 +1884,9 @@ public static class LightMechanic
 
         if (target.HasPower<HardToKillPower>())
             await PowerCmd.Remove<HardToKillPower>(target);
+
+        if (target.HasPower<AlchemyStarsAltarUnyieldingPower>())
+            await PowerCmd.Remove<AlchemyStarsAltarUnyieldingPower>(target);
     }
 
     /// <summary>
@@ -1955,6 +1985,7 @@ public static class LightMechanic
         {
             var removed = state.AttributeCells.Items.ToList();
             state.AttributeCells.Clear();
+            state.RainbowForced = false;
             state.RainbowActive = false;
             state.RainbowDoubled = false;
 
